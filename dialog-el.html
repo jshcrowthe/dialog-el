@@ -15,23 +15,52 @@
       background: #fff;
       border-radius: 4px;
       box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
+      opacity: 0;
       padding: 15px;
       position: relative;
+      transform: scale(0.7);
+      transition: transform 0.3s, opacity 0.3s;
+      will-change: transform, opacity;
     }
+
 
     :host([modal]) .content {
       left:50%;
       position: fixed;
       top:50%;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) scale(0.7);
     }
+
+
     .overlay {
       background: rgba(51, 51, 51, 0.8);
       height: 100%;
       left: 0;
+      opacity: 0;
       position: fixed;
       top: 0;
+      transition: opacity 0.3s;
       width:100%;
+      will-change: opacity;
+    }
+
+    /**
+     * Visible Styles
+     * 
+     * The `visible` attribute is set on the :host element
+     * when the element has become visible. This allows us
+     * to animate the entry of a dialog/modal (and the 
+     * associated overlay)
+     */
+    :host([visible]) .content {
+      opacity: 1;
+      transform: scale(1.0);
+    }
+    :host([modal][visible]) .content {
+      transform: translate(-50%, -50%) scale(1.0);
+    }
+    :host([visible]) .overlay {
+      opacity: 1;
     }
     
   </style>
@@ -103,7 +132,7 @@
         if (_dialogStack.length > index + 1) {
           _dialogStack.forEach(function(dialog, _index) {
             if (_index <= index) return;
-            if (dialog._visible) dialog.close();
+            if (dialog.visible) dialog.close();
           });
         }
       
@@ -135,6 +164,20 @@
         super();
       }
 
+      get visible() {
+        return this._visible !== undefined ? this._visible : (this._visible = this.hasAttribute('visible'));
+      }
+
+      set visible(val) {
+        if (val) {
+          this._visible = true;
+          this.setAttribute('visible', '');
+        } else {
+          this._visible = false;
+          this.removeAttribute('visible');
+        }
+      }
+
       get _content() {
         return this.__contentNode__ || (this.__contentNode__ = this.shadowRoot.querySelector('.content'));
       }
@@ -150,7 +193,7 @@
       createdCallback() {
         // Initial Style/A11y Setup
         this.hidden = true;
-        this._visible = false;
+        this.visible = false;
         this.setAttribute('aria-hidden', 'true');
         this.setAttribute('role', 'dialog');
 
@@ -165,7 +208,7 @@
       }
 
       detachedCallback() {
-        if (this._visible) this.close();
+        if (this.visible) this.close();
       }
 
       show() {
@@ -178,10 +221,11 @@
         _dialogStack.push(this);
         this.style.zIndex = 1000 + _dialogStack.length - 1;
 
-        // Delay the setting of _visible property to allow nested
+        // Delay the setting of visible property to allow nested
         // elements time to display without being closed by the
-        // click handler
-        setTimeout(() => this._visible = true, 0);
+        // click handler. Also this allows element animations
+        // to occur.
+        setTimeout(() => this.visible = true, 0);
 
         // Capture last active element and reassign focus
         this._lastActive = document.activeElement;
@@ -189,19 +233,36 @@
       }
 
       close() {
-        this._detachEventHandlers();
-        this.hidden = true;
-        this._visible = false;
-        this.setAttribute('aria-hidden', 'true');
-        this.style.zIndex = null;
+        Promise.resolve()
+        .then(() => {
+          this._detachEventHandlers();
+          _dialogStack = _dialogStack.filter(dialog => dialog !== this);
+        })
+        .then(() => {
+          return new Promise(resolve => {
+            var event = 'transitionend';
+            var handler = function() {
+              resolve();
+              this._content.removeEventListener(event, handler);
+            }.bind(this);
+            this._content.addEventListener(event, handler);
+            this.visible = false;
+          });
+        })
+        .then(() => {
+          this.hidden = true;
+          this.setAttribute('aria-hidden', 'true');
+          this.style.zIndex = null;
+        })
+        .then(() => {
+          // Focus last active element and remove old reference
+          if (this._lastActive) {
+            this._lastActive.focus();
+            this._lastActive = null;
+          }
+        })
         
-        _dialogStack = _dialogStack.filter(dialog => dialog !== this);
 
-        // Focus last active element and remove old reference
-        if (this._lastActive) {
-          this._lastActive.focus();
-          this._lastActive = null;
-        }
       }
 
       _getEventHandlers() {
@@ -238,11 +299,11 @@
           event: 'keydown',
           handler: (event) => {
             if (this._topDialog !== this) return;
-            if (this._visible && event.which === 27) {
+            if (this.visible && event.which === 27) {
               event.preventDefault();
               this.close();
             }
-            if (this._visible && event.which === 9) {
+            if (this.visible && event.which === 9) {
               trapTabKey(this, event);
             }
           }
