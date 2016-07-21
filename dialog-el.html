@@ -207,24 +207,49 @@
       }
 
       show() {
-        this._attachEventHandlers();
-        
-        this.hidden = false;
-        this.removeAttribute('aria-hidden');
-
-        // Compute z-index for this dialog (based on stack index)
-        _dialogStack.push(this);
-        this.style.zIndex = 1000 + _dialogStack.length - 1;
-
-        // Delay the setting of visible property to allow nested
-        // elements time to display without being closed by the
-        // click handler. Also this allows element animations
-        // to occur.
-        setTimeout(() => this.visible = true, 0);
-
-        // Capture last active element and reassign focus
-        this._lastActive = document.activeElement;
-        setFocusToFirstItem(this)
+        Promise.resolve()
+        .then(() => {
+          this._attachEventHandlers();
+          _dialogStack.push(this);
+          
+        })
+        .then(() => {
+          this.hidden = false;
+          this.removeAttribute('aria-hidden');
+          
+          // Compute z-index for this dialog (based on stack index)
+          this.style.zIndex = 1000 + _dialogStack.length - 1;
+        })
+        .then(() => {
+          // Transition the elements out and resolve when the 
+          // animation has completed
+          return new Promise(resolve => {
+            var event = 'transitionend';
+            var handler = function() {
+              resolve();
+              this._content.removeEventListener(event, handler);
+            }.bind(this);
+            this._content.addEventListener(event, handler);
+            // Delay the setting of visible property to allow nested
+            // elements time to display without being closed by the
+            // click handler. Also this allows element animations
+            // to occur.
+            setTimeout(() => this.visible = true, 0);
+          });
+        })
+        .then(() => {
+          // Capture last active element and reassign focus
+          this._lastActive = document.activeElement;
+          setFocusToFirstItem(this);
+        })
+        .then(() => {
+          // Fire `dialog-opened` event
+          this.dispatchEvent(new CustomEvent('dialog-opened', {
+            details: {
+              dialog: this
+            }
+          }));
+        });
       }
 
       close() {
@@ -259,7 +284,15 @@
             this._lastActive.focus();
             this._lastActive = null;
           }
-        });
+        })
+        .then(() => {
+          // Fire `dialog-closed` event
+          this.dispatchEvent(new CustomEvent('dialog-closed', {
+            details: {
+              dialog: this
+            }
+          }));
+        })
       }
 
       _getEventHandlers() {
