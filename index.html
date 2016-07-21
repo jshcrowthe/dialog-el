@@ -26,72 +26,187 @@
       && shadowDOMSupported
       && 'import' in document.createElement('link')
       && 'content' in document.createElement('template'));
-  
+
     if (!webComponentsSupported) {
       var wcPoly = document.createElement('script');
       wcPoly.src = shadowDOMSupported ? 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js' : 
-                                        'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents.min.js';
+      'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents.min.js';
       wcPoly.async = true;
       document.head.appendChild(wcPoly);
     }
   </script>
   <link rel="import" href="./dialog-el.html" async>
-  <style>
-    h1 {
-      text-align: center;
-      margin: 0;
+  <link rel="stylesheet" type="text/css" href="assets/github-markdown.css">
+  <link rel="stylesheet" type="text/css" href="assets/prism.css">
+  <style type="text/css">
+    .horizontal-ul {
+      list-style: none;
+      padding: 0;
     }
-    body {
-      height: 999px;
+    .horizontal-ul li {
+      display: inline-block;
     }
   </style>
 </head>
 <body>
-  <h1>Dialog Element</h1>
-  <button id='modal-button'>Open Modal</button>
-  <dialog-el id='m1' modal>
-    <h1>Modal</h1>
-    <button id='dialog-button-1'>Open Dialog 1</button>
-    <dialog-el id='d1'>
-      <h1>Dialog 1</h1>
-      <input type="" name="">
-      <button id='dialog-button-2'>Open Dialog 2</button>
-        <dialog-el id='d2'>
-          <h1>Dialog 2</h1>
-          <button dialog-submit>Submit</button>
-          <button dialog-cancel>Cancel</button>
-      </dialog-el>
+  <p><a href="https://travis-ci.org/jshcrowthe/dialog-el"><img src="https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=master" alt="Build Status"></a></p>
+
+  <h1>&lt;dialog-el&gt;</h1>
+
+  <h2>Intro</h2>
+
+  <p>This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer&#39;s <a href="https://github.com/PolymerElements/paper-dialog">paper-dialog</a> and the <a href="https://github.com/edenspiekermann/a11y-dialog">A11y Dialog</a> fork from Edenspiekermann.</p>
+
+  <h2>Demo</h2>
+  
+  <p>Click the following buttons to see different types of modals</p>
+
+  <ul class='horizontal-ul'>
+    <li><button class='simpleDialog'>Simple Dialog</button></li>
+    <li><button class='simpleModal'>Simple Modal</button></li>
+    <li><button class='nestedDialog'>Nested Dialog</button></li>
+    <li><button class='nestedModal'>Nested Modal</button></li>
+  </ul>
+  
+
+  <dialog-el id='simpleDialog'>
+    <h1>Demo Dialog!</h1>
+    <p>This is a simple dialog! Look at me go!</p>
+  </dialog-el>
+
+  <dialog-el id='simpleModal' modal>
+    <h1>Demo Modal!</h1>
+    <p>This is a simple modal! I stole all the focus yeah!</p>
+  </dialog-el>
+
+  <dialog-el id='nestedDialog'>
+    <h1>Demo Dialog!</h1>
+    <p>This is a dialog with another dialog inside! Click below to open the nested dialog</p>
+    <button class='nestedDialog-child'>Open Child Dialog</button>
+    <dialog-el id='nestedDialog-child'>
+      <h1>Demo Dialog!</h1>
+      <p>This is a nested dialog! Here I am!</p>
     </dialog-el>
   </dialog-el>
+
+  <dialog-el id='nestedModal' modal>
+    <h1>Demo Dialog!</h1>
+    <p>This is a modal with another dialog inside! Click below to open the nested dialog</p>
+    <button class='nestedModal-child'>Open Child Dialog</button>
+    <dialog-el id='nestedModal-child'>
+      <h1>Demo Dialog!</h1>
+      <p>This is a nested dialog! Here I am!</p>
+    </dialog-el>
+  </dialog-el>
+
   <script>
-    // Bootstrap Function
-    var bootstrap = function() {
-      // Modal Handlers
-      var modal = document.querySelector('#m1');
-      var modalButton = document.querySelector('#modal-button');
-      modalButton.addEventListener('click', function(e) { modal.show() });
-
-      // Dialog Handlers
-      var dialog1 = document.querySelector('#d1');
-      var dialogButton1 = document.querySelector('#dialog-button-1');
-      dialogButton1.addEventListener('click', function(e) { dialog1.show() });
-
-      var dialog2 = document.querySelector('#d2');
-      var dialogButton2 = document.querySelector('#dialog-button-2');
-      dialogButton2.addEventListener('click', function(e) { dialog2.show() });
-    }
-
-    // If web components are supported then bootstrap the app otherwise
-    // wait and do it after the `WebComponentsReady` event
-    if (webComponentsSupported) {
-      bootstrap();
-    } else {
-      var handler = function() {
-        bootstrap();
-        document.removeEventListener('WebComponentsReady', handler);
-      };
-      document.addEventListener('WebComponentsReady', handler)
-    }
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child'];
+    dialogs.forEach(selector => {
+      document.querySelector(`.${selector}`).addEventListener('click', () => {
+        document.querySelector(`#${selector}`).show()
+      });
+    });
   </script>
+
+  <h2>Dependencies</h2>
+
+  <p>There are no non-native dependencies in this Web Component. If your browser supports the following two things you are good. If not you will need to make sure you load the Polyfills first</p>
+
+  <ul>
+    <li>Promises
+
+      <ul>
+        <li>
+          <a href="https://github.com/taylorhakes/promise-polyfill">https://github.com/taylorhakes/promise-polyfill</a>
+        </li>
+        <li>
+          <a href="https://github.com/stefanpenner/es6-promise">https://github.com/stefanpenner/es6-promise</a>
+        </li>
+      </ul>
+    </li>
+    <li>Web Components (including Shadow DOM)
+
+      <ul>
+        <li>
+          <a href="https://github.com/webcomponents/webcomponentsjs">https://github.com/webcomponents/webcomponentsjs</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <h2>Utilization</h2>
+
+  <p>Because this is a Web Component you can instantiate it using one of two methods:</p>
+
+  <p>HTML</p>
+
+  <pre>
+    <code class='language-html'>
+      &lt;dialog-el&gt;
+        &lt;!-- Your dialog/modal content --&gt;
+      &lt;/dialog-el&gt;
+    </code>
+  </pre>
+
+  <p>JS</p>
+
+  <pre>
+    <code class="language-javascript">
+      var dialogEl = document.createElement(&#39;dialog-el&#39;);
+      document.body.appendChild(dialogEl);
+    </code>
+  </pre>
+
+  <h2>Methods</h2>
+
+  <ul>
+    <li>
+      <p><code>dialog.show</code></p>
+
+      <p>This is the means of displaying the dialog/modal. Simply select the element and call this method to display the dialog/modal.</p>
+
+      <p><strong>Example:</strong></p>
+
+      <pre>
+        <code class="language-javascript">
+          var dialog = document.querySelector(&#39;dialog-el&#39;);
+          dialog.show();
+        </code>
+      </pre>
+
+      <p>This function returns a Promise that you can use to perform operations after the dialog/modal has displayed.</p>
+
+      <p><strong>NOTE: The <code>show</code> function, if called on an already open dialog, will throw an error</strong></p>
+    </li>
+    <li>
+      <p><code>dialog.close</code></p>
+
+      <p>This is the means of closing an open dialog/modal. Simply select the element and call this method to close it.</p>
+
+      <p><strong>Example:</strong></p>
+
+      <pre>
+        <code class="language-javascript">
+          var dialog = document.querySelector(&#39;dialog-el&#39;);
+          dialog.close();
+        </code>
+      </pre>
+
+      <p>This function returns a Promise that you can use to perform operations after the dialog/modal has closed.</p>
+
+      <p><strong>NOTE: The <code>close</code> function, if called on an already closed dialog, will throw an error</strong></p>
+    </li>
+  </ul>
+
+  <h2>Properties</h2>
+
+  <ul>
+    <li>
+      <p><code>modal</code></p>
+
+      <p>If set the dialog will render as a fixed position modal instead of an absolute positioned div.</p>
+    </li>
+  </ul>
+  <script src='assets/prism.js'></script>
 </body>
 </html>
