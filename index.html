@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+  <title>Element Seed</title>
+  <meta name="description" content="">
+
+  <!-- Mobile -->
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+  <!-- Chrome / Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="black">
+  <link rel="icon" href="icon.png">
+
+  <!-- Safari / iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+
+  <!-- Web Components -->
+  <script>
+    var webComponentsSupported = ('registerElement' in document
+      && 'shadowRoot' in HTMLElement.prototype
+      && 'import' in document.createElement('link')
+      && 'content' in document.createElement('template'));
+  
+    if (!webComponentsSupported) {
+      var wcPoly = document.createElement('script');
+      wcPoly.src = 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js';
+      wcPoly.async = true;
+      document.head.appendChild(wcPoly);
+    }
+  </script>
+  <link rel="import" href="./dialog-el.html" async>
+  <style>
+    h1 {
+      text-align: center;
+      margin: 0;
+    }
+    body {
+      height: 999px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dialog Element</h1>
+  <button id='modal-button'>Open Modal</button>
+  <dialog-el id='m1' modal>
+    <h1>Modal</h1>
+    <button id='dialog-button-1'>Open Dialog 1</button>
+    <dialog-el id='d1'>
+      <h1>Dialog 1</h1>
+      <input type="" name="">
+      <button id='dialog-button-2'>Open Dialog 2</button>
+        <dialog-el id='d2'>
+          <h1>Dialog 2</h1>
+          <button dialog-dismiss>Dismiss</button>
+      </dialog-el>
+    </dialog-el>
+  </dialog-el>
+  <script>
+    // Bootstrap Function
+    var bootstrap = function() {
+      // Modal Handlers
+      var modal = document.querySelector('#m1');
+      var modalButton = document.querySelector('#modal-button');
+      modalButton.addEventListener('click', function(e) { modal.show() });
+
+      // Dialog Handlers
+      var dialog1 = document.querySelector('#d1');
+      var dialogButton1 = document.querySelector('#dialog-button-1');
+      dialogButton1.addEventListener('click', function(e) { dialog1.show() });
+
+      var dialog2 = document.querySelector('#d2');
+      var dialogButton2 = document.querySelector('#dialog-button-2');
+      dialogButton2.addEventListener('click', function(e) { dialog2.show() });
+    }
+
+    // If web components are supported then bootstrap the app otherwise
+    // wait and do it after the `WebComponentsReady` event
+    if (webComponentsSupported) {
+      bootstrap();
+    } else {
+      var handler = function() {
+        bootstrap();
+        document.removeEventListener('WebComponentsReady', handler);
+      };
+      document.addEventListener('WebComponentsReady', handler)
+    }
+  </script>
+</body>
+</html>

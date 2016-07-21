@@ -1,0 +1,298 @@
+<template id='modal'>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    :host {
+      position: absolute;
+      display: inline-block;
+    }
+    :host([hidden]) {
+      display: none !important;
+    }
+    .content {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
+      padding: 15px;
+      position: fixed;
+      top:50%;
+      left:50%;
+      transform: translate(-50%, -50%);
+    }
+    .overlay {
+      background: rgba(51, 51, 51, 0.8);
+      height: 100%;
+      left: 0;
+      position: fixed;
+      top: 0;
+      width:100%;
+    }
+  </style>
+  <div class='overlay'>
+    <div class="content">
+      <content></content>
+    </div>
+  </div>
+</template>
+<template id='dialog'>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    :host {
+      position: absolute;
+      display: inline-block;
+    }
+    :host([hidden]) {
+      display: none !important;
+    }
+    .content {
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
+      padding: 15px;
+      position: relative;
+    }
+  </style>
+  <div class="content">
+    <content></content>
+  </div>
+</template>
+
+<script>
+  (function(document, HTMLElement) {
+    var _dialogStack = [];
+
+      // Helper function to get all focusable children from a node
+    function getFocusableChildren (node) {
+      var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
+
+      return $$(focusableElements.join(','), node).filter(function (child) {
+        return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
+      });
+    }
+
+    // Helper function to get all nodes in context matching selector as an array
+    function $$ (selector, context) {
+      return Array.prototype.slice.call((context || document).querySelectorAll(selector));
+    }
+
+    // Helper function trapping the tab key inside a node
+    function trapTabKey (node, event) {
+      var focusableChildren = getFocusableChildren(node);
+      var focusedItemIndex = focusableChildren.indexOf(document.activeElement);
+
+      if (event.shiftKey && focusedItemIndex === 0) {
+        focusableChildren[focusableChildren.length - 1].focus();
+        event.preventDefault();
+      } else if (!event.shiftKey && focusedItemIndex === focusableChildren.length - 1) {
+        focusableChildren[0].focus();
+        event.preventDefault();
+      }
+    }
+
+    function setFocusToFirstItem (node) {
+      var focusableChildren = getFocusableChildren(node);
+      if (focusableChildren.length) focusableChildren[0].focus();
+    }
+
+    var handleClick = function() {
+      var _host;
+      return function(e) {
+        var host = _host || (function(el) {
+          var orig = el;
+          while(el.nodeType != 11) {
+            el = el.parentNode;
+          }
+          // Set up reference for later usage
+          return (_host = el.host);
+        })(this);
+
+        var index = _dialogStack.indexOf(host);
+
+        if (_dialogStack.length > index + 1) {
+          _dialogStack.forEach(function(dialog, _index) {
+            if (_index <= index) return;
+            if (dialog._visible) dialog.close();
+          });
+        }
+      
+        if (e && e.stopPropagation) e.stopPropagation();
+      };
+    };
+
+    /** 
+     * Reference the template tag in this current document when HTML imported
+     * (Contains a fix for the `document.currentScript`/`document._currentScript`
+     * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
+     */
+    var dialogTemplate = (function(document) {
+      var script = document._currentScript || document.currentScript;
+      return script.ownerDocument.querySelector('#dialog');
+    })(document);
+
+    var modalTemplate = (function(document) {
+      var script = document._currentScript || document.currentScript;
+      return script.ownerDocument.querySelector('#modal');
+    })(document);
+
+    class DialogEl extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      get _content() {
+        return this.__contentNode__ || (this.__contentNode__ = this.shadowRoot.querySelector('.content'));
+      }
+
+      get _overlay() {
+        return this.__overlayNode__ || (this.__overlayNode__ = this.shadowRoot.querySelector('.overlay'));
+      }
+
+      get _topDialog() {
+        return _dialogStack[_dialogStack.length - 1];
+      }
+
+      createdCallback() {
+        // Initial Style/A11y Setup
+        this.hidden = true;
+        this._visible = false;
+        this.setAttribute('aria-hidden', 'true');
+        this.setAttribute('role', 'dialog');
+
+        // Initial template setup
+        this._isModal = this.hasAttribute('modal');
+        var template = this._isModal ? modalTemplate : dialogTemplate;
+        // Get dialogTemplate clone
+        var clone = document.importNode(template.content, true);
+        // Create a shadowRoot and append the dialogTemplate
+        this.createShadowRoot().appendChild(clone);
+      }
+
+      detachedCallback() {
+        if (this._visible) this.close();
+      }
+
+      show() {
+        this._attachEventHandlers();
+        
+        this.hidden = false;
+        this.removeAttribute('aria-hidden');
+
+        // Compute z-index for this dialog (based on stack index)
+        _dialogStack.push(this);
+        this.style.zIndex = 1000 + _dialogStack.length - 1;
+
+        // Delay the setting of _visible property to allow nested
+        // elements time to display without being closed by the
+        // click handler
+        setTimeout(() => this._visible = true, 0);
+
+        // Capture last active element and reassign focus
+        this._lastActive = document.activeElement;
+        setFocusToFirstItem(this)
+      }
+
+      close() {
+        this._detachEventHandlers();
+        this.hidden = true;
+        this._visible = false;
+        this.setAttribute('aria-hidden', 'true');
+        this.style.zIndex = null;
+        
+        _dialogStack = _dialogStack.filter(dialog => dialog !== this);
+
+        // Focus last active element and remove old reference
+        if (this._lastActive) {
+          this._lastActive.focus();
+          this._lastActive = null;
+        }
+      }
+
+      _getEventHandlers() {
+        var array = []
+
+        // Stacking Context Event Handlers
+        array.push({
+          element: this._content,
+          event: 'click',
+          handler: handleClick()
+        });
+
+        array.push({
+          element: window,
+          event: 'click',
+          handler: this.close.bind(this),
+          delay: true
+        });
+
+        if (this._isModal) {
+          array.push({
+            element: document,
+            event: 'scroll',
+            handler: event => {
+              console.log(event);
+              event.preventDefault()
+            }
+          });
+        }
+
+        // A11y Event Handlers
+        array.push({
+          element: document,
+          event: 'keydown',
+          handler: (event) => {
+            if (this._topDialog !== this) return;
+            if (this._visible && event.which === 27) {
+              event.preventDefault();
+              this.close();
+            }
+            if (this._visible && event.which === 9) {
+              trapTabKey(this, event);
+            }
+          }
+        });
+
+        array.push({
+          element: document.body,
+          event: 'focus',
+          handler: event => {
+            if (this._topDialog !== this) return;
+            if (that.visible && !node.contains(event.target)) {
+              setFocusToFirstItem(this);
+            }
+          }
+        });
+
+        return array;
+      }
+
+      // Properly attach all the needed event handlers
+      _attachEventHandlers() {
+        // Grab a reference to the handler functions so we
+        // can remove them later
+        if (!Array.isArray(this.__handlers)) {
+          this.__handlers = this._getEventHandlers();
+        }
+
+        this.__handlers.forEach(obj => {
+          if (obj.delay) {
+            setTimeout(() => obj.element.addEventListener(obj.event, obj.handler), 0);
+          } else {
+            obj.element.addEventListener(obj.event, obj.handler);
+          }
+        });
+      }
+
+      // Detach all the needed event handlers
+      _detachEventHandlers() {
+        if (!Array.isArray(this.__handlers)) return;
+        this.__handlers.forEach(obj => obj.element.removeEventListener(obj.event, obj.handler));
+      }
+
+    }
+
+    document.registerElement('dialog-el', DialogEl);
+  })(document, HTMLElement)
+</script>
