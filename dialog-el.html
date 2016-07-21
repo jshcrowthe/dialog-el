@@ -140,24 +140,19 @@
       };
     };
 
+    var getTemplate = function(selector) {
+      var script = document._currentScript || document.currentScript;
+      return script.ownerDocument.querySelector(selector);
+    };
+
     /** 
      * Reference the template tag in this current document when HTML imported
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
      * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
      */
-    var styleTemplate = (function(document) {
-      var script = document._currentScript || document.currentScript;
-      return script.ownerDocument.querySelector('#style');
-    })(document);
-    var dialogTemplate = (function(document) {
-      var script = document._currentScript || document.currentScript;
-      return script.ownerDocument.querySelector('#dialog');
-    })(document);
-
-    var modalTemplate = (function(document) {
-      var script = document._currentScript || document.currentScript;
-      return script.ownerDocument.querySelector('#modal');
-    })(document);
+    var styleTemplate = getTemplate('#style');
+    var dialogTemplate = getTemplate('#dialog');
+    var modalTemplate = getTemplate('#modal');
 
     class DialogEl extends HTMLElement {
       constructor() {
@@ -235,10 +230,13 @@
       close() {
         Promise.resolve()
         .then(() => {
+          // Detach event listeners and clean up dialog stack
           this._detachEventHandlers();
           _dialogStack = _dialogStack.filter(dialog => dialog !== this);
         })
         .then(() => {
+          // Transition the elements out and resolve when the 
+          // animation has completed
           return new Promise(resolve => {
             var event = 'transitionend';
             var handler = function() {
@@ -250,6 +248,7 @@
           });
         })
         .then(() => {
+          // Reset element props
           this.hidden = true;
           this.setAttribute('aria-hidden', 'true');
           this.style.zIndex = null;
@@ -260,9 +259,7 @@
             this._lastActive.focus();
             this._lastActive = null;
           }
-        })
-        
-
+        });
       }
 
       _getEventHandlers() {
@@ -325,8 +322,6 @@
 
       // Properly attach all the needed event handlers
       _attachEventHandlers() {
-        // Grab a reference to the handler functions so we
-        // can remove them later
         if (!Array.isArray(this.__handlers)) {
           this.__handlers = this._getEventHandlers();
         }
