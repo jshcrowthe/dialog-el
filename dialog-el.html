@@ -77,7 +77,12 @@
 
 <script>
   (function(document, HTMLElement) {
+    // Master dialog stack, we use this to compute z-indexes as well as 
+    // know which dialogs/modals to close on a click event in the DOM
     var _dialogStack = [];
+
+    // Something to track whether or not we need to leverage the Shadow DOM
+    // polyfills `shimStyling` method. We only want to do this once
     var _instantiated = false;
 
       // Helper function to get all focusable children from a node
@@ -126,12 +131,18 @@
           while(el.nodeType != 11) {
             el = el.parentNode;
           }
-          // Set up reference for later usage
+          // Set up reference to host to avoid
+          // querying the DOM later
           return (_host = el.host);
         })(this);
 
+        // Find the index of the clicked dialog
         var index = _dialogStack.indexOf(host);
 
+        // If there are dialogs on top of the clicked
+        // dialog loop through and close them (we assume
+        // that you intended to close all the other
+        // dialogs in this case)
         if (_dialogStack.length > index + 1) {
           _dialogStack.forEach(function(dialog, _index) {
             if (_index <= index) return;
@@ -139,6 +150,12 @@
           });
         }
         
+        /**
+         * By adding `dialog-submit` or `dialog-cancel` to a
+         * child of one of your components you can easily 
+         * close out the current dialog/modal. This will also
+         * customize the reason statement in the close event.
+         */
         var dismissNodes = e.path.filter(el => el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit')));
         if (dismissNodes.length) {
           host._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
@@ -171,10 +188,16 @@
         super();
       }
 
+      /**
+       * Getter for the `visible` status
+       */
       get visible() {
         return this._visible !== undefined ? this._visible : (this._visible = this.hasAttribute('visible'));
       }
 
+      /**
+       * Setter for the `visible` status
+       */
       set visible(val) {
         if (val) {
           this._visible = true;
@@ -185,14 +208,22 @@
         }
       }
 
+      /**
+       * Getter for the content of the dialog/modal
+       */
       get _content() {
         return this.__contentNode__ || (this.__contentNode__ = this.shadowRoot.querySelector('.content'));
       }
-
+      /**
+       * Getter for the modal overlay
+       */
       get _overlay() {
         return this.__overlayNode__ || (this.__overlayNode__ = this.shadowRoot.querySelector('.overlay'));
       }
 
+      /**
+       * Getter for the top of the _dialogStack
+       */
       get _topDialog() {
         return _dialogStack[_dialogStack.length - 1];
       }
