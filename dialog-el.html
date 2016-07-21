@@ -1,4 +1,4 @@
-<template id='modal'>
+<template id='style'>
   <style>
     * {
       box-sizing: border-box;
@@ -10,14 +10,19 @@
     :host([hidden]) {
       display: none !important;
     }
+    
     .content {
       background: #fff;
       border-radius: 4px;
       box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
       padding: 15px;
+      position: relative;
+    }
+
+    :host([modal]) .content {
+      left:50%;
       position: fixed;
       top:50%;
-      left:50%;
       transform: translate(-50%, -50%);
     }
     .overlay {
@@ -28,7 +33,10 @@
       top: 0;
       width:100%;
     }
+    
   </style>
+</template>
+<template id='modal'>
   <div class='overlay'>
     <div class="content">
       <content></content>
@@ -36,25 +44,6 @@
   </div>
 </template>
 <template id='dialog'>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-    :host {
-      position: absolute;
-      display: inline-block;
-    }
-    :host([hidden]) {
-      display: none !important;
-    }
-    .content {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
-      padding: 15px;
-      position: relative;
-    }
-  </style>
   <div class="content">
     <content></content>
   </div>
@@ -127,6 +116,10 @@
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
      * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
      */
+    var styleTemplate = (function(document) {
+      var script = document._currentScript || document.currentScript;
+      return script.ownerDocument.querySelector('#style');
+    })(document);
     var dialogTemplate = (function(document) {
       var script = document._currentScript || document.currentScript;
       return script.ownerDocument.querySelector('#dialog');
@@ -163,11 +156,12 @@
 
         // Initial template setup
         this._isModal = this.hasAttribute('modal');
-        var template = this._isModal ? modalTemplate : dialogTemplate;
-        // Get dialogTemplate clone
-        var clone = document.importNode(template.content, true);
-        // Create a shadowRoot and append the dialogTemplate
-        this.createShadowRoot().appendChild(clone);
+        var style = document.importNode(styleTemplate.content, true);
+        var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
+
+        // Create a shadowRoot and append the style and dialogTemplate
+        this.createShadowRoot().appendChild(style)
+        this.shadowRoot.appendChild(template);
       }
 
       detachedCallback() {
