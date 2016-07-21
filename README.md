@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=master)](https://travis-ci.org/jshcrowthe/dialog-el)
+[![Build Status](https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=gh-pages)](https://travis-ci.org/jshcrowthe/dialog-el)
 
 # &lt;dialog-el&gt;
 
