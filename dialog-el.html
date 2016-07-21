@@ -136,6 +136,12 @@
           });
         }
       
+        var dismissNodes = e.path.filter(el => el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit')));
+        if (dismissNodes.length) {
+          host._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
+          host.close();
+        }
+
         if (e && e.stopPropagation) e.stopPropagation();
       };
     };
@@ -248,9 +254,7 @@
         .then(() => {
           // Fire `dialog-opened` event
           this.dispatchEvent(new CustomEvent('dialog-opened', {
-            details: {
-              dialog: this
-            }
+            bubbles: true,
           }));
         });
       }
@@ -291,8 +295,9 @@
         .then(() => {
           // Fire `dialog-closed` event
           this.dispatchEvent(new CustomEvent('dialog-closed', {
-            details: {
-              dialog: this
+            bubbles: true,
+            detail: {
+              action: this._closeAction
             }
           }));
         })
