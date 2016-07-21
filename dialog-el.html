@@ -78,12 +78,13 @@
 <script>
   (function(document, HTMLElement) {
     var _dialogStack = [];
+    var _instantiated = false;
 
       // Helper function to get all focusable children from a node
     function getFocusableChildren (node) {
       var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
 
-      return $$(focusableElements.join(','), node).filter(function (child) {
+      return $$(focusableElements.join(','), node).filter(function(child) {
         return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
       });
     }
@@ -96,7 +97,12 @@
     // Helper function trapping the tab key inside a node
     function trapTabKey (node, event) {
       var focusableChildren = getFocusableChildren(node);
-      var focusedItemIndex = focusableChildren.indexOf(document.activeElement);
+
+      // This line is required due to how the Shadow DOM polyfill wraps elements
+      // (See: https://github.com/webcomponents/webcomponentsjs#element-wrapping--unwrapping-limitations-)
+      var activeElement = ShadowDOMPolyfill && ShadowDOMPolyfill.wrap ? ShadowDOMPolyfill.wrap(document.activeElement) : document.activeElement;
+      
+      var focusedItemIndex = focusableChildren.indexOf(activeElement);
 
       if (event.shiftKey && focusedItemIndex === 0) {
         focusableChildren[focusableChildren.length - 1].focus();
@@ -207,8 +213,11 @@
         this.createShadowRoot().appendChild(style)
         this.shadowRoot.appendChild(template);
 
-        if (WebComponents && WebComponents.ShadowCSS && WebComponents.ShadowCSS.shimStyling) {
+        // If we have the full Shadow DOM polyfill and haven't instantiated 
+        // an instance of this component once
+        if (WebComponents && WebComponents.ShadowCSS && WebComponents.ShadowCSS.shimStyling && !_instantiated) {
           WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
+          _instantiated = true;
         }
       }
 
