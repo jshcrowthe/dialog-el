@@ -257,7 +257,12 @@
       }
 
       show() {
-        Promise.resolve()
+        return Promise.resolve()
+        .then(() => {
+          if (this.visible) throw new Error('Tried to open a dialog that is already open', {
+            element: this
+          });
+        })
         .then(() => {
           this._attachEventHandlers();
           _dialogStack.push(this);
@@ -301,7 +306,12 @@
       }
 
       close() {
-        Promise.resolve()
+        return Promise.resolve()
+        .then(() => {
+          if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
+            element: this
+          });
+        })
         .then(() => {
           // Detach event listeners and clean up dialog stack
           this._detachEventHandlers();

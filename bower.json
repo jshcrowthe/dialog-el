@@ -1,0 +1,33 @@
+{
+  "name": "dialog-el",
+  "homepage": "https://github.com/jshcrowthe/dialog-el",
+  "authors": [
+    "Josh Crowther <jshcrowthe@gmail.com>"
+  ],
+  "description": "A WebComponent for accesible dialogs and modals",
+  "main": "dialog-el.html",
+  "keywords": [
+    "modal",
+    "dialog",
+    "a11y",
+    "accesibility",
+    "webcomponent",
+    "webcomponents",
+    "web-component",
+    "web-components"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^4.3.1"
+  },
+  "dependencies": {
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22"
+  }
+}
