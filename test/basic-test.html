@@ -66,8 +66,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         test('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
           var el = fixture('simple-dialog');
           var handler = function() {
-            done();
             document.removeEventListener('dialog-opened', handler);
+            done();
           };
           document.addEventListener('dialog-opened', handler);
           el.show();
@@ -76,8 +76,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         test('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
           var el = fixture('simple-dialog');
           var handler = function() {
-            done();
             document.removeEventListener('dialog-closed', handler);
+            done();
           };
           document.addEventListener('dialog-closed', handler);
           el.show()
@@ -116,6 +116,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .then(() => {
               button.click();
             });
+        });
+
+        test('Should return a rejected promise if someone calls `dialog.show()` on a visible dialog', function(done) {
+          var el = fixture('simple-dialog');
+          el.show()
+            .then(() => el.show().catch(err => done()));
+        });
+        test('Should return a rejected promise if someone calls `dialog.close()` on a hidden dialog', function(done) {
+          var el = fixture('simple-dialog');
+          el.close().catch(err => done());
         });
       });
     </script>
