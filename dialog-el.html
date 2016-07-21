@@ -230,6 +230,11 @@
           this.style.zIndex = 1000 + _dialogStack.length - 1;
         })
         .then(() => {
+          // Capture last active element and reassign focus
+          this._lastActive = document.activeElement;
+          setFocusToFirstItem(this);
+        })
+        .then(() => {
           // Transition the elements out and resolve when the 
           // animation has completed
           return new Promise(resolve => {
@@ -247,11 +252,6 @@
           });
         })
         .then(() => {
-          // Capture last active element and reassign focus
-          this._lastActive = document.activeElement;
-          setFocusToFirstItem(this);
-        })
-        .then(() => {
           // Fire `dialog-opened` event
           this.dispatchEvent(new CustomEvent('dialog-opened', {
             bubbles: true,
@@ -265,6 +265,13 @@
           // Detach event listeners and clean up dialog stack
           this._detachEventHandlers();
           _dialogStack = _dialogStack.filter(dialog => dialog !== this);
+        })
+        .then(() => {
+          // Focus last active element and remove old reference
+          if (this._lastActive) {
+            this._lastActive.focus();
+            this._lastActive = null;
+          }
         })
         .then(() => {
           // Transition the elements out and resolve when the 
@@ -284,13 +291,6 @@
           this.hidden = true;
           this.setAttribute('aria-hidden', 'true');
           this.style.zIndex = null;
-        })
-        .then(() => {
-          // Focus last active element and remove old reference
-          if (this._lastActive) {
-            this._lastActive.focus();
-            this._lastActive = null;
-          }
         })
         .then(() => {
           // Fire `dialog-closed` event
