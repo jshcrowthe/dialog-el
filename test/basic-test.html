@@ -117,16 +117,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               button.click();
             });
         });
-
-        test('Should return a rejected promise if someone calls `dialog.show()` on a visible dialog', function(done) {
-          var el = fixture('simple-dialog');
-          el.show()
-            .then(() => el.show().catch(err => done()));
-        });
-        test('Should return a rejected promise if someone calls `dialog.close()` on a hidden dialog', function(done) {
-          var el = fixture('simple-dialog');
-          el.close().catch(err => done());
-        });
       });
     </script>
 
