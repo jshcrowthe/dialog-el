@@ -21,14 +21,16 @@
 
   <!-- Web Components -->
   <script>
+    var shadowDOMSupported = 'createShadowRoot' in HTMLElement.prototype;
     var webComponentsSupported = ('registerElement' in document
-      && 'shadowRoot' in HTMLElement.prototype
+      && shadowDOMSupported
       && 'import' in document.createElement('link')
       && 'content' in document.createElement('template'));
   
     if (!webComponentsSupported) {
       var wcPoly = document.createElement('script');
-      wcPoly.src = 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js';
+      wcPoly.src = shadowDOMSupported ? 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js' : 
+                                        'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents.min.js';
       wcPoly.async = true;
       document.head.appendChild(wcPoly);
     }
