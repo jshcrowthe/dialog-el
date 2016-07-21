@@ -26,6 +26,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template>
         <dialog-el>
           <h1>Simple Dialog</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
         </dialog-el>
       </template>
     </test-fixture>
@@ -59,16 +65,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         test('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
           var el = fixture('simple-dialog');
-          el.show().then(done);
+          var handler = function() {
+            done();
+            document.removeEventListener('dialog-opened', handler);
+          };
+          document.addEventListener('dialog-opened', handler);
+          el.show();
         });
 
         test('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
           var el = fixture('simple-dialog');
+          var handler = function() {
+            done();
+            document.removeEventListener('dialog-closed', handler);
+          };
+          document.addEventListener('dialog-closed', handler);
           el.show()
-            .then(() => el.close())
-            .then(() => done());
+            .then(() => el.close());        
         });
 
+        test('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
+          var el = fixture('simple-dialog-with-submit-button');
+          
+          var button = el.lastElementChild;
+
+          var handler = function(e) {
+            expect(e.detail.action).to.equal('submit');
+            document.removeEventListener('dialog-closed', handler);
+            done();
+          };
+          document.addEventListener('dialog-closed', handler);
+          el.show()
+            .then(() => {
+              button.click();
+            });
+        });
+
+        test('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
+          var el = fixture('simple-dialog-with-cancel-button');
+          
+          var button = el.lastElementChild;
+
+          var handler = function(e) {
+            expect(e.detail.action).to.equal('cancel');
+            document.removeEventListener('dialog-closed', handler);
+            done();
+          };
+          document.addEventListener('dialog-closed', handler);
+          el.show()
+            .then(() => {
+              button.click();
+            });
+        });
       });
     </script>
 
