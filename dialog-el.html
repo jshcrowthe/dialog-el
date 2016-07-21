@@ -140,7 +140,10 @@
       };
     };
 
-    var getTemplate = function(selector) {
+    /**
+     * Executes querySelector on the current document
+     */
+    var querySelector = function(selector) {
       var script = document._currentScript || document.currentScript;
       return script.ownerDocument.querySelector(selector);
     };
@@ -150,9 +153,9 @@
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
      * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
      */
-    var styleTemplate = getTemplate('#style');
-    var dialogTemplate = getTemplate('#dialog');
-    var modalTemplate = getTemplate('#modal');
+    var styleTemplate = querySelector('#style');
+    var dialogTemplate = querySelector('#dialog');
+    var modalTemplate = querySelector('#modal');
 
     class DialogEl extends HTMLElement {
       constructor() {
