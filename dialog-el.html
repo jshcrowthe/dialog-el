@@ -116,7 +116,9 @@
     });
 
     document.addEventListener('touchmove', function(e) {
-      e.preventDefault();
+      if (e.path[0].classList.contains('overlay')) {
+        e.preventDefault();
+      }
       _isTouch = false;
     });
 
