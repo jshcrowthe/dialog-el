@@ -90,6 +90,7 @@
 
     document.addEventListener('touchstart', function(e) {
       if (!_dialogStack.length) return;
+      var _topDialog = _dialogStack[_dialogStack.length - 1];
       _touchActive = true;
       setTimeout(function() {
         if (_touchActive || !_isTouch) {
@@ -97,6 +98,11 @@
           _isTouch = true;
           return;
         }
+
+        // If the dialog stack has changed such that the top dialog
+        // has changed, abort close operation
+        if (_topDialog !== _dialogStack[_dialogStack.length - 1]) return;
+
         _dialogStack.forEach(function(dialog) {
           if (!dialog.contains(e.target) || e.path[0] === dialog._overlay) {
             dialog.close()
