@@ -323,18 +323,28 @@
         .then(function() {
           // Transition the elements out and resolve when the 
           // animation has completed
-          return new Promise(function(resolve) {
-            var event = 'transitionend';
+          var event = 'transitionend';
+          return new Promise(function(resolve, reject) {
             var handler = function() {
               resolve();
               this._content.removeEventListener(event, handler);
             }.bind(this);
             this._content.addEventListener(event, handler);
+
             // Delay the setting of visible property to allow nested
             // elements time to display without being closed by the
             // click handler. Also this allows element animations
             // to occur.
             setTimeout(function() { this.visible = true }.bind(this), 0);
+
+            // Set a backup handler call to ensure the modal opens
+            // even if for some reason the transition craps out
+            setTimeout(function() {
+              reject(handler)
+            }, 350);
+          }.bind(this)).catch(function(handler) {
+            console.warn('dialog "show" transition did not fire', this);
+            this._content.removeEventListener(event, handler);
           }.bind(this));
         }.bind(this))
         .then(function() {
@@ -369,7 +379,7 @@
         .then(function() {
           // Transition the elements out and resolve when the 
           // animation has completed
-          return new Promise(function(resolve) {
+          return new Promise(function(resolve, reject) {
             var event = 'transitionend';
             var handler = function() {
               resolve();
@@ -377,6 +387,15 @@
             }.bind(this);
             this._content.addEventListener(event, handler);
             this.visible = false;
+
+            // Set a backup handler call to ensure the modal closes
+            // even if for some reason the transition craps out
+            setTimeout(function() {
+              reject(handler);
+            }, 350);
+          }.bind(this)).catch(function(handler) {
+            console.warn('dialog "close" transition did not fire', this);
+            this._content.removeEventListener(event, handler);
           }.bind(this));
         }.bind(this))
         .then(function() {
