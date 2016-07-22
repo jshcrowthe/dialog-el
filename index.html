@@ -101,9 +101,9 @@
 
   <script>
     var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child'];
-    dialogs.forEach(selector => {
-      document.querySelector(`.${selector}`).addEventListener('click', () => {
-        document.querySelector(`#${selector}`).show()
+    dialogs.forEach(function(selector) {
+      document.querySelector('.' + selector).addEventListener('click', function() {
+        document.querySelector('#' + selector).show();
       });
     });
   </script>

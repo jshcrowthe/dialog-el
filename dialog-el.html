@@ -156,7 +156,9 @@
          * close out the current dialog/modal. This will also
          * customize the reason statement in the close event.
          */
-        var dismissNodes = e.path.filter(el => el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit')));
+        var dismissNodes = e.path.filter(function(el) {
+          return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
+        });
         if (dismissNodes.length) {
           host._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
           host.close();
@@ -258,32 +260,31 @@
 
       show() {
         return Promise.resolve()
-        .then(() => {
+        .then(function() {
           if (this.visible) throw new Error('Tried to open a dialog that is already open', {
             element: this
           });
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           this._attachEventHandlers();
           _dialogStack.push(this);
-          
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           this.hidden = false;
           this.removeAttribute('aria-hidden');
           
           // Compute z-index for this dialog (based on stack index)
           this.style.zIndex = 1000 + _dialogStack.length - 1;
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           // Capture last active element and reassign focus
           this._lastActive = document.activeElement;
           setFocusToFirstItem(this);
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           // Transition the elements out and resolve when the 
           // animation has completed
-          return new Promise(resolve => {
+          return new Promise(function(resolve) {
             var event = 'transitionend';
             var handler = function() {
               resolve();
@@ -294,40 +295,42 @@
             // elements time to display without being closed by the
             // click handler. Also this allows element animations
             // to occur.
-            setTimeout(() => this.visible = true, 0);
-          });
-        })
-        .then(() => {
+            setTimeout(function() { this.visible = true }.bind(this), 0);
+          }.bind(this));
+        }.bind(this))
+        .then(function() {
           // Fire `dialog-opened` event
           this.dispatchEvent(new CustomEvent('dialog-opened', {
             bubbles: true,
           }));
-        });
+        }.bind(this));
       }
 
       close() {
         return Promise.resolve()
-        .then(() => {
+        .then(function() {
           if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
             element: this
           });
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           // Detach event listeners and clean up dialog stack
           this._detachEventHandlers();
-          _dialogStack = _dialogStack.filter(dialog => dialog !== this);
-        })
-        .then(() => {
+          _dialogStack = _dialogStack.filter(function(dialog) {
+            return dialog !== this
+          });
+        }.bind(this))
+        .then(function() {
           // Focus last active element and remove old reference
           if (this._lastActive) {
             this._lastActive.focus();
             this._lastActive = null;
           }
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           // Transition the elements out and resolve when the 
           // animation has completed
-          return new Promise(resolve => {
+          return new Promise(function(resolve) {
             var event = 'transitionend';
             var handler = function() {
               resolve();
@@ -335,15 +338,15 @@
             }.bind(this);
             this._content.addEventListener(event, handler);
             this.visible = false;
-          });
-        })
-        .then(() => {
+          }.bind(this));
+        }.bind(this))
+        .then(function() {
           // Reset element props
           this.hidden = true;
           this.setAttribute('aria-hidden', 'true');
           this.style.zIndex = null;
-        })
-        .then(() => {
+        }.bind(this))
+        .then(function() {
           // Fire `dialog-closed` event
           this.dispatchEvent(new CustomEvent('dialog-closed', {
             bubbles: true,
@@ -351,7 +354,7 @@
               action: this._closeAction
             }
           }));
-        })
+        }.bind(this))
       }
 
       _getEventHandlers() {
@@ -375,7 +378,7 @@
           array.push({
             element: document,
             event: 'scroll',
-            handler: event => {
+            handler: function(event) {
               event.preventDefault()
             }
           });
@@ -385,7 +388,7 @@
         array.push({
           element: document,
           event: 'keydown',
-          handler: (event) => {
+          handler: function(event) {
             if (this._topDialog !== this) return;
             if (this.visible && event.which === 27) {
               event.preventDefault();
@@ -394,18 +397,18 @@
             if (this.visible && event.which === 9) {
               trapTabKey(this, event);
             }
-          }
+          }.bind(this)
         });
 
         array.push({
           element: document.body,
           event: 'focus',
-          handler: event => {
+          handler: function(event) {
             if (this._topDialog !== this) return;
             if (that.visible && !node.contains(event.target)) {
               setFocusToFirstItem(this);
             }
-          }
+          }.bind(this)
         });
 
         return array;
@@ -417,19 +420,19 @@
           this.__handlers = this._getEventHandlers();
         }
 
-        this.__handlers.forEach(obj => {
+        this.__handlers.forEach(function(obj) {
           if (obj.delay) {
-            setTimeout(() => obj.element.addEventListener(obj.event, obj.handler), 0);
+            setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler) }, 0);
           } else {
             obj.element.addEventListener(obj.event, obj.handler);
           }
-        });
+        }.bind(this));
       }
 
       // Detach all the needed event handlers
       _detachEventHandlers() {
         if (!Array.isArray(this.__handlers)) return;
-        this.__handlers.forEach(obj => obj.element.removeEventListener(obj.event, obj.handler));
+        this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
       }
 
     }
