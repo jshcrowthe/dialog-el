@@ -318,7 +318,7 @@
           this._detachEventHandlers();
           _dialogStack = _dialogStack.filter(function(dialog) {
             return dialog !== this
-          });
+          }.bind(this));
         }.bind(this))
         .then(function() {
           // Focus last active element and remove old reference
