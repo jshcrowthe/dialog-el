@@ -85,6 +85,35 @@
     // polyfills `shimStyling` method. We only want to do this once
     var _instantiated = false;
 
+    var _isTouch = true;
+    var _touchActive = false;
+
+    document.addEventListener('touchstart', function(e) {
+      if (!_dialogStack.length) return;
+      _touchActive = true;
+      setTimeout(function() {
+        if (_touchActive || !_isTouch) {
+          // Reset _isTouch prop
+          _isTouch = true;
+          return;
+        }
+        _dialogStack.forEach(function(dialog) {
+          if (!dialog.contains(e.target) || e.path[0] === dialog._overlay) {
+            dialog.close()
+          }
+        });
+      }, 250);
+    });
+
+    document.addEventListener('touchend', function() {
+      _touchActive = false;
+    });
+
+    document.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+      _isTouch = false;
+    });
+
       // Helper function to get all focusable children from a node
     function getFocusableChildren (node) {
       var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
@@ -118,11 +147,13 @@
       }
     }
 
+    // Helper function to focus the first focusable item
     function setFocusToFirstItem (node) {
       var focusableChildren = getFocusableChildren(node);
       if (focusableChildren.length) focusableChildren[0].focus();
     }
 
+    // Content click handler
     var handleClick = function() {
       var _host;
       return function(e) {
@@ -373,16 +404,6 @@
           handler: this.close.bind(this),
           delay: true
         });
-
-        if (this._isModal) {
-          array.push({
-            element: document,
-            event: 'scroll',
-            handler: function(event) {
-              event.preventDefault()
-            }
-          });
-        }
 
         // A11y Event Handlers
         array.push({
