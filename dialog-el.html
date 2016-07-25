@@ -128,7 +128,7 @@
     function getFocusableChildren(node) {
       var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
 
-      return Array.prototype.filter.call(document.querySelectorAll(focusableElements.join(',')), function(child) {
+      return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
         return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
       });
     }
