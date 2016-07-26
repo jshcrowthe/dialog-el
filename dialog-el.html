@@ -92,6 +92,8 @@
       if (!_dialogStack.length) return;
       var _topDialog = _dialogStack[_dialogStack.length - 1];
       _touchActive = true;
+
+      // Wait 250ms to detect a tap
       setTimeout(function() {
         if (_touchActive || !_isTouch) {
           // Reset _isTouch prop
@@ -123,17 +125,12 @@
     });
 
       // Helper function to get all focusable children from a node
-    function getFocusableChildren (node) {
+    function getFocusableChildren(node) {
       var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
 
-      return $$(focusableElements.join(','), node).filter(function(child) {
+      return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
         return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
       });
-    }
-
-    // Helper function to get all nodes in context matching selector as an array
-    function $$ (selector, context) {
-      return Array.prototype.slice.call((context || document).querySelectorAll(selector));
     }
 
     // Helper function trapping the tab key inside a node
