@@ -9,17 +9,13 @@ env:
     - CXX=g++-4.8
 node_js: stable
 addons:
-  firefox: latest
   apt:
     sources:
-      - google-chrome
       - ubuntu-toolchain-r-test
     packages:
-      - google-chrome-stable
       - g++-4.8
   sauce_connect: true
 script:
-  - xvfb-run wct
   - wct -s 'default'
 branches:
   only:
