@@ -221,22 +221,17 @@
     var dialogTemplate = querySelector('#dialog');
     var modalTemplate = querySelector('#modal');
 
-    class DialogEl extends HTMLElement {
-      constructor() {
-        super();
-      }
+    var proto = Object.create(HTMLElement.prototype);
 
-      /**
-       * Getter for the `visible` status
-       */
-      get visible() {
+
+    /**
+     * Getter/Setter for the `visible` status
+     */
+    Object.defineProperty(proto, 'visible', {
+      get: function() {
         return this._visible !== undefined ? this._visible : (this._visible = this.hasAttribute('visible'));
-      }
-
-      /**
-       * Setter for the `visible` status
-       */
-      set visible(val) {
+      },
+      set: function(val) {
         if (val) {
           this._visible = true;
           this.setAttribute('visible', '');
@@ -245,243 +240,253 @@
           this.removeAttribute('visible');
         }
       }
+    });
 
-      /**
-       * Getter for the content of the dialog/modal
-       */
-      get _content() {
+    /**
+     * Getter for the content of the dialog/modal
+     */
+    Object.defineProperty(proto, '_content', {
+      get: function() {
         return this.__contentNode__ || (this.__contentNode__ = this.shadowRoot.querySelector('.content'));
       }
-      /**
-       * Getter for the modal overlay
-       */
-      get _overlay() {
+    });
+
+    
+    /**
+     * Getter for the modal overlay
+     */
+    Object.defineProperty(proto, '_overlay', {
+      get: function () {
         return this.__overlayNode__ || (this.__overlayNode__ = this.shadowRoot.querySelector('.overlay'));
       }
+    });
 
-      /**
-       * Getter for the top of the _dialogStack
-       */
-      get _topDialog() {
+    /**
+     * Getter for the top of the _dialogStack
+     */
+    Object.defineProperty(proto, '_topDialog', {
+      get: function () {
         return _dialogStack[_dialogStack.length - 1];
       }
+    });
 
-      createdCallback() {
-        // Initial Style/A11y Setup
-        this.hidden = true;
-        this.visible = false;
-        this.setAttribute('aria-hidden', 'true');
-        this.setAttribute('role', 'dialog');
+    proto.createdCallback = function() {
+      // Initial Style/A11y Setup
+      this.hidden = true;
+      this.visible = false;
+      this.setAttribute('aria-hidden', 'true');
+      this.setAttribute('role', 'dialog');
 
-        // Initial template setup
-        this._isModal = this.hasAttribute('modal');
-        var style = document.importNode(styleTemplate.content, true);
-        var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
+      // Initial template setup
+      this._isModal = this.hasAttribute('modal');
+      var style = document.importNode(styleTemplate.content, true);
+      var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
 
-        // Create a shadowRoot and append the style and dialogTemplate
-        this.createShadowRoot().appendChild(style)
-        this.shadowRoot.appendChild(template);
+      // Create a shadowRoot and append the style and dialogTemplate
+      this.createShadowRoot().appendChild(style)
+      this.shadowRoot.appendChild(template);
 
-        // If we have the full Shadow DOM polyfill and haven't instantiated 
-        // an instance of this component once
-        if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling && !_instantiated) {
-          window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
-          _instantiated = true;
-        }
+      // If we have the full Shadow DOM polyfill and haven't instantiated 
+      // an instance of this component once
+      if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling && !_instantiated) {
+        window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
+        _instantiated = true;
       }
-
-      detachedCallback() {
-        if (this.visible) this.close();
-      }
-
-      show() {
-        return Promise.resolve()
-        .then(function() {
-          if (this.visible) throw new Error('Tried to open a dialog that is already open', {
-            element: this
-          });
-        }.bind(this))
-        .then(function() {
-          this._attachEventHandlers();
-          _dialogStack.push(this);
-        }.bind(this))
-        .then(function() {
-          this.hidden = false;
-          this.removeAttribute('aria-hidden');
-          
-          // Compute z-index for this dialog (based on stack index)
-          this.style.zIndex = 1000 + _dialogStack.length - 1;
-        }.bind(this))
-        .then(function() {
-          // Capture last active element and reassign focus
-          this._lastActive = document.activeElement;
-          setFocusToFirstItem(this);
-        }.bind(this))
-        .then(function() {
-          // Transition the elements out and resolve when the 
-          // animation has completed
-          var event = 'transitionend';
-          return new Promise(function(resolve, reject) {
-            var handler = function() {
-              resolve();
-              this._content.removeEventListener(event, handler);
-            }.bind(this);
-            this._content.addEventListener(event, handler);
-
-            // Delay the setting of visible property to allow nested
-            // elements time to display without being closed by the
-            // click handler. Also this allows element animations
-            // to occur.
-            setTimeout(function() { this.visible = true }.bind(this), 0);
-
-            // Set a backup handler call to ensure the modal opens
-            // even if for some reason the transition craps out
-            setTimeout(function() {
-              reject(handler)
-            }, 350);
-          }.bind(this)).catch(function(handler) {
-            console.warn('dialog "show" transition did not fire', this);
-            this._content.removeEventListener(event, handler);
-          }.bind(this));
-        }.bind(this))
-        .then(function() {
-          // Fire `dialog-opened` event
-          this.dispatchEvent(new CustomEvent('dialog-opened', {
-            bubbles: true,
-          }));
-        }.bind(this));
-      }
-
-      close() {
-        return Promise.resolve()
-        .then(function() {
-          if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
-            element: this
-          });
-        }.bind(this))
-        .then(function() {
-          // Detach event listeners and clean up dialog stack
-          this._detachEventHandlers();
-          _dialogStack = _dialogStack.filter(function(dialog) {
-            return dialog !== this
-          }.bind(this));
-        }.bind(this))
-        .then(function() {
-          // Focus last active element and remove old reference
-          if (this._lastActive) {
-            this._lastActive.focus();
-            this._lastActive = null;
-          }
-        }.bind(this))
-        .then(function() {
-          // Transition the elements out and resolve when the 
-          // animation has completed
-          return new Promise(function(resolve, reject) {
-            var event = 'transitionend';
-            var handler = function() {
-              resolve();
-              this._content.removeEventListener(event, handler);
-            }.bind(this);
-            this._content.addEventListener(event, handler);
-            this.visible = false;
-
-            // Set a backup handler call to ensure the modal closes
-            // even if for some reason the transition craps out
-            setTimeout(function() {
-              reject(handler);
-            }, 350);
-          }.bind(this)).catch(function(handler) {
-            console.warn('dialog "close" transition did not fire', this);
-            this._content.removeEventListener(event, handler);
-          }.bind(this));
-        }.bind(this))
-        .then(function() {
-          // Reset element props
-          this.hidden = true;
-          this.setAttribute('aria-hidden', 'true');
-          this.style.zIndex = null;
-        }.bind(this))
-        .then(function() {
-          // Fire `dialog-closed` event
-          this.dispatchEvent(new CustomEvent('dialog-closed', {
-            bubbles: true,
-            detail: {
-              action: this._closeAction
-            }
-          }));
-        }.bind(this))
-      }
-
-      _getEventHandlers() {
-        var array = []
-
-        // Stacking Context Event Handlers
-        array.push({
-          element: this._content,
-          event: 'click',
-          handler: handleClick()
-        });
-
-        array.push({
-          element: window,
-          event: 'click',
-          handler: this.close.bind(this),
-          delay: true
-        });
-
-        // A11y Event Handlers
-        array.push({
-          element: document,
-          event: 'keydown',
-          handler: function(event) {
-            if (this._topDialog !== this) return;
-            if (this.visible && event.which === 27) {
-              event.preventDefault();
-              this.close();
-            }
-            if (this.visible && event.which === 9) {
-              trapTabKey(this, event);
-            }
-          }.bind(this)
-        });
-
-        array.push({
-          element: document.body,
-          event: 'focus',
-          handler: function(event) {
-            if (this._topDialog !== this) return;
-            if (that.visible && !node.contains(event.target)) {
-              setFocusToFirstItem(this);
-            }
-          }.bind(this)
-        });
-
-        return array;
-      }
-
-      // Properly attach all the needed event handlers
-      _attachEventHandlers() {
-        if (!Array.isArray(this.__handlers)) {
-          this.__handlers = this._getEventHandlers();
-        }
-
-        this.__handlers.forEach(function(obj) {
-          if (obj.delay) {
-            setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler) }, 0);
-          } else {
-            obj.element.addEventListener(obj.event, obj.handler);
-          }
-        }.bind(this));
-      }
-
-      // Detach all the needed event handlers
-      _detachEventHandlers() {
-        if (!Array.isArray(this.__handlers)) return;
-        this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
-      }
-
     }
 
-    document.registerElement('dialog-el', DialogEl);
+    proto.detachedCallback = function() {
+      if (this.visible) this.close();
+    }
+
+    proto.show = function() {
+      return Promise.resolve()
+      .then(function() {
+        if (this.visible) throw new Error('Tried to open a dialog that is already open', {
+          element: this
+        });
+      }.bind(this))
+      .then(function() {
+        this._attachEventHandlers();
+        _dialogStack.push(this);
+      }.bind(this))
+      .then(function() {
+        this.hidden = false;
+        this.removeAttribute('aria-hidden');
+        
+        // Compute z-index for this dialog (based on stack index)
+        this.style.zIndex = 1000 + _dialogStack.length - 1;
+      }.bind(this))
+      .then(function() {
+        // Capture last active element and reassign focus
+        this._lastActive = document.activeElement;
+        setFocusToFirstItem(this);
+      }.bind(this))
+      .then(function() {
+        // Transition the elements out and resolve when the 
+        // animation has completed
+        var event = 'transitionend';
+        return new Promise(function(resolve, reject) {
+          var handler = function() {
+            resolve();
+            this._content.removeEventListener(event, handler);
+          }.bind(this);
+          this._content.addEventListener(event, handler);
+
+          // Delay the setting of visible property to allow nested
+          // elements time to display without being closed by the
+          // click handler. Also this allows element animations
+          // to occur.
+          setTimeout(function() { this.visible = true }.bind(this), 0);
+
+          // Set a backup handler call to ensure the modal opens
+          // even if for some reason the transition craps out
+          setTimeout(function() {
+            reject(handler)
+          }, 350);
+        }.bind(this)).catch(function(handler) {
+          console.warn('dialog "show" transition did not fire', this);
+          this._content.removeEventListener(event, handler);
+        }.bind(this));
+      }.bind(this))
+      .then(function() {
+        // Fire `dialog-opened` event
+        this.dispatchEvent(new CustomEvent('dialog-opened', {
+          bubbles: true,
+        }));
+      }.bind(this));
+    }
+
+    proto.close = function() {
+      return Promise.resolve()
+      .then(function() {
+        if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
+          element: this
+        });
+      }.bind(this))
+      .then(function() {
+        // Detach event listeners and clean up dialog stack
+        this._detachEventHandlers();
+        _dialogStack = _dialogStack.filter(function(dialog) {
+          return dialog !== this
+        }.bind(this));
+      }.bind(this))
+      .then(function() {
+        // Focus last active element and remove old reference
+        if (this._lastActive) {
+          this._lastActive.focus();
+          this._lastActive = null;
+        }
+      }.bind(this))
+      .then(function() {
+        // Transition the elements out and resolve when the 
+        // animation has completed
+        return new Promise(function(resolve, reject) {
+          var event = 'transitionend';
+          var handler = function() {
+            resolve();
+            this._content.removeEventListener(event, handler);
+          }.bind(this);
+          this._content.addEventListener(event, handler);
+          this.visible = false;
+
+          // Set a backup handler call to ensure the modal closes
+          // even if for some reason the transition craps out
+          setTimeout(function() {
+            reject(handler);
+          }, 350);
+        }.bind(this)).catch(function(handler) {
+          console.warn('dialog "close" transition did not fire', this);
+          this._content.removeEventListener(event, handler);
+        }.bind(this));
+      }.bind(this))
+      .then(function() {
+        // Reset element props
+        this.hidden = true;
+        this.setAttribute('aria-hidden', 'true');
+        this.style.zIndex = null;
+      }.bind(this))
+      .then(function() {
+        // Fire `dialog-closed` event
+        this.dispatchEvent(new CustomEvent('dialog-closed', {
+          bubbles: true,
+          detail: {
+            action: this._closeAction
+          }
+        }));
+      }.bind(this))
+    }
+
+    proto._getEventHandlers = function() {
+      var array = []
+
+      // Stacking Context Event Handlers
+      array.push({
+        element: this._content,
+        event: 'click',
+        handler: handleClick()
+      });
+
+      array.push({
+        element: window,
+        event: 'click',
+        handler: this.close.bind(this),
+        delay: true
+      });
+
+      // A11y Event Handlers
+      array.push({
+        element: document,
+        event: 'keydown',
+        handler: function(event) {
+          if (this._topDialog !== this) return;
+          if (this.visible && event.which === 27) {
+            event.preventDefault();
+            this.close();
+          }
+          if (this.visible && event.which === 9) {
+            trapTabKey(this, event);
+          }
+        }.bind(this)
+      });
+
+      array.push({
+        element: document.body,
+        event: 'focus',
+        handler: function(event) {
+          if (this._topDialog !== this) return;
+          if (that.visible && !node.contains(event.target)) {
+            setFocusToFirstItem(this);
+          }
+        }.bind(this)
+      });
+
+      return array;
+    }
+
+    // Properly attach all the needed event handlers
+    proto._attachEventHandlers = function() {
+      if (!Array.isArray(this.__handlers)) {
+        this.__handlers = this._getEventHandlers();
+      }
+
+      this.__handlers.forEach(function(obj) {
+        if (obj.delay) {
+          setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler) }, 0);
+        } else {
+          obj.element.addEventListener(obj.event, obj.handler);
+        }
+      }.bind(this));
+    }
+
+    // Detach all the needed event handlers
+    proto._detachEventHandlers = function() {
+      if (!Array.isArray(this.__handlers)) return;
+      this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
+    }
+
+
+    document.registerElement('dialog-el', {
+      prototype: proto
+    });
   })(document, HTMLElement)
 </script>
