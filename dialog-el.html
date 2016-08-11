@@ -454,7 +454,7 @@
         event: 'focus',
         handler: function(event) {
           if (this._topDialog !== this) return;
-          if (that.visible && !node.contains(event.target)) {
+          if (this.visible && !node.contains(event.target)) {
             setFocusToFirstItem(this);
           }
         }.bind(this)
