@@ -66,6 +66,7 @@
     <li><button class='simpleModal'>Simple Modal</button></li>
     <li><button class='nestedDialog'>Nested Dialog</button></li>
     <li><button class='nestedModal'>Nested Modal</button></li>
+    <li><button class='focustrapping'>Focus Trapping Modal</button></li>
   </ul>
   
 
@@ -99,8 +100,20 @@
     </dialog-el>
   </dialog-el>
 
+  <dialog-el id='focustrapping' modal>
+    <h1>Fancy Header</h1>
+    <p>
+      <label>Name</label><input type="text">
+    </p>
+    <p>
+      <label>Phone</label><input type="text">
+    </p>
+    <textarea name="" id="" cols="30" rows="10"></textarea>
+    <button dialog-submit>Save!</button>
+  </dialog-el>
+  
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping'];
     dialogs.forEach(function(selector) {
       document.querySelector('.' + selector).addEventListener('click', function() {
         document.querySelector('#' + selector).show();

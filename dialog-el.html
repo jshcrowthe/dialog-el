@@ -140,6 +140,10 @@
       // This line is required due to how the Shadow DOM polyfill wraps elements
       // (See: https://github.com/webcomponents/webcomponentsjs#element-wrapping--unwrapping-limitations-)
       var activeElement = window.ShadowDOMPolyfill && window.ShadowDOMPolyfill.wrap ? window.ShadowDOMPolyfill.wrap(document.activeElement) : document.activeElement;
+
+      // If there are no focusable children in the dialog, prevent tabbing through the rest
+      // of the document before clearing focus on the dialog
+      if (!focusableChildren.length) return event.preventDefault();
       
       var focusedItemIndex = focusableChildren.indexOf(activeElement);
 
