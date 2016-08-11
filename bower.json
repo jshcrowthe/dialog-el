@@ -28,6 +28,7 @@
     "web-component-tester": "Polymer/web-component-tester#^4.3.1"
   },
   "dependencies": {
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22"
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22",
+    "promise-polyfill": "taylorhakes/promise-polyfill#^6.0.1"
   }
 }
