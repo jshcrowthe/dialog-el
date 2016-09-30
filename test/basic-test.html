@@ -54,6 +54,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </dialog-el>
       </template>
     </test-fixture>
+    <test-fixture id="a11y">
+      <template>
+        <dialog-el>
+          <h1>Simple Dialog</h1>
+          <button dialog-cancel>Cancel</button>
+        </dialog-el>
+      </template>
+    </test-fixture>
 
     <script>
       suite('<dialog-el>', function() {
@@ -118,6 +126,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               button.click();
             });
         });
+        a11ySuite('a11y');
       });
     </script>
 
