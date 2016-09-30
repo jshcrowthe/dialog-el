@@ -151,7 +151,7 @@
         focusableChildren[focusableChildren.length - 1].focus();
         event.preventDefault();
       } else if (!event.shiftKey && focusedItemIndex === focusableChildren.length - 1) {
-        focusableChildren[0].focus();
+        if (focusableChildren[0]) focusableChildren[0].focus();
         event.preventDefault();
       }
     }
@@ -159,7 +159,7 @@
     // Helper function to focus the first focusable item
     function setFocusToFirstItem (node) {
       var focusableChildren = getFocusableChildren(node);
-      if (focusableChildren.length) focusableChildren[0].focus();
+      if (focusableChildren[0]) focusableChildren[0].focus();
     }
 
     // Content click handler
