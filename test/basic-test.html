@@ -126,7 +126,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               button.click();
             });
         });
-        a11ySuite('a11y');
+
+        test('Should pass an a11y audit (in native shadow DOM only)', function() {
+          if (!window.ShadowDOMPolyfill) {
+            a11ySuite('a11y');
+          }
+        });
       });
     </script>
 
