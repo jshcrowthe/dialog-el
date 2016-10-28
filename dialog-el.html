@@ -81,10 +81,6 @@
     // know which dialogs/modals to close on a click event in the DOM
     var _dialogStack = [];
 
-    // Something to track whether or not we need to leverage the Shadow DOM
-    // polyfills `shimStyling` method. We only want to do this once
-    var _instantiated = false;
-
     var _isTouch = true;
     var _touchActive = false;
 
@@ -292,9 +288,8 @@
 
       // If we have the full Shadow DOM polyfill and haven't instantiated 
       // an instance of this component once
-      if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling && !_instantiated) {
+      if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling) {
         window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
-        _instantiated = true;
       }
     }
 
