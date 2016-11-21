@@ -16,13 +16,14 @@
       border-radius: 4px;
       box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
       opacity: 0;
-      padding: 15px;
+      padding: 10px;
       position: relative;
       -webkit-transform: scale(0.7);
       transform: scale(0.7);
       -webkit-transition: transform 0.3s, opacity 0.3s;
       transition: transform 0.3s, opacity 0.3s;
       will-change: transform, opacity;
+      @apply(--dialog-el-content);
     }
 
 
@@ -46,6 +47,7 @@
       transition: opacity 0.3s;
       width:100%;
       will-change: opacity;
+      @apply(--dialog-el-overlay);
     }
 
     :host([visible]) > .content {
@@ -355,7 +357,9 @@
       }.bind(this));
     }
 
-    proto.close = function() {
+    proto.close = function(e) {
+      // Allow persistent dialogs if the element clicked on has an open-dialog attribute.
+      if (e && e.target && e.target.attributes["open-dialog"]) return;
       return Promise.resolve()
       .then(function() {
         if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
