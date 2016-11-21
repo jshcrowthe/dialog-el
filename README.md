@@ -68,3 +68,13 @@ document.body.appendChild(dialogEl);
 - `modal`
 
   If set the dialog will render as a fixed position modal instead of an absolute positioned div.
+
+## Events
+
+- `dialog-opened`
+
+  Fired whenever the dialog is opened.
+  
+- `dialog-closed`
+
+  Fired whenever the dialog is closed.
