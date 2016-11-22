@@ -6,11 +6,19 @@
     :host {
       position: absolute;
       display: inline-block;
+      transform: translate(0,0);
     }
     :host([hidden]) {
       display: none !important;
     }
-    
+    :host([attach]) {
+      position: absolute;
+      display: inline-block;
+      transform: translate(0,0);
+      -webkit-filter: drop-shadow(0 0 7px rgba(0,0,0,.5));
+      filter: drop-shadow(0 0 7px rgba(0, 0, 0, .5));
+    }
+
     .content {
       background: #fff;
       border-radius: 4px;
@@ -20,9 +28,6 @@
       position: relative;
       -webkit-transform: scale(0.7);
       transform: scale(0.7);
-      -webkit-transition: transform 0.3s, opacity 0.3s;
-      transition: transform 0.3s, opacity 0.3s;
-      will-change: transform, opacity;
       @apply(--dialog-el-content);
     }
 
@@ -33,6 +38,9 @@
       top:50%;
       -webkit-transform: translate(-50%, -50%) scale(0.7);
       transform: translate(-50%, -50%) scale(0.7);
+      -webkit-transition: transform 0.3s, opacity 0.3s;
+      transition: transform 0.3s, opacity 0.3s;
+      will-change: transform, opacity;
     }
 
 
@@ -50,7 +58,7 @@
       @apply(--dialog-el-overlay);
     }
 
-    :host([visible]) > .content {
+    :host([visible]) > .pointer > .content {
       opacity: 1;
       transform: scale(1.0);
     }
@@ -61,7 +69,86 @@
     :host([visible]) > .overlay {
       opacity: 1;
     }
-    
+
+    :host([attach=left]) {
+      transform: translate(50px,0);
+    }
+
+    :host([attach=right]) {
+      transform: translate(-50px,0);
+    }
+
+    :host([attach=bottom]) {
+      transform: translate(0,25px);
+    }
+
+    :host([attach=top]) {
+      transform: translate(0,-50px);
+    }
+
+    :host([attach]) .pointer {
+      height: 0px;
+    }
+
+    :host([attach]) .pointer:after {
+      border: 16px solid transparent;
+      content: '';
+      height: 0;
+      overflow: visible;
+      position: absolute;
+      width: 0;
+    }
+
+    :host([attach=left]) .pointer:after {
+      border-left-width: 0;
+      border-right-color: #FFF;
+      top: -16px;
+      left: -15px;
+    }
+
+    :host([attach=right]) .pointer:after {
+      border-left-color: #FFF;
+      border-right-width: 0;
+      left: -17px;
+      top: -16px;
+    }
+
+    :host([attach=bottom]) .pointer:after {
+      border-bottom-color: #FFF;
+      border-top-width: 0;
+      left: -18px;
+      top: -16px;
+    }
+
+    :host([attach=top]) .pointer:after {
+      border-bottom-width: 0;
+      border-top-color: #FFF;
+      left: -18px;
+      top: 17px
+    }
+
+    :host([attach=left]) .content {
+      -webkit-transform: translate(0, -40%) !important;
+              transform: translate(0, -40%) !important;
+    }
+
+    :host([attach=right]) .content {
+      right: 16px;
+      -webkit-transform: translate(-100%, -40%) !important;
+              transform: translate(-100%, -40%) !important;
+    }
+
+    :host([attach=top]) .content {
+      top: 16px;
+      -webkit-transform: translate(-50%, -100%) !important;
+              transform: translate(-50%, -100%) !important;
+    }
+
+    :host([attach=bottom]) .content {
+      bottom: 0;
+      -webkit-transform: translate(-50%, 0) !important;
+              transform: translate(-50%, 0) !important;
+    }
   </style>
 </template>
 <template id='modal'>
@@ -72,8 +159,10 @@
   </div>
 </template>
 <template id='dialog'>
-  <div class="content">
-    <content></content>
+  <div class="pointer">
+    <div class="content">
+      <content></content>
+    </div>
   </div>
 </template>
 
