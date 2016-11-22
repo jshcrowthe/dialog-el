@@ -77,4 +77,15 @@ document.body.appendChild(dialogEl);
   
 - `dialog-closed`
 
-  Fired whenever the dialog is closed.
+
+  
+## CSS Custom Properties
+
+Use these to override default styles
+
+Property Name | Description | Default Value
+-------------| --------------| -------------
+`--dialog-el-padding` | Used as the padding for the dialog | `15px`
+`--dialog-el-background` | Used for the `background` property of the dialog | `#FFFFFF`
+
+These defaults effectively wrap your provided local DOM in a 15px white border. Override them to change the appearance.  
