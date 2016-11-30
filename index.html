@@ -29,7 +29,7 @@
 
     if (!webComponentsSupported) {
       var wcPoly = document.createElement('script');
-      wcPoly.src = shadowDOMSupported ? 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js' : 
+      wcPoly.src = shadowDOMSupported ? 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents-lite.min.js' :
       'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.22/webcomponents.min.js';
       wcPoly.async = true;
       document.head.appendChild(wcPoly);
@@ -58,7 +58,7 @@
   <p>This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer&#39;s <a href="https://github.com/PolymerElements/paper-dialog">paper-dialog</a> and the <a href="https://github.com/edenspiekermann/a11y-dialog">A11y Dialog</a> fork from Edenspiekermann.</p>
 
   <h2>Demo</h2>
-  
+
   <p>Click the following buttons to see different types of modals</p>
 
   <ul class='horizontal-ul'>
@@ -69,7 +69,7 @@
     <li><button class='focustrapping'>Focus Trapping Modal</button></li>
     <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
   </ul>
-  
+
 
   <dialog-el id='simpleDialog'>
     <h1>Demo Dialog!</h1>
@@ -232,6 +232,50 @@
       <p>Based on the value of this property (left, right, top, bottom), it sets an arrow pointer on the side of the dialog. For example, <code>arrow-direction="left"</code> adds an arrow to the left side of the dialog. Note that this does not work with the <code>modal</code> property.</p>
     </li>
   </ul>
+
+  <h2>Events</h2>
+
+  <ul>
+    <li>
+      <p><code>dialog-opened</code></p>
+
+      <p>Fired whenever the dialog is opened.</p>
+    </li>
+
+    <li>
+      <p><code>dialog-closed</code></p>
+
+      <p>Fired whenever the dialog is closed.</p>
+
+    </li>
+  </ul>
+
+
+  <h2>CSS Custom Properties</h2>
+  <p>Use these to override default styles</p>
+  <table>
+    <thead>
+      <tr>
+        <td>Property Name</td>
+        <td>Description</td>
+        <td>Default Value</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>--dialog-el-padding</code></td>
+        <td>Used as the padding for the dialog</td>
+        <td><code>15px</code></td>
+      </tr>
+      <tr>
+        <td><code>--dialog-el-background</code></td>
+        <td>Used for the <code>background</code> property of the dialog</td>
+        <td><code>#FFFFFF</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>These defaults effectively wrap your provided local DOM in a 15px white border. Override them to change the appearance.</p>
   <script src='assets/prism.js'></script>
 </body>
 </html>
