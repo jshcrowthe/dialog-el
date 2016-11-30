@@ -67,6 +67,7 @@
     <li><button class='nestedDialog'>Nested Dialog</button></li>
     <li><button class='nestedModal'>Nested Modal</button></li>
     <li><button class='focustrapping'>Focus Trapping Modal</button></li>
+    <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
   </ul>
   
 
@@ -111,9 +112,14 @@
     <textarea name="" id="" cols="30" rows="10"></textarea>
     <button dialog-submit>Save!</button>
   </dialog-el>
-  
+
+  <dialog-el id='arrowDirectionDialog' arrow-direction='left'>
+    <h1>Arrow Direction Dialog!</h1>
+    <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
+  </dialog-el>
+
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog'];
     dialogs.forEach(function(selector) {
       document.querySelector('.' + selector).addEventListener('click', function() {
         document.querySelector('#' + selector).show();
@@ -218,6 +224,12 @@
       <p><code>modal</code></p>
 
       <p>If set the dialog will render as a fixed position modal instead of an absolute positioned div.</p>
+    </li>
+
+    <li>
+      <p><code>arrow-direction</code></p>
+
+      <p>Based on the value of this property (left, right, top, bottom), it sets an arrow pointer on the side of the dialog. For example, <code>arrow-direction="left"</code> adds an arrow to the left side of the dialog. Note that this does not work with the <code>modal</code> property.</p>
     </li>
   </ul>
   <script src='assets/prism.js'></script>
