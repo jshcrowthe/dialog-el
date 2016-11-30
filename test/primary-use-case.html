@@ -54,83 +54,72 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </dialog-el>
       </template>
     </test-fixture>
-    <test-fixture id="a11y">
-      <template>
-        <dialog-el>
-          <h1>Simple Dialog</h1>
-          <button dialog-cancel>Cancel</button>
-        </dialog-el>
-      </template>
-    </test-fixture>
 
     <script>
-      suite('<dialog-el>', function() {
+      describe('<dialog-el>', function() {
+        var dialog, submitDialog, cancelDialog;
 
-        test('Should have expected API methods', function() {
-          var el = fixture('simple-dialog');
-          expect(el.show).to.be.ok;
-          expect(el.close).to.be.ok;
+        beforeEach(function() {
+          dialog = fixture('simple-dialog');
+          submitDialog = fixture('simple-dialog-with-submit-button');
+          cancelDialog = fixture('simple-dialog-with-cancel-button');
         });
 
-        test('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
-          var el = fixture('simple-dialog');
+
+        it('Should have expected API methods', function() {
+          expect(dialog.show).to.be.ok;
+          expect(dialog.close).to.be.ok;
+        });
+
+        it('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
           var handler = function() {
-            document.removeEventListener('dialog-opened', handler);
+            dialog.removeEventListener('dialog-opened', handler);
             done();
           };
-          document.addEventListener('dialog-opened', handler);
-          el.show();
+          dialog.addEventListener('dialog-opened', handler);
+          dialog.show();
         });
 
-        test('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
-          var el = fixture('simple-dialog');
+        it('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
           var handler = function() {
-            document.removeEventListener('dialog-closed', handler);
+            dialog.removeEventListener('dialog-closed', handler);
             done();
           };
-          document.addEventListener('dialog-closed', handler);
-          el.show()
-            .then(function() { el.close() });        
+          dialog.addEventListener('dialog-closed', handler);
+          dialog.show()
+            .then(function() { 
+              dialog.close() 
+            });        
         });
 
-        test('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
-          var el = fixture('simple-dialog-with-submit-button');
-          
-          var button = el.lastElementChild;
+        it('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
+          var button = submitDialog.lastElementChild;
 
           var handler = function(e) {
             expect(e.detail.action).to.equal('submit');
-            document.removeEventListener('dialog-closed', handler);
+            submitDialog.removeEventListener('dialog-closed', handler);
             done();
           };
-          document.addEventListener('dialog-closed', handler);
-          el.show()
+          submitDialog.addEventListener('dialog-closed', handler);
+          submitDialog.show()
             .then(function() {
               button.click();
             });
         });
 
-        test('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
-          var el = fixture('simple-dialog-with-cancel-button');
-          
-          var button = el.lastElementChild;
+        it('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
+          var button = cancelDialog.lastElementChild;
 
           var handler = function(e) {
             expect(e.detail.action).to.equal('cancel');
-            document.removeEventListener('dialog-closed', handler);
+            cancelDialog.removeEventListener('dialog-closed', handler);
             done();
           };
-          document.addEventListener('dialog-closed', handler);
-          el.show()
+          cancelDialog.addEventListener('dialog-closed', handler);
+          cancelDialog.show()
             .then(function() {
               button.click();
             });
-        });
-
-        test('Should pass an a11y audit (in native shadow DOM only)', function() {
-          if (!window.ShadowDOMPolyfill) {
-            a11ySuite('a11y');
-          }
         });
       });
     </script>

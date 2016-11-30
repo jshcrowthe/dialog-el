@@ -173,6 +173,7 @@
     // Master dialog stack, we use this to compute z-indexes as well as 
     // know which dialogs/modals to close on a click event in the DOM
     var _dialogStack = [];
+    var _globalWindowListener = false;
 
     var _isTouch = true;
     var _touchActive = false;
@@ -251,52 +252,6 @@
       if (focusableChildren[0]) focusableChildren[0].focus();
     }
 
-    // Content click handler
-    var handleClick = function() {
-      var _host;
-      return function(e) {
-        var host = _host || (function(el) {
-          var orig = el;
-          while(el.nodeType != 11) {
-            el = el.parentNode;
-          }
-          // Set up reference to host to avoid
-          // querying the DOM later
-          return (_host = el.host);
-        })(this);
-
-        // Find the index of the clicked dialog
-        var index = _dialogStack.indexOf(host);
-
-        // If there are dialogs on top of the clicked
-        // dialog loop through and close them (we assume
-        // that you intended to close all the other
-        // dialogs in this case)
-        if (_dialogStack.length > index + 1) {
-          _dialogStack.forEach(function(dialog, _index) {
-            if (_index <= index) return;
-            if (dialog.visible) dialog.close();
-          });
-        }
-        
-        /**
-         * By adding `dialog-submit` or `dialog-cancel` to a
-         * child of one of your components you can easily 
-         * close out the current dialog/modal. This will also
-         * customize the reason statement in the close event.
-         */
-        var dismissNodes = e.path.filter(function(el) {
-          return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
-        });
-        if (dismissNodes.length) {
-          host._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
-          host.close();
-        }
-
-        if (e && e.stopPropagation) e.stopPropagation();
-      };
-    };
-
     /**
      * Executes querySelector on the current document
      */
@@ -315,7 +270,6 @@
     var modalTemplate = querySelector('#modal');
 
     var proto = Object.create(HTMLElement.prototype);
-
 
     /**
      * Getter/Setter for the `visible` status
@@ -388,7 +342,7 @@
 
     proto.detachedCallback = function() {
       if (this.visible) this.close();
-    }
+    };
 
     proto.show = function() {
       return Promise.resolve()
@@ -446,7 +400,7 @@
           bubbles: true,
         }));
       }.bind(this));
-    }
+    };
 
     proto.close = function() {
       return Promise.resolve()
@@ -461,6 +415,13 @@
         _dialogStack = _dialogStack.filter(function(dialog) {
           return dialog !== this
         }.bind(this));
+
+        // Remove the global listener if the _dialogStack is empty
+        if (!_dialogStack.length) {
+          window.removeEventListener('click', proto._closeAll);
+          _globalWindowListener = false;
+        }
+
       }.bind(this))
       .then(function() {
         // Focus last active element and remove old reference
@@ -472,8 +433,8 @@
       .then(function() {
         // Transition the elements out and resolve when the 
         // animation has completed
+        var event = 'transitionend';
         return new Promise(function(resolve, reject) {
-          var event = 'transitionend';
           var handler = function() {
             resolve();
             this._content.removeEventListener(event, handler);
@@ -505,8 +466,53 @@
             action: this._closeAction
           }
         }));
-      }.bind(this))
-    }
+      }.bind(this));
+    };
+
+    proto._closeAll = function() {
+      _dialogStack.forEach(function(dialog) {
+        if (dialog && dialog.close) dialog.close();
+      });
+    };
+
+    proto._clickHandler = function(e) {
+      // Find the index of the clicked dialog
+      var index = _dialogStack.indexOf(this);
+
+      // If there are dialogs on top of the clicked
+      // dialog loop through and close them (we assume
+      // that you intended to close all the other
+      // dialogs in this case)
+      if (_dialogStack.length > index + 1) {
+        _dialogStack.forEach(function(dialog, _index) {
+          if (_index <= index) return;
+          if (dialog.visible) dialog.close();
+        });
+      }
+      
+      /**
+       * By adding `dialog-submit` or `dialog-cancel` to a
+       * child of one of your components you can easily 
+       * close out the current dialog/modal. This will also
+       * customize the reason statement in the close event.        
+       */
+      var dismissNodes = e.path.filter(function(el) {
+        return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
+      });
+
+      /**
+       * Set the `_closeAction` property if `dialog-submit` or `dialog-cancel` is used to close the modal
+       */
+      if (dismissNodes.length) {
+        this._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
+        this.close();
+      }
+
+      /**
+       * Don't propagate the event if we haven't already closed the modal
+       */
+      if (e && e.stopPropagation) e.stopPropagation();
+    };
 
     proto._getEventHandlers = function() {
       var array = []
@@ -515,14 +521,7 @@
       array.push({
         element: this._content,
         event: 'click',
-        handler: handleClick()
-      });
-
-      array.push({
-        element: window,
-        event: 'click',
-        handler: this.close.bind(this),
-        delay: true
+        handler: this._clickHandler.bind(this)
       });
 
       // A11y Event Handlers
@@ -553,7 +552,7 @@
       });
 
       return array;
-    }
+    };
 
     // Properly attach all the needed event handlers
     proto._attachEventHandlers = function() {
@@ -568,13 +567,22 @@
           obj.element.addEventListener(obj.event, obj.handler);
         }
       }.bind(this));
-    }
+
+      // Window clicks should close all modals
+      // There is only one listener here
+      if (!_globalWindowListener) {
+        setTimeout(function() {
+          window.addEventListener('click', proto._closeAll);
+        }.bind(this), 0);
+        _globalWindowListener = true;
+      }
+    };
 
     // Detach all the needed event handlers
     proto._detachEventHandlers = function() {
       if (!Array.isArray(this.__handlers)) return;
       this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
-    }
+    };
 
 
     document.registerElement('dialog-el', {
