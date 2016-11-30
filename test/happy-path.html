@@ -54,25 +54,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </dialog-el>
       </template>
     </test-fixture>
-    <test-fixture id="a11y">
-      <template>
-        <dialog-el>
-          <h1>Simple Dialog</h1>
-          <button dialog-cancel>Cancel</button>
-        </dialog-el>
-      </template>
-    </test-fixture>
 
     <script>
-      suite('<dialog-el>', function() {
+      describe('<dialog-el>', function() {
 
-        test('Should have expected API methods', function() {
+        it('Should have expected API methods', function() {
           var el = fixture('simple-dialog');
           expect(el.show).to.be.ok;
           expect(el.close).to.be.ok;
         });
 
-        test('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
+        it('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
           var el = fixture('simple-dialog');
           var handler = function() {
             document.removeEventListener('dialog-opened', handler);
@@ -82,7 +74,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           el.show();
         });
 
-        test('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
+        it('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
           var el = fixture('simple-dialog');
           var handler = function() {
             document.removeEventListener('dialog-closed', handler);
@@ -93,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .then(function() { el.close() });        
         });
 
-        test('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
+        it('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
           var el = fixture('simple-dialog-with-submit-button');
           
           var button = el.lastElementChild;
@@ -110,7 +102,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         });
 
-        test('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
+        it('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
           var el = fixture('simple-dialog-with-cancel-button');
           
           var button = el.lastElementChild;
@@ -125,12 +117,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .then(function() {
               button.click();
             });
-        });
-
-        test('Should pass an a11y audit (in native shadow DOM only)', function() {
-          if (!window.ShadowDOMPolyfill) {
-            a11ySuite('a11y');
-          }
         });
       });
     </script>

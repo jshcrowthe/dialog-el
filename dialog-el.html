@@ -260,12 +260,6 @@
       return script.ownerDocument.querySelector(selector);
     };
 
-    var _closeAll = function() {
-      _dialogStack.forEach(function(dialog) {
-        if (dialog && dialog.close) dialog.close();
-      });
-    };
-
     /** 
      * Reference the template tag in this current document when HTML imported
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
@@ -276,7 +270,6 @@
     var modalTemplate = querySelector('#modal');
 
     var proto = Object.create(HTMLElement.prototype);
-
 
     /**
      * Getter/Setter for the `visible` status
@@ -349,7 +342,7 @@
 
     proto.detachedCallback = function() {
       if (this.visible) this.close();
-    }
+    };
 
     proto.show = function() {
       return Promise.resolve()
@@ -407,7 +400,7 @@
           bubbles: true,
         }));
       }.bind(this));
-    }
+    };
 
     proto.close = function() {
       return Promise.resolve()
@@ -425,7 +418,7 @@
 
         // Remove the global listener if the _dialogStack is empty
         if (!_dialogStack.length) {
-          window.removeEventListener('click', _closeAll);
+          window.removeEventListener('click', proto._closeAll);
           _globalWindowListener = false;
         }
 
@@ -474,7 +467,13 @@
           }
         }));
       }.bind(this));
-    }
+    };
+
+    proto._closeAll = function() {
+      _dialogStack.forEach(function(dialog) {
+        if (dialog && dialog.close) dialog.close();
+      });
+    };
 
     proto._clickHandler = function(e) {
       // Find the index of the clicked dialog
@@ -553,7 +552,7 @@
       });
 
       return array;
-    }
+    };
 
     // Properly attach all the needed event handlers
     proto._attachEventHandlers = function() {
@@ -573,17 +572,17 @@
       // There is only one listener here
       if (!_globalWindowListener) {
         setTimeout(function() {
-          window.addEventListener('click', _closeAll);
-        }, 0);
+          window.addEventListener('click', proto._closeAll);
+        }.bind(this), 0);
         _globalWindowListener = true;
       }
-    }
+    };
 
     // Detach all the needed event handlers
     proto._detachEventHandlers = function() {
       if (!Array.isArray(this.__handlers)) return;
       this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
-    }
+    };
 
 
     document.registerElement('dialog-el', {
