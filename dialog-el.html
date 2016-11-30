@@ -251,52 +251,6 @@
       if (focusableChildren[0]) focusableChildren[0].focus();
     }
 
-    // Content click handler
-    var handleClick = function() {
-      var _host;
-      return function(e) {
-        var host = _host || (function(el) {
-          var orig = el;
-          while(el.nodeType != 11) {
-            el = el.parentNode;
-          }
-          // Set up reference to host to avoid
-          // querying the DOM later
-          return (_host = el.host);
-        })(this);
-
-        // Find the index of the clicked dialog
-        var index = _dialogStack.indexOf(host);
-
-        // If there are dialogs on top of the clicked
-        // dialog loop through and close them (we assume
-        // that you intended to close all the other
-        // dialogs in this case)
-        if (_dialogStack.length > index + 1) {
-          _dialogStack.forEach(function(dialog, _index) {
-            if (_index <= index) return;
-            if (dialog.visible) dialog.close();
-          });
-        }
-        
-        /**
-         * By adding `dialog-submit` or `dialog-cancel` to a
-         * child of one of your components you can easily 
-         * close out the current dialog/modal. This will also
-         * customize the reason statement in the close event.
-         */
-        var dismissNodes = e.path.filter(function(el) {
-          return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
-        });
-        if (dismissNodes.length) {
-          host._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
-          host.close();
-        }
-
-        if (e && e.stopPropagation) e.stopPropagation();
-      };
-    };
-
     /**
      * Executes querySelector on the current document
      */
@@ -508,6 +462,39 @@
       }.bind(this))
     }
 
+    proto._clickHandler = function(e) {
+      // Find the index of the clicked dialog
+      var index = _dialogStack.indexOf(this);
+
+      // If there are dialogs on top of the clicked
+      // dialog loop through and close them (we assume
+      // that you intended to close all the other
+      // dialogs in this case)
+      if (_dialogStack.length > index + 1) {
+        _dialogStack.forEach(function(dialog, _index) {
+          if (_index <= index) return;
+          if (dialog.visible) dialog.close();
+        });
+      }
+      
+      /**
+        * By adding `dialog-submit` or `dialog-cancel` to a
+        * child of one of your components you can easily 
+        * close out the current dialog/modal. This will also
+        * customize the reason statement in the close event.
+        */
+      var dismissNodes = e.path.filter(function(el) {
+        return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
+      });
+
+      if (dismissNodes.length) {
+        this._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
+        this.close();
+      }
+
+      if (e && e.stopPropagation) e.stopPropagation();
+    };
+
     proto._getEventHandlers = function() {
       var array = []
 
@@ -515,7 +502,7 @@
       array.push({
         element: this._content,
         event: 'click',
-        handler: handleClick()
+        handler: this._clickHandler.bind(this)
       });
 
       array.push({
