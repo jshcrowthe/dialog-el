@@ -433,8 +433,8 @@
       .then(function() {
         // Transition the elements out and resolve when the 
         // animation has completed
+        var event = 'transitionend';
         return new Promise(function(resolve, reject) {
-          var event = 'transitionend';
           var handler = function() {
             resolve();
             this._content.removeEventListener(event, handler);
