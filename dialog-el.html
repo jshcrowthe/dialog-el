@@ -448,9 +448,7 @@
       }.bind(this));
     }
 
-    proto.close = function(e) {
-      // Allow persistent dialogs if the element clicked on has an open-dialog attribute.
-      if (e && e.target && e.target.attributes["open-dialog"]) return;
+    proto.close = function() {
       return Promise.resolve()
       .then(function() {
         if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
