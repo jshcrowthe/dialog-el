@@ -69,16 +69,21 @@ document.body.appendChild(dialogEl);
 
   If set the dialog will render as a fixed position modal instead of an absolute positioned div.
 
+- `arrow-direction`
+
+  Based on the value of this property (left, right, top, bottom), it sets an arrow pointer on the side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog. Note that this does not work with the `modal` property.
+
+
 ## Events
 
 - `dialog-opened`
 
   Fired whenever the dialog is opened.
-  
+
 - `dialog-closed`
 
 
-  
+
 ## CSS Custom Properties
 
 Use these to override default styles
@@ -88,4 +93,5 @@ Property Name | Description | Default Value
 `--dialog-el-padding` | Used as the padding for the dialog | `15px`
 `--dialog-el-background` | Used for the `background` property of the dialog | `#FFFFFF`
 
-These defaults effectively wrap your provided local DOM in a 15px white border. Override them to change the appearance.  
+These defaults effectively wrap your provided local DOM in a 15px white border. Override them to change the appearance.
+
