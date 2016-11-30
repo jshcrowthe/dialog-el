@@ -173,6 +173,7 @@
     // Master dialog stack, we use this to compute z-indexes as well as 
     // know which dialogs/modals to close on a click event in the DOM
     var _dialogStack = [];
+    var _globalWindowListener = false;
 
     var _isTouch = true;
     var _touchActive = false;
@@ -257,6 +258,12 @@
     var querySelector = function(selector) {
       var script = document._currentScript || document.currentScript;
       return script.ownerDocument.querySelector(selector);
+    };
+
+    var _closeAll = function() {
+      _dialogStack.forEach(function(dialog) {
+        if (dialog && dialog.close) dialog.close();
+      });
     };
 
     /** 
@@ -415,6 +422,13 @@
         _dialogStack = _dialogStack.filter(function(dialog) {
           return dialog !== this
         }.bind(this));
+
+        // Remove the global listener if the _dialogStack is empty
+        if (!_dialogStack.length) {
+          window.removeEventListener('click', _closeAll);
+          _globalWindowListener = false;
+        }
+
       }.bind(this))
       .then(function() {
         // Focus last active element and remove old reference
@@ -459,7 +473,7 @@
             action: this._closeAction
           }
         }));
-      }.bind(this))
+      }.bind(this));
     }
 
     proto._clickHandler = function(e) {
@@ -478,20 +492,26 @@
       }
       
       /**
-        * By adding `dialog-submit` or `dialog-cancel` to a
-        * child of one of your components you can easily 
-        * close out the current dialog/modal. This will also
-        * customize the reason statement in the close event.
-        */
+       * By adding `dialog-submit` or `dialog-cancel` to a
+       * child of one of your components you can easily 
+       * close out the current dialog/modal. This will also
+       * customize the reason statement in the close event.        
+       */
       var dismissNodes = e.path.filter(function(el) {
         return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
       });
 
+      /**
+       * Set the `_closeAction` property if `dialog-submit` or `dialog-cancel` is used to close the modal
+       */
       if (dismissNodes.length) {
         this._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
         this.close();
       }
 
+      /**
+       * Don't propagate the event if we haven't already closed the modal
+       */
       if (e && e.stopPropagation) e.stopPropagation();
     };
 
@@ -503,13 +523,6 @@
         element: this._content,
         event: 'click',
         handler: this._clickHandler.bind(this)
-      });
-
-      array.push({
-        element: window,
-        event: 'click',
-        handler: this.close.bind(this),
-        delay: true
       });
 
       // A11y Event Handlers
@@ -555,6 +568,15 @@
           obj.element.addEventListener(obj.event, obj.handler);
         }
       }.bind(this));
+
+      // Window clicks should close all modals
+      // There is only one listener here
+      if (!_globalWindowListener) {
+        setTimeout(function() {
+          window.addEventListener('click', _closeAll);
+        }, 0);
+        _globalWindowListener = true;
+      }
     }
 
     // Detach all the needed event handlers
