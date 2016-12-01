@@ -3,23 +3,18 @@
     * {
       box-sizing: border-box;
     }
+    
     :host {
       position: absolute;
       display: inline-block;
     }
+
     :host([hidden]) {
       display: none !important;
     }
-    :host([arrow-direction]) {
-      position: absolute;
-      display: inline-block;
-      transform: translate(0,0);
-      -webkit-filter: drop-shadow(0 0 7px rgba(0,0,0,.5));
-      filter: drop-shadow(0 0 7px rgba(0, 0, 0, .5));
-    }
 
     .content {
-      background: var(--dialog-el-background, #fff);
+      background: var(--dialog-el-background, #FFFFFF);
       border-radius: 4px;
       box-shadow: 0px 0px 4px 0px rgba(0,0,0,0.35), 0px 3px 2px 0px rgba(0,0,0,0.18);
       opacity: 0;
@@ -55,102 +50,57 @@
       will-change: opacity;
     }
 
-    :host([visible]) > .pointer > .content {
+    :host([visible]) > .content {
       opacity: 1;
       transform: scale(1.0);
     }
     :host([modal][visible]) > .overlay > .content {
       opacity: 1;
-      transform: translate(-50%, -50%) scale(1.0);
+      transform: translate3d(-50%, -50%, 0) scale(1.0);
     }
     :host([visible]) > .overlay {
       opacity: 1;
     }
 
-    :host([arrow-direction=left]) {
-      transform: translate(50px,0);
-    }
-
-    :host([arrow-direction=right]) {
-      transform: translate(-50px,0);
-    }
-
-    :host([arrow-direction=top]) {
-      transform: translate(0,25px);
-    }
-
-    :host([arrow-direction=bottom]) {
-      transform: translate(0,-50px);
+    :host(:not([arrow-direction])) .pointer, 
+    :host([arrow-direction][modal]) .pointer {
+      display: none !important;
     }
 
     :host([arrow-direction]) .pointer {
-      height: 0px;
-    }
-
-    :host([arrow-direction]) .pointer:after {
-      border: 16px solid transparent;
-      content: '';
-      height: 0;
-      overflow: visible;
+      height: 22px;
+      width: 22px;
+      display: block;
       position: absolute;
-      width: 0;
-      opacity: 0;
+      top: 0;
+      left: 50%;
+      transform: rotate(45deg) translate3d(-50%,-5px,0);
+      z-index: -1;
+      background-color: var(--dialog-el-background, #FFFFFF);
+      box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), -1px -1px 1px 0px rgba(0,0,0,0.18);
     }
 
-    :host([arrow-direction][visible]) .pointer:after {
-      opacity: 1;
+    :host([arrow-direction=left]) .pointer {
+      top: 50%;
+      left: 0;
+      transform: rotate(45deg) translate3d(-14px,2px,0);
+      box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), -1px 1px 1px 0px rgba(0,0,0,0.18);
     }
 
-    :host([arrow-direction=left]) .pointer:after {
-      border-left-width: 0;
-      border-right-color: #FFF;
-      top: -16px;
-      left: -15px;
+    :host([arrow-direction=bottom]) .pointer {
+      top: 100%;
+      left: 50%;
+      transform: rotate(45deg) translate3d(-50%,-5px,0);
+      box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px 2px 1px 0px rgba(0,0,0,0.18);
     }
 
-    :host([arrow-direction=right]) .pointer:after {
-      border-left-color: #FFF;
-      border-right-width: 0;
-      left: -17px;
-      top: -16px;
+    :host([arrow-direction=right]) .pointer {
+      top: 50%;
+      left: 100%;
+      transform: rotate(45deg) translate3d(-14px,2px,0);
+      box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px -1px 1px 0px rgba(0,0,0,0.18);
     }
 
-    :host([arrow-direction=top]) .pointer:after {
-      border-bottom-color: #FFF;
-      border-top-width: 0;
-      left: -18px;
-      top: -16px;
-    }
-
-    :host([arrow-direction=bottom]) .pointer:after {
-      border-bottom-width: 0;
-      border-top-color: #FFF;
-      left: -18px;
-      top: 16px
-    }
-
-    :host([arrow-direction=left]) .content {
-      -webkit-transform: translate(0, -40%) !important;
-              transform: translate(0, -40%) !important;
-    }
-
-    :host([arrow-direction=right]) .content {
-      right: 16px;
-      -webkit-transform: translate(-100%, -40%) !important;
-              transform: translate(-100%, -40%) !important;
-    }
-
-    :host([arrow-direction=bottom]) .content {
-      top: 16px;
-      -webkit-transform: translate(-50%, -100%) !important;
-              transform: translate(-50%, -100%) !important;
-    }
-
-    :host([arrow-direction=top]) .content {
-      bottom: 0;
-      -webkit-transform: translate(-50%, 0) !important;
-              transform: translate(-50%, 0) !important;
-    }
   </style>
 </template>
 <template id='modal'>
@@ -161,10 +111,9 @@
   </div>
 </template>
 <template id='dialog'>
-  <div class="pointer">
-    <div class="content">
-      <content></content>
-    </div>
+  <div class="content">
+    <div class='pointer'></div>
+    <content></content>
   </div>
 </template>
 
