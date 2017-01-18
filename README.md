@@ -18,16 +18,22 @@ There are no non-native dependencies in this Web Component. If your browser supp
 
 ## Utilization
 
-Because this is a Web Component you can instantiate it using one of two methods:
+_Examples:_
 
-HTML
+**HTML**
 ```html
 <dialog-el>
-  <!-- Your dialog/modal content -->
+  <h1>A header</h1>
+  <p>Dialog Content</p>
+</dialog-el>
+
+<dialog-el modal>
+  <h1>A modal</h1>
+  <p>Modal Content</p>
 </dialog-el>
 ```
 
-JS
+**JavaScript**
 ```javascript
 var dialogEl = document.createElement('dialog-el');
 document.body.appendChild(dialogEl);
@@ -45,7 +51,7 @@ document.body.appendChild(dialogEl);
   dialog.show();
   ```
 
-  This function returns a Promise that you can use to perform operations after the dialog/modal has displayed.
+  This function returns a `Promise` that you can use to perform operations after the dialog/modal has displayed.
 
   **NOTE: The `show` function, if called on an already open dialog, will throw an error**
 
@@ -59,7 +65,7 @@ document.body.appendChild(dialogEl);
   dialog.close();
   ```
 
-  This function returns a Promise that you can use to perform operations after the dialog/modal has closed.
+  This function returns a `Promise` that you can use to perform operations after the dialog/modal has closed.
 
   **NOTE: The `close` function, if called on an already closed dialog, will throw an error**
 
@@ -67,11 +73,22 @@ document.body.appendChild(dialogEl);
 
 - `modal`
 
-  If set the dialog will render as a fixed position modal instead of an absolute positioned div.
+  If set the dialog will render as a fixed position modal instead of an absolute positioned dialog.
 
 - `arrow-direction`
 
-  Based on the value of this property (left, right, top, bottom), it sets an arrow pointer on the side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog. Note that this does not work with the `modal` property.
+  Based on the value of this property (left, right, top, bottom), it will render an arrow on that side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog.
+
+
+  _Example:_
+  ```html
+  <dialog-el arrow-direction='left'>
+    <h1>A header</h1>
+    <p>Dialog Content</p>
+  </dialog-el>
+  ```
+
+  **NOTE: This does not work with the `modal` property**
 
 
 ## Events
@@ -82,6 +99,7 @@ document.body.appendChild(dialogEl);
 
 - `dialog-closed`
 
+  Fired whenever the dialog is closed.
 
 
 ## CSS Custom Properties

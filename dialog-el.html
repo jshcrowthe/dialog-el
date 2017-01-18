@@ -110,6 +110,7 @@
     </div>
   </div>
 </template>
+
 <template id='dialog'>
   <div class="content">
     <div class='pointer'></div>
@@ -533,9 +534,9 @@
       this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
     };
 
-
     document.registerElement('dialog-el', {
       prototype: proto
     });
+
   })(document, HTMLElement)
 </script>
