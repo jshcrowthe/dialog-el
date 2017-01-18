@@ -3,21 +3,7 @@
 
 # &lt;dialog-el&gt;
 
-## Intro
-
 This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer's [paper-dialog](https://github.com/PolymerElements/paper-dialog) and the [A11y Dialog](https://github.com/edenspiekermann/a11y-dialog) fork from Edenspiekermann.
-
-## Dependencies
-
-There are no non-native dependencies in this Web Component. If your browser supports the following two things you are good. If not you will need to make sure you load the Polyfills first
-
-- Promises
-  - https://github.com/taylorhakes/promise-polyfill
-  - https://github.com/stefanpenner/es6-promise
-- Web Components (including Shadow DOM)
-  - https://github.com/webcomponents/webcomponentsjs
-
-## Utilization
 
 <!--
 <custom-element-demo>
@@ -60,6 +46,18 @@ There are no non-native dependencies in this Web Component. If your browser supp
   </template>
 </custom-element-demo>
 -->
+
+## Dependencies
+
+There are no non-native dependencies in this Web Component. If your browser supports the following two things you are good. If not you will need to make sure you load the Polyfills first
+
+- Promises
+  - https://github.com/taylorhakes/promise-polyfill
+  - https://github.com/stefanpenner/es6-promise
+- Web Components (including Shadow DOM)
+  - https://github.com/webcomponents/webcomponentsjs
+
+## Utilization
 
 _Examples:_
 
