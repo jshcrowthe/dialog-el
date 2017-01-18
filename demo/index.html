@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>paper-toast</title>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <script src="../../webcomponentsjs/webcomponents.js"></script>
+
+  <link rel="import" href="../dialog-el.html">
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+
+  <style is="custom-style" include="demo-pages-shared-styles"></style>
+  <style>
+    .relative {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body unresolved class="centered">
+  <h3>By Default the <code>dialog-el</code> renders an absolutely positioned dialog</h3>
+  <demo-snippet class="centered-demo">
+    <template>
+      <style>
+        .content {
+          width: 100vw;
+          max-width: 350px;
+        }
+      </style>
+
+      <div style='position: relative;'>
+        <paper-button raised onclick="dialog0.show()">Default Dialog</paper-button>
+
+        <dialog-el id="dialog0">
+          <div class="content">
+            <h4>Dialog</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
+          </div>
+        </dialog-el>
+      </div>
+    </template>
+  </demo-snippet>
+
+  <h3>When the <code>modal</code> property is set, the dialog is rendered as a centered modal</h3>
+  <demo-snippet class="centered-demo">
+    <template>
+      <paper-button raised onclick="dialog1.show()">Modal Dialog</paper-button>
+
+      <dialog-el id="dialog1" modal>
+        <h4>Modal</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi debitis quam dicta, ex, libero porro. Iste provident soluta, et tempora maxime distinctio omnis sunt aliquam aperiam qui, libero, inventore tenetur.</p>
+      </dialog-el>
+    </template>
+  </demo-snippet>
+
+  <h3>Dialogs and modals can have content with <code>dialog-submit</code>/<code>dialog-cancel</code> that will automatically close the dialog/modal for you. It will customize the <code>dialog-closed</code> custom event body with the submit/cancel status</h3>
+  <demo-snippet class="centered-demo">
+    <template>
+      <paper-button raised onclick="dialog2.show()">Modal Dialog</paper-button>
+
+      <dialog-el id="dialog2" modal>
+        <h4>Modal</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi debitis quam dicta, ex, libero porro. Iste provident soluta, et tempora maxime distinctio omnis sunt aliquam aperiam qui, libero, inventore tenetur.</p>
+        <paper-button raised dialog-submit>Submit</paper-button>
+        <paper-button raised dialog-cancel>Cancel</paper-button>
+      </dialog-el>
+
+      <script>
+        dialog2.addEventListener('dialog-closed', function(event) {
+          console.log(event);
+        });
+      </script>
+    </template>
+  </demo-snippet>
+
+  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property</h3>
+  <demo-snippet class="centered-demo">
+    <template>
+      <style>
+        .content {
+          width: 100vw;
+          max-width: 350px;
+        }
+        .positioned-dialog {
+          transform: translate3d(20px, -50%, 0);
+          top: 50%;
+          left: 100%;
+        }
+      </style>
+
+      <div style='position: relative;'>
+        <paper-button raised onclick="dialog3.show()">Arrow Dialog</paper-button>
+
+        <dialog-el id="dialog3" arrow-direction='left' class="positioned-dialog">
+          <div class="content">
+            <h4>Dialog</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
+          </div>
+        </dialog-el>
+      </div>
+    </template>
+  </demo-snippet>
+
+  <h3>Nested dialogs are also supported with proper a11y tab scoping</h3>
+  <demo-snippet class="centered-demo">
+    <template>
+      <style>
+        .content {
+          width: 100vw;
+          max-width: 350px;
+        }
+      </style>
+
+      <div style='position: relative;'>
+        <paper-button raised onclick="dialog4.show()">Open Dialog</paper-button>
+
+        <dialog-el id="dialog4">
+          <div class="content">
+            <h4>Dialog</h4>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
+            <paper-button raised onclick="dialog5.show()">Open Nested Dialog</paper-button>
+
+            <dialog-el id="dialog5">
+              <div class="content">
+                <h4>Dialog</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
+              </div>
+            </dialog-el>
+            
+          </div>
+        </dialog-el>
+      </div>
+    </template>
+  </demo-snippet>
+
+</body>
+
+</html>

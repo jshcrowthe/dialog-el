@@ -1,10 +1,51 @@
 [![Build Status](https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=master)](https://travis-ci.org/jshcrowthe/dialog-el)
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/jshcrowthe/dialog-el)
 
 # &lt;dialog-el&gt;
 
-## Intro
-
 This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer's [paper-dialog](https://github.com/PolymerElements/paper-dialog) and the [A11y Dialog](https://github.com/edenspiekermann/a11y-dialog) fork from Edenspiekermann.
+
+<!--
+<custom-element-demo>
+  <template>
+    <script src="../webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../paper-button/paper-button.html">
+    <link rel="import" href="dialog-el.html">
+    <style>
+      .centered {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px
+      }
+      .content paper-button {
+        color: #FFFFFF;
+        background-color: #5c6bc0;
+      }
+    </style>
+
+    <div class='centered content'>
+      <paper-button onclick='dialog.show()'>Open Dialog</paper-button>
+      <paper-button onclick='modal.show()'>Open Modal</paper-button>
+      
+      <dialog-el id="dialog">
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
+        </div>
+      </dialog-el>
+      
+      <dialog-el id="modal" modal>
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
+        </div>
+      </dialog-el>
+    </div>
+  </template>
+</custom-element-demo>
+-->
 
 ## Dependencies
 
@@ -18,16 +59,22 @@ There are no non-native dependencies in this Web Component. If your browser supp
 
 ## Utilization
 
-Because this is a Web Component you can instantiate it using one of two methods:
+_Examples:_
 
-HTML
+**HTML**
 ```html
 <dialog-el>
-  <!-- Your dialog/modal content -->
+  <h1>A header</h1>
+  <p>Dialog Content</p>
+</dialog-el>
+
+<dialog-el modal>
+  <h1>A modal</h1>
+  <p>Modal Content</p>
 </dialog-el>
 ```
 
-JS
+**JavaScript**
 ```javascript
 var dialogEl = document.createElement('dialog-el');
 document.body.appendChild(dialogEl);
@@ -45,7 +92,7 @@ document.body.appendChild(dialogEl);
   dialog.show();
   ```
 
-  This function returns a Promise that you can use to perform operations after the dialog/modal has displayed.
+  This function returns a `Promise` that you can use to perform operations after the dialog/modal has displayed.
 
   **NOTE: The `show` function, if called on an already open dialog, will throw an error**
 
@@ -59,7 +106,7 @@ document.body.appendChild(dialogEl);
   dialog.close();
   ```
 
-  This function returns a Promise that you can use to perform operations after the dialog/modal has closed.
+  This function returns a `Promise` that you can use to perform operations after the dialog/modal has closed.
 
   **NOTE: The `close` function, if called on an already closed dialog, will throw an error**
 
@@ -67,11 +114,22 @@ document.body.appendChild(dialogEl);
 
 - `modal`
 
-  If set the dialog will render as a fixed position modal instead of an absolute positioned div.
+  If set the dialog will render as a fixed position modal instead of an absolute positioned dialog.
 
 - `arrow-direction`
 
-  Based on the value of this property (left, right, top, bottom), it sets an arrow pointer on the side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog. Note that this does not work with the `modal` property.
+  Based on the value of this property (left, right, top, bottom), it will render an arrow on that side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog.
+
+
+  _Example:_
+  ```html
+  <dialog-el arrow-direction='left'>
+    <h1>A header</h1>
+    <p>Dialog Content</p>
+  </dialog-el>
+  ```
+
+  **NOTE: This does not work with the `modal` property**
 
 
 ## Events
@@ -82,6 +140,7 @@ document.body.appendChild(dialogEl);
 
 - `dialog-closed`
 
+  Fired whenever the dialog is closed.
 
 
 ## CSS Custom Properties
