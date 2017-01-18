@@ -19,6 +19,48 @@ There are no non-native dependencies in this Web Component. If your browser supp
 
 ## Utilization
 
+<!--
+<custom-element-demo>
+  <template>
+    <script src="../webcomponentsjs/webcomponents.js"></script>
+    <link rel="import" href="../paper-button/paper-button.html">
+    <link rel="import" href="dialog-el.html">
+    <style>
+      .centered {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 200px
+      }
+      .content paper-button {
+        color: #FFFFFF;
+        background-color: #5c6bc0;
+      }
+    </style>
+
+    <div class='centered content'>
+      <paper-button onclick='dialog.show()'>Open Dialog</paper-button>
+      <paper-button onclick='modal.show()'>Open Modal</paper-button>
+      
+      <dialog-el id="dialog">
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
+        </div>
+      </dialog-el>
+      
+      <dialog-el id="modal" modal>
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
+        </div>
+      </dialog-el>
+    </div>
+  </template>
+</custom-element-demo>
+-->
+
 _Examples:_
 
 **HTML**
