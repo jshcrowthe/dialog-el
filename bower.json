@@ -30,5 +30,9 @@
   "dependencies": {
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22",
     "promise-polyfill": "taylorhakes/promise-polyfill#^6.0.1"
+  },
+  "devDependencies": {
+    "paper-button": "PolymerElements/paper-button#^1.0.14",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.2.5"
   }
 }
