@@ -532,6 +532,9 @@
       this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
     };
 
+    /**
+     * @demo demo/index.html
+     */
     document.registerElement('dialog-el', {
       prototype: proto
     });
