@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=master)](https://travis-ci.org/jshcrowthe/dialog-el)
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/jshcrowthe/dialog-el)
 
 # &lt;dialog-el&gt;
 
