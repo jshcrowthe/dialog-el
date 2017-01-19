@@ -6,6 +6,7 @@
 This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer's [paper-dialog](https://github.com/PolymerElements/paper-dialog) and the [A11y Dialog](https://github.com/edenspiekermann/a11y-dialog) fork from Edenspiekermann.
 
 <!--
+```
 <custom-element-demo>
   <template>
     <script src="../webcomponentsjs/webcomponents.js"></script>
@@ -45,6 +46,7 @@ This repo is a Custom Element for creating accessible dialogs/modals It is heavi
     </div>
   </template>
 </custom-element-demo>
+```
 -->
 
 ## Dependencies
