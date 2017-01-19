@@ -5,6 +5,20 @@
 
 This repo is a Custom Element for creating accessible dialogs/modals It is heavily inspired by Polymer's [paper-dialog](https://github.com/PolymerElements/paper-dialog) and the [A11y Dialog](https://github.com/edenspiekermann/a11y-dialog) fork from Edenspiekermann.
 
+## Dependencies
+
+There are no non-native dependencies in this Web Component. If your browser supports the following two things you are good. If not you will need to make sure you load the Polyfills first
+
+- Promises
+  - https://github.com/taylorhakes/promise-polyfill
+  - https://github.com/stefanpenner/es6-promise
+- Web Components (including Shadow DOM)
+  - https://github.com/webcomponents/webcomponentsjs
+
+## Utilization
+
+_Examples:_
+
 <!--
 ```
 <custom-element-demo>
@@ -30,47 +44,21 @@ This repo is a Custom Element for creating accessible dialogs/modals It is heavi
       <paper-button onclick='dialog.show()'>Open Dialog</paper-button>
       <paper-button onclick='modal.show()'>Open Modal</paper-button>
       
-      <dialog-el id="dialog">
-        <div class="content">
-          <h4>Dialog</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
-        </div>
-      </dialog-el>
-      
-      <dialog-el id="modal" modal>
-        <div class="content">
-          <h4>Dialog</h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
-        </div>
-      </dialog-el>
+      <next-code-block></next-code-block>
     </div>
   </template>
 </custom-element-demo>
 ```
 -->
 
-## Dependencies
-
-There are no non-native dependencies in this Web Component. If your browser supports the following two things you are good. If not you will need to make sure you load the Polyfills first
-
-- Promises
-  - https://github.com/taylorhakes/promise-polyfill
-  - https://github.com/stefanpenner/es6-promise
-- Web Components (including Shadow DOM)
-  - https://github.com/webcomponents/webcomponentsjs
-
-## Utilization
-
-_Examples:_
-
 **HTML**
 ```html
-<dialog-el>
+<dialog-el id='dialog'>
   <h1>A header</h1>
   <p>Dialog Content</p>
 </dialog-el>
 
-<dialog-el modal>
+<dialog-el id='modal' modal>
   <h1>A modal</h1>
   <p>Modal Content</p>
 </dialog-el>
