@@ -19,6 +19,7 @@ There are no non-native dependencies in this Web Component. If your browser supp
 
 _Examples:_
 
+**HTML**
 <!--
 ```
 <custom-element-demo>
@@ -51,7 +52,6 @@ _Examples:_
 ```
 -->
 
-**HTML**
 ```html
 <dialog-el id='dialog'>
   <h1>A header</h1>
