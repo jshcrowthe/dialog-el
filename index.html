@@ -113,7 +113,7 @@
     <button dialog-submit>Save!</button>
   </dialog-el>
 
-  <dialog-el id='arrowDirectionDialog' arrow-direction='top'>
+  <dialog-el id='arrowDirectionDialog' arrow-direction='left'>
     <h1>Arrow Direction Dialog!</h1>
     <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
   </dialog-el>
@@ -122,6 +122,15 @@
     var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog'];
     dialogs.forEach(function(selector) {
       document.querySelector('.' + selector).addEventListener('click', function() {
+        // Reposition the arrow-direction dialog
+        if (selector === 'arrowDirectionDialog') {
+          var arrowDirectionDialog = document.querySelector('#arrowDirectionDialog');
+          arrowDirectionDialog.style.top =  document.querySelector('button.arrowDirectionDialog').offsetTop + "px";
+          arrowDirectionDialog.style.left = document.querySelector('button.arrowDirectionDialog').offsetLeft + "px";
+          // The fixed width is to emulate person-card
+          arrowDirectionDialog.style.width = "486px";
+        }
+        // Show the dialog
         document.querySelector('#' + selector).show();
       });
     });
