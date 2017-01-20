@@ -1,13 +1,9 @@
 language: node_js
-sudo: true
-dist: trusty
+sudo: required
 before_script:
   - npm install -g bower web-component-tester
   - bower install
-env:
-  global:
-    - CXX=g++-4.8
-node_js: stable
+node_js: '6'
 addons:
   firefox: latest
   apt:
@@ -15,7 +11,7 @@ addons:
       - google-chrome
     packages:
       - google-chrome-stable
-  sauce_connect: true
 script:
-  - xvfb-run -s '-screen 0 1024x768x24'  wct
-  - 'wct -s ''default'''
+  - xvfb-run -s '-screen 0 1024x768x24' wct
+  - 'if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct -s ''default''; fi'
+dist: trusty
