@@ -62,12 +62,13 @@
   <p>Click the following buttons to see different types of modals</p>
 
   <ul class='horizontal-ul'>
+    <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
     <li><button class='simpleDialog'>Simple Dialog</button></li>
     <li><button class='simpleModal'>Simple Modal</button></li>
     <li><button class='nestedDialog'>Nested Dialog</button></li>
     <li><button class='nestedModal'>Nested Modal</button></li>
     <li><button class='focustrapping'>Focus Trapping Modal</button></li>
-    <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
+    <li><button class='arrowDirectionDialog2'>Arrow Direction Dialog2</button></li>
   </ul>
 
 
@@ -119,19 +120,23 @@
   </dialog-el>
 
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog', 'arrowDirectionDialog2'];
     dialogs.forEach(function(selector) {
-      document.querySelector('.' + selector).addEventListener('click', function() {
+      document.querySelector('.' + selector).addEventListener('click', function(e) {
+        e.stopPropagation();
         // Reposition the arrow-direction dialog
-        if (selector === 'arrowDirectionDialog') {
+        if (selector.search('arrowDirectionDialog') >= 0) {
           var arrowDirectionDialog = document.querySelector('#arrowDirectionDialog');
-          arrowDirectionDialog.style.top =  document.querySelector('button.arrowDirectionDialog').offsetTop + "px";
-          arrowDirectionDialog.style.left = document.querySelector('button.arrowDirectionDialog').offsetLeft + "px";
+          arrowDirectionDialog.style.top =  document.querySelector('button.' + selector).offsetTop + "px";
+          arrowDirectionDialog.style.left = document.querySelector('button.' + selector).offsetLeft + "px";
           // The fixed width is to emulate person-card
           arrowDirectionDialog.style.width = "486px";
+          // Show the dialog
+          document.querySelector('#arrowDirectionDialog').show(true);
+        } else {
+          // Show the dialog
+          document.querySelector('#' + selector).show();
         }
-        // Show the dialog
-        document.querySelector('#' + selector).show();
       });
     });
   </script>
