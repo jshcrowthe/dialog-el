@@ -212,7 +212,7 @@
         arrowDirectionValue = dialog.attributes["arrow-direction"].value;
 
         // Grab the min or fixed width of the dialog if there is one, or default to 100px.
-        minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || "100");
+        minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || dialog.offsetWidth || "100");
         tempLeftPosition = parseFloat(dialog.style.left.replace("px", ""));
         tempTopPosition = parseFloat(dialog.style.top.replace("px", ""));
         pointer = dialog.shadowRoot.querySelector(".pointer");
