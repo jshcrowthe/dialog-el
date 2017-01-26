@@ -149,7 +149,7 @@
 
         _dialogStack.forEach(function(dialog) {
           if (!dialog.contains(e.target) || e.path[0] === dialog._overlay) {
-            dialog.close()
+            dialog.close();
           }
         });
       }, 250);
@@ -282,15 +282,15 @@
       var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
 
       // Create a shadowRoot and append the style and dialogTemplate
-      this.createShadowRoot().appendChild(style)
+      this.createShadowRoot().appendChild(style);
       this.shadowRoot.appendChild(template);
 
       // If we have the full Shadow DOM polyfill and haven't instantiated
       // an instance of this component once
       if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling) {
-        window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
+        window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el');
       }
-    }
+    };
 
     proto.detachedCallback = function() {
       if (this.visible) this.close();
@@ -334,12 +334,12 @@
           // elements time to display without being closed by the
           // click handler. Also this allows element animations
           // to occur.
-          setTimeout(function() { this.visible = true }.bind(this), 0);
+          setTimeout(function() { this.visible = true; }.bind(this), 0);
 
           // Set a backup handler call to ensure the modal opens
           // even if for some reason the transition craps out
           setTimeout(function() {
-            reject(handler)
+            reject(handler);
           }, 350);
         }.bind(this)).catch(function(handler) {
           console.warn('dialog "show" transition did not fire', this);
@@ -365,7 +365,7 @@
         // Detach event listeners and clean up dialog stack
         this._detachEventHandlers();
         _dialogStack = _dialogStack.filter(function(dialog) {
-          return dialog !== this
+          return dialog !== this;
         }.bind(this));
 
         // Remove the global listener if the _dialogStack is empty
@@ -449,7 +449,7 @@
        * customize the reason statement in the close event.
        */
       var dismissNodes = e.path.filter(function(el) {
-        return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
+        return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'));
       });
 
       /**
@@ -467,7 +467,7 @@
     };
 
     proto._getEventHandlers = function() {
-      var array = []
+      var array = [];
 
       // Stacking Context Event Handlers
       array.push({
@@ -514,7 +514,7 @@
 
       this.__handlers.forEach(function(obj) {
         if (obj.delay) {
-          setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler) }, 0);
+          setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler); }, 0);
         } else {
           obj.element.addEventListener(obj.event, obj.handler);
         }
@@ -533,12 +533,12 @@
     // Detach all the needed event handlers
     proto._detachEventHandlers = function() {
       if (!Array.isArray(this.__handlers)) return;
-      this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
+      this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler); });
     };
 
     document.registerElement('dialog-el', {
       prototype: proto
     });
 
-  })(document, HTMLElement)
+  })(document, HTMLElement);
 </script>

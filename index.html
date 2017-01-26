@@ -21,6 +21,15 @@
 
   <!-- Web Components -->
   <script>
+    var promiseSupported = typeof Promise !== 'undefined';
+
+    if (!promiseSupported) {
+      var promisePoly = document.createElement('script');
+      promisePoly.src = 'https://cdnjs.cloudflare.com/ajax/libs/native-promise-only/0.8.1/npo.js';
+      promisePoly.async = true;
+      document.head.appendChild(promisePoly);
+    }
+
     var shadowDOMSupported = 'createShadowRoot' in HTMLElement.prototype;
     var webComponentsSupported = ('registerElement' in document
       && shadowDOMSupported
