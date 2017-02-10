@@ -594,7 +594,7 @@
       /**
        * Don't propagate the event if we haven't already closed the modal
        */
-      if (e && e.stopPropagation) e.stopPropagation();
+      if (e && e.stopPropagation && e.target.tagName !== 'A') e.stopPropagation();
     };
 
     proto._getEventHandlers = function() {
