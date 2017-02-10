@@ -592,9 +592,10 @@
       }
 
       /**
-       * Don't propagate the event if we haven't already closed the modal
+       * Don't propagate the event if we haven't already closed the modal unless the target
+       * has an href so it can be caught by either the browser or a pushstate handler
        */
-      if (e && e.stopPropagation) e.stopPropagation();
+      if (e && e.stopPropagation && !e.target.hasAttribute('href')) e.stopPropagation();
     };
 
     proto._getEventHandlers = function() {
