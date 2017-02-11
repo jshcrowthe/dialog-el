@@ -242,6 +242,22 @@
     });
 
     /**
+     * Getter/Setter for the `visible` status
+     */
+    Object.defineProperty(proto, 'modal', {
+      get: function() {
+        return this.hasAttribute('modal');
+      },
+      set: function(val) {
+        if (val) {
+          this.setAttribute('modal', '');
+        } else {
+          this.removeAttribute('modal');
+        }
+      }
+    });
+
+    /**
      * Getter for the content of the dialog/modal
      */
     Object.defineProperty(proto, '_content', {
