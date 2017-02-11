@@ -155,6 +155,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               done();
             });
         });
+
+        it('Should react to valid changes to the `arrowDirection` property', function() {
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          dynamicDialog.arrowDirection = 'left';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('left');
+          dynamicDialog.arrowDirection = 'right';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('right');
+          dynamicDialog.arrowDirection = 'top';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('top');
+          dynamicDialog.arrowDirection = 'bottom';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('bottom');
+        });
+
+        it('Should noop on invalid changes to the `arrowDirection` property', function() {
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          dynamicDialog.arrowDirection = 'qwerty';
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+        });
       });
     </script>
 

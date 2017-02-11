@@ -119,6 +119,12 @@ document.body.appendChild(dialogEl);
   </dialog-el>
   ```
 
+  ```javascript
+  var dialog = document.createElement('dialog-el');
+  dialog.arrowDirection = 'left';
+  document.body.appendChild(dialog);
+  ```
+
   **NOTE: This does not work with the `modal` property**
 
 
