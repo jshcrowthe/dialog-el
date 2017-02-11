@@ -61,13 +61,14 @@
 
   <p>Click the following buttons to see different types of modals</p>
 
-  <ul class='horizontal-ul'>
+  <ul id='dialog-buttons' class='horizontal-ul'>
     <li><button class='simpleDialog'>Simple Dialog</button></li>
     <li><button class='simpleModal'>Simple Modal</button></li>
     <li><button class='nestedDialog'>Nested Dialog</button></li>
     <li><button class='nestedModal'>Nested Modal</button></li>
     <li><button class='focustrapping'>Focus Trapping Modal</button></li>
     <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
+    <li><button class='autoPositionDialog' data-auto-position>Auto Position Dialog</button></li>
   </ul>
 
 
@@ -118,11 +119,22 @@
     <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
   </dialog-el>
 
+  <dialog-el id='autoPositionDialog' arrow-direction='top'>
+    <div style='width: 500px;'>
+      <h1>Auto Position Dialog!</h1>
+      <p>This dialog will be automatically positioned relative to the button.</p>
+      <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
+    </div>
+  </dialog-el>
+
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog',  'autoPositionDialog'];
     dialogs.forEach(function(selector) {
-      document.querySelector('.' + selector).addEventListener('click', function() {
-        document.querySelector('#' + selector).show();
+      var button = document.querySelector('.' + selector);
+      button.addEventListener('click', function() {
+        var dialog = document.querySelector('#' + selector);
+        var target = button.hasAttribute('data-auto-position') ? button : null;
+        dialog.show(target);
       });
     });
   </script>
