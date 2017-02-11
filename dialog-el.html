@@ -85,7 +85,7 @@
     :host([arrow-direction=left]) .pointer {
       top: 50%;
       left: 0;
-      transform: rotate(45deg) translate3d(-14px,2px,0);
+      transform: rotate(45deg) translate3d(-16px,0,0);
       box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), -1px 1px 1px 0px rgba(0,0,0,0.18);
     }
 
@@ -99,7 +99,7 @@
     :host([arrow-direction=right]) .pointer {
       top: 50%;
       left: 100%;
-      transform: rotate(45deg) translate3d(-14px,2px,0);
+      transform: rotate(45deg) translate3d(-16px,0,0);
       box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px -1px 1px 0px rgba(0,0,0,0.18);
     }
   </style>
@@ -354,7 +354,92 @@
       if (this.visible) this.close();
     };
 
-    proto.show = function() {
+    proto._resetPosition = function() {
+      this.style.top = 'initial';
+      this.style.right = 'initial';
+      this.style.bottom = 'initial';
+      this.style.left = 'initial';
+    }
+
+    proto.positionDialog = function(anchor) {
+      // If `anchor` is falsy OR the anchor and dialog don't share an
+      // offsetParent, early return
+      if (!anchor || anchor.offsetParent !== this.offsetParent) return;
+
+      var quadrant = 0;
+      if (this.hasAttribute('arrow-direction')) {
+        var directionQuadrantMap = {
+          bottom: 0,
+          left: 1,
+          right: 2,
+          top: 3
+        };
+
+        quadrant = directionQuadrantMap[this.getAttribute('arrow-direction')];
+
+        var arrowSize = 22;
+
+        switch (quadrant) {
+          case 0: 
+            this.style.top = anchor.offsetTop - this.offsetHeight - arrowSize + 'px';
+            this.style.left = anchor.offsetLeft + anchor.offsetWidth / 2 - this.offsetWidth / 2 + 'px';
+            break;
+          case 1: 
+            this.style.top = anchor.offsetTop + anchor.offsetHeight / 2 - this.offsetHeight / 2 + 'px';
+            this.style.left = anchor.offsetLeft + anchor.offsetWidth + arrowSize + 'px';
+            break;
+          case 2: 
+            this.style.top = anchor.offsetTop + anchor.offsetHeight / 2 - this.offsetHeight / 2 + 'px';
+            this.style.left = anchor.offsetLeft - this.offsetWidth - arrowSize + 'px';
+            break;
+          case 3: 
+            this.style.top = anchor.offsetTop + anchor.offsetHeight + arrowSize + 'px';
+            this.style.left = anchor.offsetLeft + anchor.offsetWidth / 2 - this.offsetWidth / 2 + 'px';
+            break;
+          default:
+            this._resetPosition();
+            break;
+        }
+      } else {
+
+        // Get the center point of the `anchor` element relative to the page
+        // we need to compute which quadrant of the page to fly the dialog out
+        // to
+        var rect = anchor.getBoundingClientRect();
+        var anchorX = rect.left + anchor.offsetWidth / 2;
+        var anchorY = rect.top + anchor.offsetHeight / 2;
+        var screenXCenter = window.innerWidth / 2;
+        var screenYCenter = window.innerHeight / 2;
+        if (anchorX >= screenXCenter) quadrant += 1;
+        if (anchorY >= screenYCenter) quadrant += 2;
+
+        // Position the dialog, relative to the `anchor` in the appropriate 
+        // quadrant
+        switch (quadrant) {
+          case 0: 
+            this.style.top = anchor.offsetTop + anchor.offsetHeight + 'px';
+            this.style.left = anchor.offsetLeft + anchor.offsetWidth + 'px';
+            break;
+          case 1: 
+            this.style.top = anchor.offsetTop + anchor.offsetHeight + 'px';
+            this.style.left = anchor.offsetLeft - this.offsetWidth + 'px';
+            break;
+          case 2: 
+            this.style.top = anchor.offsetTop - this.offsetHeight + 'px';
+            this.style.left = anchor.offsetLeft + anchor.offsetWidth + 'px';
+            break;
+          case 3: 
+            this.style.top = anchor.offsetTop - this.offsetHeight + 'px';
+            this.style.left = anchor.offsetLeft - this.offsetWidth + 'px';
+            break;
+          default:
+            this._resetPosition();
+            break;
+        }
+      }
+    };
+
+    proto.show = function(anchor) {
       return Promise.resolve()
       .then(function() {
         if (this.visible) throw new Error('Tried to open a dialog that is already open', {
@@ -376,6 +461,10 @@
         // Capture last active element and reassign focus
         this._lastActive = document.activeElement;
         setFocusToFirstItem(this);
+      }.bind(this))
+      .then(function() {
+        // Try and position the dialog if needed
+        this.positionDialog(anchor);
       }.bind(this))
       .then(function() {
         // Transition the elements out and resolve when the 

@@ -68,8 +68,42 @@
     <li><button class='nestedModal'>Nested Modal</button></li>
     <li><button class='focustrapping'>Focus Trapping Modal</button></li>
     <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
-    <li><button class='autoPositionDialog' data-auto-position>Auto Position Dialog</button></li>
   </ul>
+
+  <h3>Auto Positioning Demo</h3>
+  <p>
+    <strong>NOTE:</strong> the auto positioning will only work <storng>reliably</storng> 
+    on a dialog with fixed height & width. It will also function differently based on the
+    existance of the <code>arrow-direction</code> attribute.
+    </p>
+  <div style='margin-bottom: 10px;'>
+    <h4>Standard Positioning</h4>
+    <p>The following dialog will always fly out to the side of the screen with the most space</p>
+    <button class='autoPositionDialog' data-auto-position>Auto Positioned Dialog</button>
+  </div>
+  <div>
+    <h4>Arrow Positioning</h4>
+    <p>
+      The following dialog will always such that the arrow is pointing at the center of the passed element
+      (in this case the button)
+    </p>
+    <div style='display: flex; justify-content: center; align-items: center;'>
+      <button class='autoPositionArrowDialog' data-auto-position>Auto Positioned Arrow Dialog</button>
+      <select id="arrow-direction">
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+      </select>
+      <dialog-el id='autoPositionArrowDialog' arrow-direction='left'>
+        <div style='width: 500px;'>
+          <h1>Auto Position Dialog!</h1>
+          <p>This dialog will be automatically positioned relative to the button.</p>
+          <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
+        </div>
+      </dialog-el>
+    </div>
+  </div>
 
 
   <dialog-el id='simpleDialog'>
@@ -119,7 +153,7 @@
     <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
   </dialog-el>
 
-  <dialog-el id='autoPositionDialog' arrow-direction='top'>
+  <dialog-el id='autoPositionDialog'>
     <div style='width: 500px;'>
       <h1>Auto Position Dialog!</h1>
       <p>This dialog will be automatically positioned relative to the button.</p>
@@ -128,7 +162,7 @@
   </dialog-el>
 
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog',  'autoPositionDialog'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog', 'autoPositionDialog', 'autoPositionArrowDialog'];
     dialogs.forEach(function(selector) {
       var button = document.querySelector('.' + selector);
       button.addEventListener('click', function() {
@@ -136,6 +170,12 @@
         var target = button.hasAttribute('data-auto-position') ? button : null;
         dialog.show(target);
       });
+    });
+
+    var arrowDirectionSelect = document.querySelector('#arrow-direction');
+    arrowDirectionSelect.addEventListener('change', function(e) {
+      var dialog = document.querySelector('#autoPositionArrowDialog');
+      dialog.setAttribute('arrow-direction', arrowDirectionSelect.value);
     });
   </script>
 
