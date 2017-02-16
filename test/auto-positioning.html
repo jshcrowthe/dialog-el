@@ -14,28 +14,274 @@
   <body>
 
     <!-- You can use the document as a place to set up your fixtures. -->
-    <test-fixture id="a11y">
+    <test-fixture id="arrow-positioning" >
       <template>
-        <dialog-el modal>
-          <h1>Simple Dialog</h1>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        </dialog-el>
+        <div style="position: absolute; top: 0; right: 0; left: 0; bottom: 0; display: flex; justify-content: center; align-items: center;">
+          <div id="button-wrap">
+            <button>Anchor Button</button>
+          </div>
+          <div id="dialog-wrap">
+            <dialog-el style="width: 400px; height: 300px;">
+              <h1>Simple Dialog</h1>
+              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+              tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+              quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+              consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+              cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+              proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </dialog-el>
+          </div>
+        </div>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="no-arrow-positioning">
+      <template>
+        <div style="position: absolute; top: 0; right: 0; left: 0; bottom: 0; display: flex; justify-content: center; align-items: center;">
+          <div id="button-wrap" style='position: absolute;'>
+            <button>Anchor Button</button>
+          </div>
+          <dialog-el style="width: 400px; height: 300px;">
+            <h1>Simple Dialog</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+            tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+            consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+            proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          </dialog-el>
+        </div>
       </template>
     </test-fixture>
 
     <script>
-      describe('<dialog-el> A11y', function() {
-        /**
-         * Do a11y audit if native shadow DOM is supported
-         */
-        if (!window.ShadowDOMPolyfill) {
-          a11ySuite('a11y');
-        }
+      describe('<dialog-el> Auto Positioning', function() {
+        describe('Arrow Positioning', function() {
+          var dom, dialog, button, buttonClientRect, dialogWrap, buttonWrap, validatePosition;
+
+          beforeEach(function() {
+            dom = fixture('arrow-positioning');
+            dialog = dom.querySelector('dialog-el');
+            button = dom.querySelector('button');
+            dialogWrap = dom.querySelector('#dialog-wrap');
+            buttonWrap = dom.querySelector('#button-wrap');
+            buttonClientRect = button.getBoundingClientRect();
+            
+            validatePosition = function(direction, clientRect) {
+              var pointMap = {
+                left: {
+                  x: buttonClientRect.left + buttonClientRect.width + 20,
+                  y: buttonClientRect.top + buttonClientRect.height / 2
+                },
+                right: {
+                  x: buttonClientRect.left - 20,
+                  y: buttonClientRect.top + buttonClientRect.height / 2
+                },
+                top: {
+                  x: buttonClientRect.left + buttonClientRect.width / 2,
+                  y: buttonClientRect.top + buttonClientRect.height + 20
+                },
+                bottom: {
+                  x: buttonClientRect.left + buttonClientRect.width / 2,
+                  y: buttonClientRect.top - 20
+                }
+              };
+
+              return dialog.show(button)
+                .then(function() {
+                  var point = pointMap[direction]
+                  var elAtPoint = document.elementFromPoint(point.x, point.y);
+                  expect(elAtPoint).to.equal(dialog);
+                })
+                .then(function() {
+                  return dialog.close();
+                });
+            };
+          });
+
+          it('Should fly out to the left of the anchor element when arrow-direction=right', function(done) {
+            var direction = 'right';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the right of the anchor element when arrow-direction=left', function(done) {
+            var direction = 'left';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the bottom of the anchor element when arrow-direction=top', function(done) {
+            var direction = 'top';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the top of the anchor element when arrow-direction=bottom', function(done) {
+            var direction = 'bottom';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should position the dialog properly when the anchor is in a nested, positioned, container', function(done) {
+            buttonWrap.style.position = 'absolute';
+            buttonWrap.style.left = '400px';
+            buttonWrap.style.top = '20px';
+            
+            var direction = 'top';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should position the dialog properly when the dialog is in a nested, positioned, container', function(done) {
+            dialogWrap.style.position = 'absolute';
+            dialogWrap.style.right = '0px';
+            dialogWrap.style.bottom = '0px';
+            
+            var direction = 'top';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should position the dialog properly when the dialog and the anchor are in different, nested, positioned, containers', function(done) {
+            // Position Button Wrapper
+            buttonWrap.style.position = 'absolute';
+            buttonWrap.style.left = '400px';
+            buttonWrap.style.top = '20px';
+            
+            // Position Dialog Wrapper
+            dialogWrap.style.position = 'absolute';
+            dialogWrap.style.right = '0px';
+            dialogWrap.style.bottom = '0px';
+            
+            var direction = 'top';
+            dialog.arrowDirection = direction;
+            validatePosition(direction)
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+        });
+        describe('No Arrow Positioning', function() {
+          var dom, dialog, button, buttonClientRect, dialogWrap, buttonWrap, validatePosition;
+          
+          beforeEach(function() {
+            dom = fixture('no-arrow-positioning');
+            dialog = dom.querySelector('dialog-el');
+            button = dom.querySelector('button');
+            dialogWrap = dom.querySelector('#dialog-wrap');
+            buttonWrap = dom.querySelector('#button-wrap');
+            
+            validatePosition = function(direction, clientRect) {
+              var distance = 5;
+              var pointMap = {
+                topLeft: {
+                  x: clientRect.left + clientRect.width + distance,
+                  y: clientRect.top + clientRect.height + distance
+                },
+                topRight: {
+                  x: clientRect.left - distance,
+                  y: clientRect.top + clientRect.height + distance
+                },
+                bottomLeft: {
+                  x: clientRect.left + clientRect.width + distance,
+                  y: clientRect.top - distance
+                },
+                bottomRight: {
+                  x: clientRect.left - distance,
+                  y: clientRect.top - distance
+                }
+              };
+
+              return dialog.show(button)
+                .then(function() {
+                  var point = pointMap[direction]
+                  var elAtPoint = document.elementFromPoint(point.x, point.y);
+                  expect(elAtPoint).to.equal(dialog);
+                })
+                .then(function() {
+                  return dialog.close();
+                });
+            };
+          });
+          it('Should fly out to the bottom right if the anchor element is in the top left', function(done) {
+            buttonWrap.style.left = '0';
+            buttonWrap.style.top = '0';
+            validatePosition('topLeft', button.getBoundingClientRect())
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the bottom left if the anchor element is in the top right', function(done) {
+            buttonWrap.style.right = '0';
+            buttonWrap.style.top = '0';
+            validatePosition('topRight', button.getBoundingClientRect())
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the top right if the anchor element is in the bottom left', function(done) {
+            buttonWrap.style.left = '0';
+            buttonWrap.style.bottom = '0';
+            validatePosition('bottomLeft', button.getBoundingClientRect())
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+          it('Should fly out to the top left if the anchor element is in the bottom right', function(done) {
+            buttonWrap.style.right = '0';
+            buttonWrap.style.bottom = '0';
+            validatePosition('bottomRight', button.getBoundingClientRect())
+              .then(function() {
+                done();
+              })
+              .catch(function(err) {
+                done(err)
+              });
+          });
+        });
       });
     </script>
 
