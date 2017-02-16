@@ -216,28 +216,6 @@
     };
 
     /**
-     * Gets top and left coordinates relative to document.
-     * http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-     */
-    function getCoords(elem) {
-      var box = elem.getBoundingClientRect();
-
-      var body = document.body;
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      var clientTop = docEl.clientTop || body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      var top  = box.top +  scrollTop - clientTop;
-      var left = box.left + scrollLeft - clientLeft;
-
-      return { top: Math.round(top), left: Math.round(left) };
-  }
-
-    /**
      * Reference the template tag in this current document when HTML imported
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
      * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
@@ -378,7 +356,33 @@
       this.style.right = 'initial';
       this.style.bottom = 'initial';
       this.style.left = 'initial';
-    }
+    };
+
+    /**
+     * Gets top and left coordinates relative to document and the position of the dialog's offsetParent.
+     * Source: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+     */
+    proto._getCoords = function(elem) {
+      var anchorBoundingRect = elem.getBoundingClientRect();
+      var dialogParentRect = this.offsetParent.getBoundingClientRect();
+
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || document.body.scrollLeft;
+
+      var clientTop = docEl.clientTop || document.body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || document.body.clientLeft || 0;
+
+      debugger;
+      var top  = anchorBoundingRect.top + scrollTop - clientTop;
+      var left = anchorBoundingRect.left + scrollLeft - clientLeft;
+
+      return { 
+        top: Math.round(top), 
+        left: Math.round(left) 
+      };
+    };
 
     proto.positionDialog = function(anchor) {
       // If `anchor` is falsy, early return
@@ -397,7 +401,7 @@
         
         var arrowSize = 22;
         this._resetPosition();
-        var anchorCoords = getCoords(anchor);
+        var anchorCoords = this._getCoords(anchor);
 
         switch (quadrant) {
           case 0: 
