@@ -208,7 +208,31 @@
     function setFocusToFirstItem (node) {
       var focusableChildren = getFocusableChildren(node);
       if (focusableChildren[0]) focusableChildren[0].focus();
-    }
+    };
+
+    /**
+     * Gets top and left coordinates relative to document and the position of the dialog's offsetParent.
+     * Source: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+     */
+    var getCoords = function(elem) {
+      var boundingRect = elem.getBoundingClientRect();
+
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || document.body.scrollLeft;
+
+      var clientTop = docEl.clientTop || document.body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || document.body.clientLeft || 0;
+
+      var top  = boundingRect.top + scrollTop - clientTop;
+      var left = boundingRect.left + scrollLeft - clientLeft;
+
+      return { 
+        top: Math.round(top), 
+        left: Math.round(left) 
+      };
+    };
 
     var querySelector = function(selector) {
       var script = document._currentScript || document.currentScript;
@@ -358,30 +382,13 @@
       this.style.left = 'initial';
     };
 
-    /**
-     * Gets top and left coordinates relative to document and the position of the dialog's offsetParent.
-     * Source: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-     */
-    proto._getCoords = function(elem) {
-      var anchorBoundingRect = elem.getBoundingClientRect();
-      var dialogParentRect = this.offsetParent.getBoundingClientRect();
+    proto._computeCoords = function(elem) {
+      var anchorPosition = getCoords(elem);
+      // If the offsetParent is the document we know left and top are 0, skip expensive computation
+      if (this.offsetParent === document.body) return { top: anchorPosition.top, left: anchorPosition.left };
 
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || document.body.scrollLeft;
-
-      var clientTop = docEl.clientTop || document.body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || document.body.clientLeft || 0;
-
-      debugger;
-      var top  = anchorBoundingRect.top + scrollTop - clientTop;
-      var left = anchorBoundingRect.left + scrollLeft - clientLeft;
-
-      return { 
-        top: Math.round(top), 
-        left: Math.round(left) 
-      };
+      var dialogParentPosition = getCoords(this.offsetParent);
+      return { top: anchorPosition.top - dialogParentPosition.top, left: anchorPosition.left - dialogParentPosition.left };
     };
 
     proto.positionDialog = function(anchor) {
@@ -401,7 +408,7 @@
         
         var arrowSize = 22;
         this._resetPosition();
-        var anchorCoords = this._getCoords(anchor);
+        var anchorCoords = this._computeCoords(anchor);
 
         switch (quadrant) {
           case 0: 
