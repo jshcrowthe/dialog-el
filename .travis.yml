@@ -9,11 +9,13 @@ env:
     - CXX=g++-4.8
 node_js: stable
 addons:
+  firefox: latest
   apt:
     sources:
-      - ubuntu-toolchain-r-test
+      - google-chrome
     packages:
-      - g++-4.8
+      - google-chrome-stable
   sauce_connect: true
 script:
-  - wct --skip-plugin local
+  - xvfb-run -s '-screen 0 1024x768x24' wct --skip-plugin sauce
+  - 'if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct --skip-plugin local; fi' 
