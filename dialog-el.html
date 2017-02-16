@@ -361,12 +361,15 @@
       this._templateInit();
     }
 
-    var dynamicAttributes = ['modal'];
+    var dynamicAttributes = ['modal', 'arrow-direction'];
     proto.attributeChangedCallback = function(attr) {
       if (!~dynamicAttributes.indexOf(attr)) return;
       switch(attr) {
         case 'modal':
           this._templateInit();
+          break;
+        case 'arrow-direction':
+          if (this.visible) this.positionDialog(this._activeAnchor);
           break;
       }
     };
@@ -494,6 +497,7 @@
       }.bind(this))
       .then(function() {
         // Try and position the dialog if needed
+        this._activeAnchor = anchor;
         this.positionDialog(anchor);
       }.bind(this))
       .then(function() {
@@ -587,6 +591,7 @@
         this.hidden = true;
         this.setAttribute('aria-hidden', 'true');
         this.style.zIndex = null;
+        this._activeAnchor = null;
       }.bind(this))
       .then(function() {
         // Fire `dialog-closed` event
