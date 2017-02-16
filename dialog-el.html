@@ -242,6 +242,38 @@
     });
 
     /**
+     * Getter/Setter for the `modal` attribute
+     */
+    Object.defineProperty(proto, 'modal', {
+      get: function() {
+        return this.hasAttribute('modal');
+      },
+      set: function(val) {
+        if (Boolean(val)) {
+          this.setAttribute('modal', '');
+        } else {
+          this.removeAttribute('modal');
+        }
+      }
+    });
+
+    /**
+     * Getter/Setter for the `arrow-direction` attribute
+     */
+    Object.defineProperty(proto, 'arrowDirection', {
+      get: function() {
+        return this.getAttribute('arrow-direction');
+      },
+      set: function(val) {
+        if (!val) return this.removeAttribute('arrow-direction');
+        var validVals = ['left', 'top', 'right', 'bottom'];
+        if (~validVals.indexOf(val)) {
+          this.setAttribute('arrow-direction', val);
+        }
+      }
+    });
+
+    /**
      * Getter for the content of the dialog/modal
      */
     Object.defineProperty(proto, '_content', {
@@ -269,21 +301,21 @@
       }
     });
 
-    proto.createdCallback = function() {
-      // Initial Style/A11y Setup
-      this.hidden = true;
-      this.visible = false;
-      this.setAttribute('aria-hidden', 'true');
-      this.setAttribute('role', 'dialog');
-
-      // Initial template setup
+    proto._templateInit = function() {
+      // Template Setup
       this._isModal = this.hasAttribute('modal');
       var style = document.importNode(styleTemplate.content, true);
       var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
 
-      // Create a shadowRoot and append the style and dialogTemplate
-      this.createShadowRoot().appendChild(style)
-      this.shadowRoot.appendChild(template);
+      // If there is already a shadowRoot, clear it to stamp a clean template
+      if (this.shadowRoot) {
+        while (this.shadowRoot.lastChild) { this.shadowRoot.removeChild(this.shadowRoot.lastChild) }
+      }
+
+      // Create or reference an empty shadowRoot and append the style and dialogTemplate
+      var root = this.shadowRoot || this.createShadowRoot();
+      root.appendChild(style);
+      root.appendChild(template);
 
       // If we have the full Shadow DOM polyfill and haven't instantiated
       // an instance of this component once
@@ -291,6 +323,26 @@
         window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
       }
     }
+
+    proto.createdCallback = function() {
+      // Initial Style/A11y Setup
+      this.hidden = true;
+      this.visible = false;
+      this.setAttribute('aria-hidden', 'true');
+      this.setAttribute('role', 'dialog');
+
+      this._templateInit();
+    }
+
+    var dynamicAttributes = ['modal'];
+    proto.attributeChangedCallback = function(attr) {
+      if (!~dynamicAttributes.indexOf(attr)) return;
+      switch(attr) {
+        case 'modal':
+          this._templateInit();
+          break;
+      }
+    };
 
     proto.detachedCallback = function() {
       if (this.visible) this.close();

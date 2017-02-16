@@ -106,9 +106,9 @@ document.body.appendChild(dialogEl);
 
   If set the dialog will render as a fixed position modal instead of an absolute positioned dialog.
 
-- `arrow-direction`
+- `arrowDirection`
 
-  Based on the value of this property (left, right, top, bottom), it will render an arrow on that side of the dialog. For example, arrow-direction="left" adds an arrow to the left side of the dialog.
+  Based on the value of this property (left, right, top, bottom), it will render an arrow on that side of the dialog. For example, a value of `left` adds an arrow to the left side of the dialog.
 
 
   _Example:_
@@ -117,6 +117,12 @@ document.body.appendChild(dialogEl);
     <h1>A header</h1>
     <p>Dialog Content</p>
   </dialog-el>
+  ```
+
+  ```javascript
+  var dialog = document.createElement('dialog-el');
+  dialog.arrowDirection = 'left';
+  document.body.appendChild(dialog);
   ```
 
   **NOTE: This does not work with the `modal` property**

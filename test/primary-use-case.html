@@ -37,6 +37,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </test-fixture>
 
+    <test-fixture id="simple-dynamic-dialog">
+      <template>
+        <dialog-el>
+          <h1>Simple Dynamic Dialog</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </dialog-el>
+      </template>
+    </test-fixture>
+
     <test-fixture id="simple-dialog-with-submit-button">
       <template>
         <dialog-el>
@@ -61,10 +75,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         beforeEach(function() {
           dialog = fixture('simple-dialog');
+          dynamicDialog = fixture('simple-dynamic-dialog');
           submitDialog = fixture('simple-dialog-with-submit-button');
           cancelDialog = fixture('simple-dialog-with-cancel-button');
         });
-
 
         it('Should have expected API methods', function() {
           expect(dialog.show).to.be.ok;
@@ -120,6 +134,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             .then(function() {
               button.click();
             });
+        });
+
+        it('Should react to changes to the `modal` attribute', function(done) {
+          expect(dynamicDialog._isModal).to.be.false;
+          expect(dynamicDialog.hasAttribute('modal')).to.be.false;
+          dynamicDialog.show()
+            .then(function() {
+              return dynamicDialog.close();
+            })
+            .then(function() {
+              dynamicDialog.modal = true;
+              expect(dynamicDialog._isModal).to.be.true;
+              expect(dynamicDialog.hasAttribute('modal')).to.be.true;
+            })
+            .then(function() {
+              return dynamicDialog.show()                
+            })
+            .then(function() {
+              done();
+            });
+        });
+
+        it('Should react to valid changes to the `arrowDirection` property', function() {
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          dynamicDialog.arrowDirection = 'left';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('left');
+          dynamicDialog.arrowDirection = 'right';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('right');
+          dynamicDialog.arrowDirection = 'top';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('top');
+          dynamicDialog.arrowDirection = 'bottom';
+          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('bottom');
+        });
+
+        it('Should noop on invalid changes to the `arrowDirection` property', function() {
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          dynamicDialog.arrowDirection = 'qwerty';
+          expect(dynamicDialog.arrowDirection).to.be.falsy;
+          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
         });
       });
     </script>
