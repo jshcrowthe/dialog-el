@@ -173,7 +173,7 @@
     });
 
       // Helper function to get all focusable children from a node
-    function getFocusableChildren(node) {
+    var getFocusableChildren = function(node) {
       var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
 
       return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
@@ -182,7 +182,7 @@
     }
 
     // Helper function trapping the tab key inside a node
-    function trapTabKey (node, event) {
+    var trapTabKey = function(node, event) {
       var focusableChildren = getFocusableChildren(node);
 
       // This line is required due to how the Shadow DOM polyfill wraps elements
@@ -202,10 +202,10 @@
         if (focusableChildren[0]) focusableChildren[0].focus();
         event.preventDefault();
       }
-    }
+    };
 
     // Helper function to focus the first focusable item
-    function setFocusToFirstItem (node) {
+    var setFocusToFirstItem = function(node) {
       var focusableChildren = getFocusableChildren(node);
       if (focusableChildren[0]) focusableChildren[0].focus();
     };
