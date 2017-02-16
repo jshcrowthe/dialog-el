@@ -105,61 +105,62 @@
     </div>
   </div>
 
-
-  <dialog-el id='simpleDialog'>
-    <h1>Demo Dialog!</h1>
-    <p>This is a simple dialog! Look at me go!</p>
-  </dialog-el>
-
-  <dialog-el id='simpleModal' modal>
-    <h1>Demo Modal!</h1>
-    <p>This is a simple modal! I stole all the focus yeah!</p>
-  </dialog-el>
-
-  <dialog-el id='nestedDialog'>
-    <h1>Demo Dialog!</h1>
-    <p>This is a dialog with another dialog inside! Click below to open the nested dialog</p>
-    <button class='nestedDialog-child'>Open Child Dialog</button>
-    <dialog-el id='nestedDialog-child'>
+  <div class="dialog-wrapper">
+    <dialog-el id='simpleDialog'>
       <h1>Demo Dialog!</h1>
-      <p>This is a nested dialog! Here I am!</p>
+      <p>This is a simple dialog! Look at me go!</p>
     </dialog-el>
-  </dialog-el>
 
-  <dialog-el id='nestedModal' modal>
-    <h1>Demo Dialog!</h1>
-    <p>This is a modal with another dialog inside! Click below to open the nested dialog</p>
-    <button class='nestedModal-child'>Open Child Dialog</button>
-    <dialog-el id='nestedModal-child'>
+    <dialog-el id='simpleModal' modal>
+      <h1>Demo Modal!</h1>
+      <p>This is a simple modal! I stole all the focus yeah!</p>
+    </dialog-el>
+
+    <dialog-el id='nestedDialog'>
       <h1>Demo Dialog!</h1>
-      <p>This is a nested dialog! Here I am!</p>
+      <p>This is a dialog with another dialog inside! Click below to open the nested dialog</p>
+      <button class='nestedDialog-child'>Open Child Dialog</button>
+      <dialog-el id='nestedDialog-child'>
+        <h1>Demo Dialog!</h1>
+        <p>This is a nested dialog! Here I am!</p>
+      </dialog-el>
     </dialog-el>
-  </dialog-el>
 
-  <dialog-el id='focustrapping' modal>
-    <h1>Fancy Header</h1>
-    <p>
-      <label>Name</label><input type="text">
-    </p>
-    <p>
-      <label>Phone</label><input type="text">
-    </p>
-    <textarea name="" id="" cols="30" rows="10"></textarea>
-    <button dialog-submit>Save!</button>
-  </dialog-el>
+    <dialog-el id='nestedModal' modal>
+      <h1>Demo Dialog!</h1>
+      <p>This is a modal with another dialog inside! Click below to open the nested dialog</p>
+      <button class='nestedModal-child'>Open Child Dialog</button>
+      <dialog-el id='nestedModal-child'>
+        <h1>Demo Dialog!</h1>
+        <p>This is a nested dialog! Here I am!</p>
+      </dialog-el>
+    </dialog-el>
 
-  <dialog-el id='arrowDirectionDialog' arrow-direction='top'>
-    <h1>Arrow Direction Dialog!</h1>
-    <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
-  </dialog-el>
+    <dialog-el id='focustrapping' modal>
+      <h1>Fancy Header</h1>
+      <p>
+        <label>Name</label><input type="text">
+      </p>
+      <p>
+        <label>Phone</label><input type="text">
+      </p>
+      <textarea name="" id="" cols="30" rows="10"></textarea>
+      <button dialog-submit>Save!</button>
+    </dialog-el>
 
-  <dialog-el id='autoPositionDialog'>
-    <div style='width: 500px;'>
-      <h1>Auto Position Dialog!</h1>
-      <p>This dialog will be automatically positioned relative to the button.</p>
-      <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
-    </div>
-  </dialog-el>
+    <dialog-el id='arrowDirectionDialog' arrow-direction='top'>
+      <h1>Arrow Direction Dialog!</h1>
+      <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
+    </dialog-el>
+
+    <dialog-el id='autoPositionDialog'>
+      <div style='width: 500px;'>
+        <h1>Auto Position Dialog!</h1>
+        <p>This dialog will be automatically positioned relative to the button.</p>
+        <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
+      </div>
+    </dialog-el>
+  </div>
 
   <script>
     var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog', 'autoPositionDialog', 'autoPositionArrowDialog'];
