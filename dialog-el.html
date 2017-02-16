@@ -415,20 +415,20 @@
 
         switch (quadrant) {
           case 0: 
-            this.style.top = anchorCoords.top - this.offsetHeight - arrowSize + 'px';
-            this.style.left = anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2 + 'px';
+            this.style.top = (anchorCoords.top - this.offsetHeight - arrowSize / 2) + 'px';
+            this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
             break;
           case 1: 
-            this.style.top = anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2 + 'px';
-            this.style.left = anchorCoords.left + anchor.offsetWidth + arrowSize + 'px';
+            this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
+            this.style.left = (anchorCoords.left + anchor.offsetWidth + arrowSize) + 'px';
             break;
           case 2: 
-            this.style.top = anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2 + 'px';
-            this.style.left = anchorCoords.left - this.offsetWidth - arrowSize + 'px';
+            this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
+            this.style.left = (anchorCoords.left - this.offsetWidth - arrowSize) + 'px';
             break;
           case 3: 
-            this.style.top = anchorCoords.top + anchor.offsetHeight + arrowSize + 'px';
-            this.style.left = anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2 + 'px';
+            this.style.top = (anchorCoords.top + anchor.offsetHeight + arrowSize) + 'px';
+            this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
             break;
           default:
             break;
@@ -446,24 +446,25 @@
         if (anchorX >= screenXCenter) quadrant += 1;
         if (anchorY >= screenYCenter) quadrant += 2;
 
+        var anchorCoords = this._computeCoords(anchor);
         // Position the dialog, relative to the `anchor` in the appropriate 
         // quadrant
         switch (quadrant) {
           case 0: 
-            this.style.top = anchor.offsetTop + anchor.offsetHeight + 'px';
-            this.style.left = anchor.offsetLeft + anchor.offsetWidth + 'px';
+            this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
+            this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
             break;
           case 1: 
-            this.style.top = anchor.offsetTop + anchor.offsetHeight + 'px';
-            this.style.left = anchor.offsetLeft - this.offsetWidth + 'px';
+            this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
+            this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
             break;
           case 2: 
-            this.style.top = anchor.offsetTop - this.offsetHeight + 'px';
-            this.style.left = anchor.offsetLeft + anchor.offsetWidth + 'px';
+            this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
+            this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
             break;
           case 3: 
-            this.style.top = anchor.offsetTop - this.offsetHeight + 'px';
-            this.style.left = anchor.offsetLeft - this.offsetWidth + 'px';
+            this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
+            this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
             break;
           default:
             this._resetPosition();
