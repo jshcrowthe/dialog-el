@@ -144,7 +144,10 @@
 
         // This is a tap, build the custom tap event
         var evt = new CustomEvent('dialog-el-tap', {
-          originalEvent: e
+          bubbles: true,
+          detail: {
+            originalEvent: e
+          }
         });
 
         var root;
@@ -426,6 +429,7 @@
         // Remove the global listener if the _dialogStack is empty
         if (!_dialogStack.length) {
           window.removeEventListener('click', proto._closeAll);
+          window.removeEventListener('dialog-el-tap', proto._closeAll);
           _globalWindowListener = false;
         }
 
@@ -585,6 +589,7 @@
       // There is only one listener here
       if (!_globalWindowListener) {
         setTimeout(function() {
+          window.addEventListener('dialog-el-tap', proto._closeAll);
           window.addEventListener('click', proto._closeAll);
         }.bind(this), 0);
         _globalWindowListener = true;
