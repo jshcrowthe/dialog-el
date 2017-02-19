@@ -142,15 +142,19 @@
           return;
         }
 
-        // If the dialog stack has changed such that the top dialog
-        // has changed, abort close operation
-        if (_topDialog !== _dialogStack[_dialogStack.length - 1]) return;
-
-        _dialogStack.forEach(function(dialog) {
-          if (!dialog.contains(e.target) || e.path[0] === dialog._overlay) {
-            dialog.close()
-          }
+        // This is a tap, build the custom tap event
+        var evt = new CustomEvent('dialog-el-tap', {
+          originalEvent: e
         });
+
+        var root;
+        var path = e.path || (e.composedPath && e.composedPath());
+        if (path) {
+          root = path[0];  
+        } 
+        root = root || e.srcElement
+
+        root.dispatchEvent(evt);
       }, 250);
     });
 
@@ -524,6 +528,12 @@
       array.push({
         element: this._content,
         event: 'click',
+        handler: this._clickHandler.bind(this)
+      });
+
+      array.push({
+        element: this._content,
+        event: 'dialog-el-tap',
         handler: this._clickHandler.bind(this)
       });
 
