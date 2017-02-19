@@ -96,6 +96,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           nestedDialog = fixture('nested-modal');
         });
 
+        it('should fire a `dialog-el-tap` event if touchstart and touchend happen within 250ms and a modal is open', function(done) {
+          var pTag = modal.querySelector('p');
+          modal.show()
+            .then(function() {
+              modal.dispatchEvent(new Event('touchstart', { bubbles: true }));
+              setTimeout(function() {
+                modal.dispatchEvent(new Event('touchend', { bubbles: true }));
+              }, 2);
+            })
+            .then(function() {
+              return new Promise(function(resolve, reject) {
+                var handler = function() {
+                  resolve();
+                  document.removeEventListener('dialog-el-tap', handler);
+                }
+                document.addEventListener('dialog-el-tap', handler);
+              });
+            })
+            .then(function() {
+              done();
+            })
+            .catch(function(err) {
+              done(err || new Error('Event didnt fire'));
+            });
+        });
+
         it('should close all dialogs when window (not dialog content) is clicked', function(done) {
           var _closeAll = sinon.stub(dialog.__proto__, '_closeAll');
           dialog.show()
@@ -153,6 +179,24 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             });
         });
 
+        it('should close relevant stacked modals on sub-modal tap', function(done) {
+          var inner = nestedModal.querySelector('dialog-el');
+          var close = sinon.stub(inner, 'close');
+
+          nestedModal.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              nestedModal._content.dispatchEvent(new CustomEvent('dialog-el-tap'));
+            })
+            .then(function() {
+              expect(close.calledOnce).to.be.true;
+              close.restore();
+              done();
+            });
+        });
+
         it('should close all stacked dialogs on window click', function(done) {
           var inner = nestedDialog.querySelector('dialog-el');
           var close1 = sinon.stub(inner, 'close');
@@ -172,6 +216,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               close2.restore();
               done();
             });
+        });
+
+        it('should close all stacked dialogs on window click', function(done) {
+          var inner = nestedDialog.querySelector('dialog-el');
+          var close1 = sinon.stub(inner, 'close');
+          var close2 = sinon.stub(nestedDialog, 'close');
+
+          nestedDialog.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              document.body.dispatchEvent(new CustomEvent('dialog-el-tap', { bubbles: true }));
+            })
+            .then(function() {
+              expect(close1.calledOnce).to.be.true;
+              expect(close2.calledOnce).to.be.true;
+              close1.restore();
+              close2.restore();
+              done();
+            })
+            .catch(function(err) {
+              done(err);
+            })
         });
 
       });
