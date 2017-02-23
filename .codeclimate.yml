@@ -1,0 +1,46 @@
+---
+engines:
+  csslint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+        javascript:
+          mass_threshold: 100
+  eslint:
+    enabled: true
+    channel: "eslint-3"
+    config:
+      ignore_warnings: true
+  fixme:
+    enabled: true
+    config:
+      strings:
+      - FIXME
+      - TODO
+      - ToDo
+      - Todo
+      - TO-DO
+      - To-Do
+      - HACK
+      - Hack
+      - HERE BE DRAGONS
+      - Here Be Dragons
+  markdownlint:
+    enabled: true
+  shellcheck:
+    enabled: true
+ratings:
+  paths:
+  - "**.html"
+  - "**.css"
+  - "**.js"
+exclude_paths:
+- ".*"
+- bower_components/
+- build/
+- dist/
+- node_modules/
+- "**/reports/**/*"
+- "**/test/**/*"

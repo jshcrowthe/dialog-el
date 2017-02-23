@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/jshcrowthe/dialog-el.svg?branch=master)](https://travis-ci.org/jshcrowthe/dialog-el)
-[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://www.webcomponents.org/element/jshcrowthe/dialog-el)
+[![Code Climate](https://codeclimate.com/repos/58ae483561b7e20291002125/badges/a91d10f1774530536589/gpa.svg)](https://codeclimate.com/repos/58ae483561b7e20291002125/feed) [![Test Coverage](https://codeclimate.com/repos/58ae483561b7e20291002125/badges/a91d10f1774530536589/coverage.svg)](https://codeclimate.com/repos/58ae483561b7e20291002125/coverage) [![Issue Count](https://codeclimate.com/repos/58ae483561b7e20291002125/badges/a91d10f1774530536589/issue_count.svg)](https://codeclimate.com/repos/58ae483561b7e20291002125/feed) [![Build Status](https://travis-ci.org/fs-webdev/dialog-el.svg?branch=master)](https://travis-ci.org/fs-webdev/dialog-el)
 
 # &lt;dialog-el&gt;
 
