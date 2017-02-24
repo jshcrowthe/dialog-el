@@ -3,7 +3,7 @@
     * {
       box-sizing: border-box;
     }
-    
+
     :host {
       position: absolute;
       display: inline-block;
@@ -12,7 +12,7 @@
     :host([hidden]) {
       display: none !important;
     }
-    
+
     .content {
       background: #FFFFFF;
       background: var(--dialog-el-background, #FFFFFF);
@@ -28,7 +28,7 @@
       -webkit-transition: transform 0.3s, opacity 0.3s;
       transition: transform 0.3s, opacity 0.3s;
     }
-    
+
     :host([modal]) > .overlay > .content {
       left:50%;
       position: fixed;
@@ -36,7 +36,7 @@
       -webkit-transform: translate(-50%, -50%) scale(0.7);
       transform: translate(-50%, -50%) scale(0.7);
     }
-    
+
     .overlay {
       background: rgba(51, 51, 51, 0.8);
       height: 100%;
@@ -48,17 +48,17 @@
       transition: opacity 0.3s;
       width:100%;
     }
-    
+
     :host([visible]) > .content {
       opacity: 1;
       transform: scale(1.0);
     }
-    
+
     :host([modal][visible]) > .overlay > .content {
       opacity: 1;
       transform: translate3d(-50%, -50%, 0) scale(1.0);
     }
-    
+
     :host([visible]) > .overlay {
       opacity: 1;
     }
@@ -153,8 +153,8 @@
         var root;
         var path = e.path || (e.composedPath && e.composedPath());
         if (path) {
-          root = path[0];  
-        } 
+          root = path[0];
+        }
         root = root || e.srcElement
 
         root.dispatchEvent(evt);
@@ -210,6 +210,121 @@
       if (focusableChildren[0]) focusableChildren[0].focus();
     }
 
+    // Helper function for determining if the dialog needs to change direction.
+    function autoPositionArrowDialog (dialog) {
+      if (dialog.hasAttribute("arrow-direction")) {
+        var arrowDirectionValue,
+            minWidth,
+            tempLeftPosition,
+            tempTopPosition,
+            pointer;
+
+        arrowDirectionValue = dialog.attributes["arrow-direction"].value;
+
+        // Grab the min or fixed width of the dialog if there is one, or default to 100px.
+        minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || dialog.offsetWidth || "100");
+        tempLeftPosition = parseFloat(dialog.style.left.replace("px", ""));
+        tempTopPosition = parseFloat(dialog.style.top.replace("px", ""));
+        pointer = dialog.shadowRoot.querySelector(".pointer");
+        // Reset pointer to default CSS
+        pointer.style.left = "";
+        pointer.style.top = "";
+
+        switch (arrowDirectionValue) {
+          case "left":
+            if (window.innerWidth - dialog.offsetLeft - 30 < minWidth) {
+              dialog.attributes["arrow-direction"].value = "right";
+              // if dialog doesn't fit with the "right" arrow, default to "top"
+              if (dialog.offsetLeft - minWidth <= 0) {
+                dialog.attributes["arrow-direction"].value = "top";
+              }
+              // Re-run function to get the right positioning
+              autoPositionArrowDialog(dialog);
+              return;
+            } else {
+              // "left" is correct
+              // Create a buffer from the top and left
+              // coordinates so that the arrow lines up.
+              if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
+                //Reposition Arrow
+                pointer.style.top = tempTopPosition - 2 + "px";
+                pointer.style.left = "0px";
+                // Ensure that the dialog won't run off-screen
+                tempTopPosition = 0;
+              } else {
+                tempTopPosition -= (dialog.offsetHeight / 2);
+              }
+              tempLeftPosition += 30;
+            }
+            break;
+          case "right":
+            if (dialog.offsetLeft - 30 - minWidth <= 0) {
+              dialog.attributes["arrow-direction"].value = "left";
+              // if dialog doesn't fit with the "left" arrow, default to "top"
+              if (window.innerWidth - dialog.offsetLeft < minWidth) {
+                dialog.attributes["arrow-direction"].value = "top";
+              }
+              // Re-run function to get the right positioning
+              autoPositionArrowDialog(dialog);
+              return;
+            } else {
+              // "right" is correct
+              // Create a buffer from the top and left
+              // coordinates so that the arrow lines up.
+              if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
+                //Reposition Arrow
+                pointer.style.top = tempTopPosition - 2 + "px";
+                pointer.style.left = "100%";
+                // Ensure that the dialog won't run off-screen
+                tempTopPosition = 0;
+              } else {
+                tempTopPosition -= (dialog.offsetHeight / 2);
+              }
+              tempLeftPosition -= (dialog.offsetWidth + 30);
+            }
+            break;
+          case "bottom":
+            if (dialog.offsetTop - dialog.offsetHeight - 30 <= 0) {
+              dialog.attributes["arrow-direction"].value = "top";
+              // Re-run function to get the right positioning
+              autoPositionArrowDialog(dialog);
+              return;
+            }
+            // "bottom" is correct
+            // Create a buffer from the top and left
+            // coordinates so that the arrow lines up.
+            if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
+              //Reposition Arrow
+              pointer.style.top = "100%";
+              pointer.style.left = tempLeftPosition - 7 + "px";
+              // Ensure that the dialog won't run off-screen
+              tempLeftPosition = 0;
+            } else {
+              tempLeftPosition -= (dialog.offsetWidth / 2);
+            }
+            tempTopPosition -= (dialog.offsetHeight + 30);
+            break;
+          case "top":
+            // "top" is default (because it's scrollable)
+            // Create a buffer from the top and left
+            // coordinates so that the arrow lines up.
+            if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
+              //Reposition Arrow
+              pointer.style.top = "0px";
+              pointer.style.left = tempLeftPosition - 7 + "px";
+              // Ensure that the dialog won't run off-screen
+              tempLeftPosition = 0;
+            } else {
+              tempLeftPosition -= (dialog.offsetWidth / 2);
+            }
+            tempTopPosition += 30;
+            break;
+        }
+        dialog.style.left = tempLeftPosition + "px";
+        dialog.style.top = tempTopPosition + "px";
+      }
+    }
+
     /**
      * Executes querySelector on the current document
      */
@@ -217,6 +332,19 @@
       var script = document._currentScript || document.currentScript;
       return script.ownerDocument.querySelector(selector);
     };
+
+    /**
+     * crawls up the dom tree to find if parent has href
+     */
+    var findParentHref = function(el) {
+      while (el.parentNode) {
+        el = el.parentNode;
+        if (el.hasAttribute && el.hasAttribute('href')){
+          return true;
+        }
+      }
+      return false;
+    }
 
     /**
      * Reference the template tag in this current document when HTML imported
@@ -354,10 +482,10 @@
       if (this.visible) this.close();
     };
 
-    proto.show = function() {
+    proto.show = function(keepOpen) {
       return Promise.resolve()
       .then(function() {
-        if (this.visible) throw new Error('Tried to open a dialog that is already open', {
+        if (this.visible && !keepOpen) throw new Error('Tried to open a dialog that is already open', {
           element: this
         });
       }.bind(this))
@@ -378,31 +506,47 @@
         setFocusToFirstItem(this);
       }.bind(this))
       .then(function() {
-        // Transition the elements out and resolve when the 
-        // animation has completed
-        var event = 'transitionend';
-        return new Promise(function(resolve, reject) {
-          var handler = function() {
-            resolve();
+        if (this.hasAttribute("arrow-direction")) {
+          // If we've previously stored the original value, reset to that when opening a new dialog.
+          if (this.originalArrowDirection) {
+            this.attributes["arrow-direction"].value = this.originalArrowDirection;
+          } else {
+            // Store original arrow value for resetting next time
+            this.originalArrowDirection = this.attributes["arrow-direction"].value;
+          }
+          // Compute arrow direction if needed
+          autoPositionArrowDialog(this);
+        }
+      }.bind(this))
+      .then(function() {
+        // Only show the transition on the original opening of the dialog.
+        if (!this.visible) {
+          // Transition the elements out and resolve when the
+          // animation has completed
+          var event = 'transitionend';
+          return new Promise(function(resolve, reject) {
+            var handler = function() {
+              resolve();
+              this._content.removeEventListener(event, handler);
+            }.bind(this);
+            this._content.addEventListener(event, handler);
+
+            // Delay the setting of visible property to allow nested
+            // elements time to display without being closed by the
+            // click handler. Also this allows element animations
+            // to occur.
+            setTimeout(function() { this.visible = true }.bind(this), 0);
+
+            // Set a backup handler call to ensure the modal opens
+            // even if for some reason the transition craps out
+            setTimeout(function() {
+              reject(handler)
+            }, 350);
+          }.bind(this)).catch(function(handler) {
+            console.warn('dialog "show" transition did not fire', this);
             this._content.removeEventListener(event, handler);
-          }.bind(this);
-          this._content.addEventListener(event, handler);
-
-          // Delay the setting of visible property to allow nested
-          // elements time to display without being closed by the
-          // click handler. Also this allows element animations
-          // to occur.
-          setTimeout(function() { this.visible = true }.bind(this), 0);
-
-          // Set a backup handler call to ensure the modal opens
-          // even if for some reason the transition craps out
-          setTimeout(function() {
-            reject(handler)
-          }, 350);
-        }.bind(this)).catch(function(handler) {
-          console.warn('dialog "show" transition did not fire', this);
-          this._content.removeEventListener(event, handler);
-        }.bind(this));
+          }.bind(this));
+        }
       }.bind(this))
       .then(function() {
         // Fire `dialog-opened` event
@@ -520,9 +664,10 @@
       }
 
       /**
-       * Don't propagate the event if we haven't already closed the modal
+       * Don't propagate the event if we haven't already closed the modal unless the target
+       * has an href so it can be caught by either the browser or a pushstate handler
        */
-      if (e && e.stopPropagation) e.stopPropagation();
+      if (e && e.stopPropagation && !(e.target.hasAttribute('href') || findParentHref(e.target))) e.stopPropagation();
     };
 
     proto._getEventHandlers = function() {
