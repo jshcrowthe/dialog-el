@@ -5,7 +5,6 @@ before_install:
 branches:
   only:
     - master
-    - fs-dialog
 dist: trusty
 language: node_js
 node_js:

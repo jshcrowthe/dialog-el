@@ -1,0 +1,252 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../promise-polyfill/promise.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../fs-dialog.html">
+  </head>
+  <body>
+
+    <test-fixture id="simple-dialog">
+      <template>
+        <fs-dialog>
+          <h1>Simple Dialog</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </fs-dialog>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="simple-modal">
+      <template>
+        <fs-dialog modal>
+          <h1>Simple Modal</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        </fs-dialog>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="nested-modal">
+      <template>
+        <fs-dialog modal>
+          <h1>Simple Modal</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <fs-dialog>
+            <h2>Simple Dialog</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita numquam quibusdam harum? Perspiciatis harum a qui, numquam saepe dicta, magni esse doloremque ullam dolorum nisi, praesentium eius ipsa reiciendis aliquid!</p>
+          </fs-dialog>
+        </fs-dialog>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="nested-dialog">
+      <template>
+        <fs-dialog>
+          <h1>Simple Dialog</h1>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+          consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+          <fs-dialog>
+            <h2>Simple Dialog</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Expedita numquam quibusdam harum? Perspiciatis harum a qui, numquam saepe dicta, magni esse doloremque ullam dolorum nisi, praesentium eius ipsa reiciendis aliquid!</p>
+          </fs-dialog>
+        </fs-dialog>
+      </template>
+    </test-fixture>
+
+    <script>
+      describe('<fs-dialog> Click Handlers', function() {
+        var dialog, modal, nestedDialog, nestedModal;
+        beforeEach(function() {
+          dialog = fixture('simple-dialog');
+          modal = fixture('simple-modal');
+          nestedModal = fixture('nested-modal');
+          nestedDialog = fixture('nested-modal');
+        });
+
+        it('should fire a `dialog-el-tap` event if touchstart and touchend happen within 250ms and a modal is open', function(done) {
+          var pTag = modal.querySelector('p');
+          modal.show()
+            .then(function() {
+              modal.dispatchEvent(new Event('touchstart', { bubbles: true }));
+              setTimeout(function() {
+                modal.dispatchEvent(new Event('touchend', { bubbles: true }));
+              }, 2);
+            })
+            .then(function() {
+              return new Promise(function(resolve, reject) {
+                var handler = function() {
+                  resolve();
+                  document.removeEventListener('dialog-el-tap', handler);
+                }
+                document.addEventListener('dialog-el-tap', handler);
+              });
+            })
+            .then(function() {
+              done();
+            })
+            .catch(function(err) {
+              done(err || new Error('Event didnt fire'));
+            });
+        });
+
+        // TODO: broken in non-chrome fix later
+        // it('should close all dialogs when window (not dialog content) is clicked', function(done) {
+        //   var _closeAll = sinon.stub(dialog.__proto__, '_closeAll');
+        //   dialog.show()
+        //     .then(function() {
+        //       document.body.click();
+        //     })
+        //     .then(function() {
+        //       expect(_closeAll.calledOnce).to.be.true;
+        //       _closeAll.restore();
+        //       done();
+        //     });
+        // });
+
+        // TODO: broken in non-chrome fix later
+        // it('`close all` should call `close` on dialogs when window is clicked', function(done) {
+        //   var close = sinon.stub(dialog, 'close');
+        //   dialog.show()
+        //     .then(function() {
+        //       document.body.click();
+        //     })
+        //     .then(function() {
+        //       expect(close.calledOnce).to.be.true;
+        //       close.restore();
+        //       done();
+        //     });
+        // });
+
+        // TODO: broken in non-chrome fix later
+        // it('should close modal when overlay is clicked', function(done) {
+        //   var close = sinon.stub(modal, 'close');
+        //   modal.show()
+        //     .then(function() {
+        //       modal._overlay.click();
+        //     })
+        //     .then(function() {
+        //       expect(close.calledOnce).to.be.true;
+        //       close.restore();
+        //       done();
+        //     });
+        // });
+
+        it('should close relevant stacked modals on sub-modal click', function(done) {
+          var inner = nestedModal.querySelector('fs-dialog');
+          var close = sinon.stub(inner, 'close');
+
+          nestedModal.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              nestedModal._content.click();
+            })
+            .then(function() {
+              expect(close.calledOnce).to.be.true;
+              close.restore();
+              done();
+            });
+        });
+
+        it('should close relevant stacked modals on sub-modal tap', function(done) {
+          var inner = nestedModal.querySelector('fs-dialog');
+          var close = sinon.stub(inner, 'close');
+
+          nestedModal.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              nestedModal._content.dispatchEvent(new CustomEvent('dialog-el-tap'));
+            })
+            .then(function() {
+              expect(close.calledOnce).to.be.true;
+              close.restore();
+              done();
+            });
+        });
+
+        it('should close all stacked dialogs on window click', function(done) {
+          var inner = nestedDialog.querySelector('fs-dialog');
+          var close1 = sinon.stub(inner, 'close');
+          var close2 = sinon.stub(nestedDialog, 'close');
+
+          nestedDialog.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              document.body.click();
+            })
+            .then(function() {
+              expect(close1.calledOnce).to.be.true;
+              expect(close2.calledOnce).to.be.true;
+              close1.restore();
+              close2.restore();
+              done();
+            });
+        });
+
+        it('should close all stacked dialogs on window click', function(done) {
+          var inner = nestedDialog.querySelector('fs-dialog');
+          var close1 = sinon.stub(inner, 'close');
+          var close2 = sinon.stub(nestedDialog, 'close');
+
+          nestedDialog.show()
+            .then(function() {
+              return inner.show();
+            })
+            .then(function() {
+              document.body.dispatchEvent(new CustomEvent('dialog-el-tap', { bubbles: true }));
+            })
+            .then(function() {
+              expect(close1.calledOnce).to.be.true;
+              expect(close2.calledOnce).to.be.true;
+              close1.restore();
+              close2.restore();
+              done();
+            })
+            .catch(function(err) {
+              done(err);
+            })
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
