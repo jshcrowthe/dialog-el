@@ -1,5 +1,6 @@
 {
   "name": "dialog-el",
+  "version": "1.2.1",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "authors": [
     "Josh Crowther <jshcrowthe@gmail.com>"

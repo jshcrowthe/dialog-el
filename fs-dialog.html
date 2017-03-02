@@ -424,7 +424,7 @@
            * Don't propagate the event if we haven't already closed the modal unless the target
            * has an href so it can be caught by either the browser or a pushstate handler
            */
-          if (e && e.stopPropagation && !e.target.hasAttribute('href')) e.stopPropagation();
+          if (e && e.stopPropagation && !(e.target.hasAttribute('href') || findParentHref(e.target))) e.stopPropagation();
         }
       });
 
@@ -640,6 +640,18 @@
         return script.ownerDocument.querySelector(selector);
       };
 
+      /**
+       * crawls up the dom tree to find if parent has href
+       */
+      var findParentHref = function(el) {
+        while (el.parentNode) {
+          el = el.parentNode;
+          if (el.hasAttribute && el.hasAttribute('href')){
+            return true;
+          }
+        }
+        return false;
+      }
     })();
 
   </script>
