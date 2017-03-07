@@ -156,6 +156,9 @@
             }
           }
         },
+        get _topDialog() {
+          return _dialogStack[_dialogStack.length - 1];
+        },
         _computeClass: function(modal){
           if(modal) return 'overlay';
         },
