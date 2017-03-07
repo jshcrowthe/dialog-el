@@ -407,8 +407,10 @@
            * child of one of your components you can easily
            * close out the current dialog/modal. This will also
            * customize the reason statement in the close event.
+           ********* e.path doesn't work in safari, e.composedPath() doesn't work in IE11 ********       
            */
-          var dismissNodes = e.path.filter(function(el) {
+          var path = e.path || (e.composedPath && e.composedPath()) || [e.target.parentNode];
+          var dismissNodes = path.filter(function(el) {
             return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
           });
 
