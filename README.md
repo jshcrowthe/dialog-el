@@ -86,6 +86,40 @@ document.body.appendChild(dialogEl);
 
   **NOTE: The `show` function, if called on an already open dialog, will throw an error**
 
+  `dialog.show` can also take an optional DOM Element as an argument. If passed the dialog will attempt to intelligently
+  position itself relative to the passed element.
+
+  **Example:**
+  ```javascript
+  var dialog = document.querySelector('dialog-el');
+  var button = document.querySelector('#myMagicButton');
+  dialog.show(button);
+  ```
+
+  Positioning will be handled based on the existence of a valid `arrowPosition` value. If the value **does not** exist
+  the dialog will position itself where there is the most available screen real estate. If the value **does** exist, 
+  the dialog will be positioned such that the arrow points at the center of the passed element.
+
+  **Restrictions**
+  - If your `dialog-el` is positioned inside of a container with `overflow: hidden` this can cause 
+    the dialog to not be visible on the screen.
+  - Your dialog must have a fixed height & width to ensure correct positioning, consider doing 
+    something like the following:
+
+    ```html
+    <style>
+      .sizeMe {
+        width: 500px;
+        height: 300px;
+      }
+    </style>
+    <dialog-el>
+      <div class='sizeMe'>
+        <!--Content-->
+      </div>
+    </dialog-el>
+    ```
+
 - `dialog.close`
 
   This is the means of closing an open dialog/modal. Simply select the element and call this method to close it.
