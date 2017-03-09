@@ -38,7 +38,7 @@
   <link rel="import" href="./dialog-el.html" async>
   <link rel="stylesheet" type="text/css" href="assets/github-markdown.css">
   <link rel="stylesheet" type="text/css" href="assets/prism.css">
-  <style type="text/css">
+  <style>
     .horizontal-ul {
       list-style: none;
       padding: 0;
@@ -61,7 +61,7 @@
 
   <p>Click the following buttons to see different types of modals</p>
 
-  <ul class='horizontal-ul'>
+  <ul id='dialog-buttons' class='horizontal-ul'>
     <li><button class='simpleDialog'>Simple Dialog</button></li>
     <li><button class='simpleModal'>Simple Modal</button></li>
     <li><button class='nestedDialog'>Nested Dialog</button></li>
@@ -70,60 +70,113 @@
     <li><button class='arrowDirectionDialog'>Arrow Direction Dialog</button></li>
   </ul>
 
-
-  <dialog-el id='simpleDialog'>
-    <h1>Demo Dialog!</h1>
-    <p>This is a simple dialog! Look at me go!</p>
-  </dialog-el>
-
-  <dialog-el id='simpleModal' modal>
-    <h1>Demo Modal!</h1>
-    <p>This is a simple modal! I stole all the focus yeah!</p>
-  </dialog-el>
-
-  <dialog-el id='nestedDialog'>
-    <h1>Demo Dialog!</h1>
-    <p>This is a dialog with another dialog inside! Click below to open the nested dialog</p>
-    <button class='nestedDialog-child'>Open Child Dialog</button>
-    <dialog-el id='nestedDialog-child'>
-      <h1>Demo Dialog!</h1>
-      <p>This is a nested dialog! Here I am!</p>
-    </dialog-el>
-  </dialog-el>
-
-  <dialog-el id='nestedModal' modal>
-    <h1>Demo Dialog!</h1>
-    <p>This is a modal with another dialog inside! Click below to open the nested dialog</p>
-    <button class='nestedModal-child'>Open Child Dialog</button>
-    <dialog-el id='nestedModal-child'>
-      <h1>Demo Dialog!</h1>
-      <p>This is a nested dialog! Here I am!</p>
-    </dialog-el>
-  </dialog-el>
-
-  <dialog-el id='focustrapping' modal>
-    <h1>Fancy Header</h1>
-    <p>
-      <label>Name</label><input type="text">
+  <h3>Auto Positioning Demo</h3>
+  <p>
+    <strong>NOTE:</strong> the auto positioning will only work <strong>reliably</strong> 
+    on a dialog with fixed height & width. It will also function differently based on the
+    existance of the <code>arrow-direction</code> attribute.
     </p>
+  <div style='margin-bottom: 10px;'>
+    <h4>Standard Positioning</h4>
+    <p>The following dialog will always fly out to the side of the screen with the most space</p>
+    <button class='autoPositionDialog' data-auto-position>Auto Positioned Dialog</button>
+  </div>
+  <div>
+    <h4>Arrow Positioning</h4>
     <p>
-      <label>Phone</label><input type="text">
+      The following dialog will always such that the arrow is pointing at the center of the passed element
+      (in this case the button)
     </p>
-    <textarea name="" id="" cols="30" rows="10"></textarea>
-    <button dialog-submit>Save!</button>
-  </dialog-el>
+    <div style='display: flex; position:relative; justify-content: center; align-items: center;'>
+      <button class='autoPositionArrowDialog' data-auto-position>Auto Positioned Arrow Dialog</button>
+      <select id="arrow-direction">
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+      </select>
+      <dialog-el id='autoPositionArrowDialog' arrow-direction='left'>
+        <div style='width: 500px;'>
+          <h1>Auto Position Dialog!</h1>
+          <p>This dialog will be automatically positioned relative to the button.</p>
+          <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
+        </div>
+      </dialog-el>
+    </div>
+  </div>
 
-  <dialog-el id='arrowDirectionDialog' arrow-direction='top'>
-    <h1>Arrow Direction Dialog!</h1>
-    <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
-  </dialog-el>
+  <div class="dialog-wrapper">
+    <dialog-el id='simpleDialog'>
+      <h1>Demo Dialog!</h1>
+      <p>This is a simple dialog! Look at me go!</p>
+    </dialog-el>
+
+    <dialog-el id='simpleModal' modal>
+      <h1>Demo Modal!</h1>
+      <p>This is a simple modal! I stole all the focus yeah!</p>
+    </dialog-el>
+
+    <dialog-el id='nestedDialog'>
+      <h1>Demo Dialog!</h1>
+      <p>This is a dialog with another dialog inside! Click below to open the nested dialog</p>
+      <button class='nestedDialog-child'>Open Child Dialog</button>
+      <dialog-el id='nestedDialog-child'>
+        <h1>Demo Dialog!</h1>
+        <p>This is a nested dialog! Here I am!</p>
+      </dialog-el>
+    </dialog-el>
+
+    <dialog-el id='nestedModal' modal>
+      <h1>Demo Dialog!</h1>
+      <p>This is a modal with another dialog inside! Click below to open the nested dialog</p>
+      <button class='nestedModal-child'>Open Child Dialog</button>
+      <dialog-el id='nestedModal-child'>
+        <h1>Demo Dialog!</h1>
+        <p>This is a nested dialog! Here I am!</p>
+      </dialog-el>
+    </dialog-el>
+
+    <dialog-el id='focustrapping' modal>
+      <h1>Fancy Header</h1>
+      <p>
+        <label>Name</label><input type="text">
+      </p>
+      <p>
+        <label>Phone</label><input type="text">
+      </p>
+      <textarea name="" id="" cols="30" rows="10"></textarea>
+      <button dialog-submit>Save!</button>
+    </dialog-el>
+
+    <dialog-el id='arrowDirectionDialog' arrow-direction='top'>
+      <h1>Arrow Direction Dialog!</h1>
+      <p>This dialog should have an arrow pointing left. Note that positioning is up to the containing element.</p>
+    </dialog-el>
+
+    <dialog-el id='autoPositionDialog'>
+      <div style='width: 500px;'>
+        <h1>Auto Position Dialog!</h1>
+        <p>This dialog will be automatically positioned relative to the button.</p>
+        <p><strong>NOTE:</strong> This will only work on a dialog with fixed width</p>
+      </div>
+    </dialog-el>
+  </div>
 
   <script>
-    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog'];
+    var dialogs = ['simpleDialog', 'simpleModal', 'nestedDialog', 'nestedModal', 'nestedDialog-child', 'nestedModal-child', 'focustrapping', 'arrowDirectionDialog', 'autoPositionDialog', 'autoPositionArrowDialog'];
     dialogs.forEach(function(selector) {
-      document.querySelector('.' + selector).addEventListener('click', function() {
-        document.querySelector('#' + selector).show();
+      var button = document.querySelector('.' + selector);
+      button.addEventListener('click', function() {
+        var dialog = document.querySelector('#' + selector);
+        var target = button.hasAttribute('data-auto-position') ? button : null;
+        dialog.show(target);
       });
+    });
+
+    var arrowDirectionSelect = document.querySelector('#arrow-direction');
+    arrowDirectionSelect.addEventListener('change', function(e) {
+      var dialog = document.querySelector('#autoPositionArrowDialog');
+      dialog.setAttribute('arrow-direction', arrowDirectionSelect.value);
     });
   </script>
 
