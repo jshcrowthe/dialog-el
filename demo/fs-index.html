@@ -2,14 +2,14 @@
 <html>
 
 <head>
-  <title>paper-toast</title>
+  <title>fs-dialog</title>
 
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <script>
     window.Polymer = {
-      dom: 'shadow',
+      dom: 'shady',
       lazyRegister: true,
       useNativeCSSProperties: true
     };
@@ -29,7 +29,7 @@
   </style>
 </head>
 
-<body unresolved class="centered">
+<body class="centered">
   <h3>By Default the <code>fs-dialog</code> renders an absolutely positioned dialog</h3>
   <demo-snippet class="centered-demo">
     <template>
@@ -85,7 +85,7 @@
     </template>
   </demo-snippet>
 
-  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property</h3>
+  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (same offset parent)</h3>
   <demo-snippet class="centered-demo">
     <template>
       <style>
@@ -112,6 +112,46 @@
       </div>
     </template>
   </demo-snippet>
+
+  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (global version)</h3>
+  <demo-snippet class="centered-demo global">
+    <template>
+      <style>
+        .content {
+          width: 100vw;
+          max-width: 350px;
+        }
+        .content .content {
+          width: 100vw;
+          max-width: 320px;
+        }
+      </style>
+
+      <div style='position: relative;'>
+        <paper-button raised id="globalDialogButton">Arrow Dialog</paper-button>
+      </div>
+
+      <fs-dialog id="globalDialog" arrow-direction='left'>
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
+        </div>
+      </fs-dialog>
+      <script>
+      window.onload = function() {
+        document.querySelector("#globalDialogButton").addEventListener("click", function(e){
+          // Cancel the person card's default click event.
+          e.stopPropagation();
+          var dialog = document.querySelector("#globalDialog");
+          dialog.style.left = e.pageX + "px";
+          dialog.style.top = e.pageY + "px";
+          dialog.show(true);
+        });
+      };
+      </script>
+    </template>
+  </demo-snippet>
+
 
   <h3>Nested dialogs are also supported with proper a11y tab scoping</h3>
   <demo-snippet class="centered-demo">
