@@ -8,7 +8,7 @@ branches:
 dist: trusty
 language: node_js
 node_js:
-  - "4"
+  - "6"
 # Cache bower dependencies for faster/network error-tolerant builds (provided cache invalidation occurs as expected)
 cache:
   directories:
