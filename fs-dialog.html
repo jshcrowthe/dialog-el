@@ -529,6 +529,7 @@
               minWidth,
               tempLeftPosition,
               tempTopPosition,
+              dialogRect,
               pointer;
 
           arrowDirectionValue = dialog.attributes["arrow-direction"].value;
@@ -537,6 +538,7 @@
           minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || dialog.offsetWidth || "100");
           tempLeftPosition = parseFloat(dialog.style.left.replace("px", ""));
           tempTopPosition = parseFloat(dialog.style.top.replace("px", ""));
+          dialogRect = dialog.getBoundingClientRect();
           pointer = dialog.$._pointer;
           // Reset pointer to default CSS
           pointer.style.left = "";
@@ -548,7 +550,7 @@
                 dialog.attributes["arrow-direction"].value = "right";
                 // if dialog doesn't fit with the "right" arrow, default to "top"
                 if (dialog.offsetLeft - minWidth <= 0) {
-                  dialog.attributes["arrow-direction"].value = "top";
+                  dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
                 }
                 // Re-run function to get the right positioning
                 autoPositionArrowDialog(dialog);
@@ -574,7 +576,7 @@
                 dialog.attributes["arrow-direction"].value = "left";
                 // if dialog doesn't fit with the "left" arrow, default to "top"
                 if (window.innerWidth - dialog.offsetLeft < minWidth) {
-                  dialog.attributes["arrow-direction"].value = "top";
+                  dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
                 }
                 // Re-run function to get the right positioning
                 autoPositionArrowDialog(dialog);
@@ -596,11 +598,15 @@
               }
               break;
             case "bottom":
-              if (dialog.offsetTop - dialog.offsetHeight - 30 <= 0) {
-                dialog.attributes["arrow-direction"].value = "top";
-                // Re-run function to get the right positioning
-                autoPositionArrowDialog(dialog);
-                return;
+              if (dialog.offsetTop - dialog.offsetHeight - 30 <= 0 ||  tempTopPosition - window.scrollY - 30 - dialog.offsetHeight <= 0) {
+                var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
+                var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
+                if (negativeOffsetTop < negativeOffsetBottom) {
+                  dialog.attributes["arrow-direction"].value = "top";
+                  // Re-run function to get the right positioning
+                  autoPositionArrowDialog(dialog);
+                  return;
+                }
               }
               // "bottom" is correct
               // Create a buffer from the top and left
@@ -617,6 +623,17 @@
               tempTopPosition -= (dialog.offsetHeight + 30);
               break;
             case "top":
+              if (window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30) <= 0) {
+                var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
+                var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
+                if (negativeOffsetTop > negativeOffsetBottom) {
+                  dialog.attributes["arrow-direction"].value = "bottom";
+
+                  // Re-run function to get the right positioning
+                  autoPositionArrowDialog(dialog);
+                  return;
+                }
+              }
               // "top" is default (because it's scrollable)
               // Create a buffer from the top and left
               // coordinates so that the arrow lines up.
