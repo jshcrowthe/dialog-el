@@ -85,7 +85,7 @@
     </template>
   </demo-snippet>
 
-  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (same offset parent)</h3>
+  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (same offset parent). No allow-arrow-change property.</h3>
   <demo-snippet class="centered-demo">
     <template>
       <style>
@@ -113,7 +113,7 @@
     </template>
   </demo-snippet>
 
-  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (global version)</h3>
+  <h3>Dialogs can be positioned with CSS and can have position arrows with the <code>arrow-direction</code> property (global version). Includes allow-arrow-change property.</h3>
   <demo-snippet class="centered-demo global">
     <template>
       <style>
@@ -131,7 +131,7 @@
         <paper-button raised id="globalDialogButton">Arrow Dialog</paper-button>
       </div>
 
-      <fs-dialog id="globalDialog" arrow-direction='left'>
+      <fs-dialog id="globalDialog" arrow-direction='left' allow-arrow-change>
         <div class="content">
           <h4>Dialog</h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>

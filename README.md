@@ -109,10 +109,18 @@ document.body.appendChild(dialogEl);
 
   Based on the value of this property (left, right, top, bottom), it will render an arrow on that side of the dialog. For example, a value of `left` adds an arrow to the left side of the dialog.
 
+- `allowArrowChange`
+
+  With `allowArrowChange`, the `arrowDirection` property is used as the default starting direction when auto-positioning the dialog. The arrow direction changes only if there isn't enough room for the dialog in that direction.
+
+  Without `allowArrowChange`, the `arrowDirection` is the only direction and it will not change. This makes it so the dialog can be displayed off the screen.
+
+  If `arrowDirection` is left off, then `allowArrowDirection` changes nothing. The dialog acts as a regular dialog with no arrow and no auto-positioning.
+
 
   _Example:_
   ```html
-  <dialog-el arrow-direction='left'>
+  <dialog-el arrow-direction='left' allow-arrow-change>
     <h1>A header</h1>
     <p>Dialog Content</p>
   </dialog-el>
@@ -124,7 +132,7 @@ document.body.appendChild(dialogEl);
   document.body.appendChild(dialog);
   ```
 
-  **NOTE: This does not work with the `modal` property**
+  **NOTE: `arrowDirection` and `allowArrowChange` do not work with the `modal` property**
 
 
 ## Events
