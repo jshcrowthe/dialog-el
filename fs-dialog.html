@@ -148,6 +148,9 @@
             value: false,
             reflectToAttribute: true
           },
+          originalArrowDirection: {
+            type: String
+          },
           _overlay: {
             type: Object,
             value: function(){
@@ -395,6 +398,17 @@
             if (dialog && dialog.close) dialog.close();
           });
         },
+        /** Close any other dialogs that might be open except
+         * the one used to call this function.
+         * To be used similar to dialog.show() or dialog.close()
+         * simply call dialog.closeAllOtherDialogs().
+         */
+        closeAllOtherDialogs: function() {
+          var that = this;
+          _dialogStack.forEach(function(dialog) {
+            if (dialog && dialog !== that && dialog.close) dialog.close();
+          });
+        },
         _clickHandler: function(e) {
           // Find the index of the clicked dialog
           var index = _dialogStack.indexOf(this);
@@ -415,7 +429,7 @@
            * child of one of your components you can easily
            * close out the current dialog/modal. This will also
            * customize the reason statement in the close event.
-           ********* e.path doesn't work in safari, e.composedPath() doesn't work in IE11 ********       
+           ********* e.path doesn't work in safari, e.composedPath() doesn't work in IE11 ********
            */
           var path = e.path || (e.composedPath && e.composedPath()) || [e.target.parentNode];
           var dismissNodes = path.filter(function(el) {
