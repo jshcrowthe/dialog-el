@@ -99,6 +99,17 @@ document.body.appendChild(dialogEl);
 
   **NOTE: The `close` function, if called on an already closed dialog, will throw an error**
 
+- `dialog.closeAllOtherDialogs` (fs-dialog only)
+
+  This will close any open dialogs except the one calling the function.
+  Best to use after opening the dialog.
+
+  **Example:**
+  ```javascript
+  var dialog = document.querySelector('dialog-el');
+  dialog.closeAllOtherDialogs();
+  ```
+
 ## Properties
 
 - `modal`
