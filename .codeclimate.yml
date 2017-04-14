@@ -12,6 +12,9 @@ engines:
     enabled: true
     channel: "eslint-3"
     config:
+      extensions:
+        - .html
+        - .js
       ignore_warnings: true
   fixme:
     enabled: true

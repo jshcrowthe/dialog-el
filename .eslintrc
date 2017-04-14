@@ -1,4 +1,8 @@
 {
+  "plugins": [
+    "eslint-plugin-html",
+    "eslint-plugin-jsdoc"
+  ],
   "env": {
     "browser": true,
     "jquery": true
@@ -173,6 +177,21 @@
     "generator-star-spacing": [2, "before"], // enforce the spacing around the * in generator functions (off by default)
 
     //
+    // JSDoc Plugin Rules
+    //
+    "jsdoc/check-param-names": 2,
+    "jsdoc/check-tag-names": 2,
+    "jsdoc/check-types": 2,
+    "jsdoc/newline-after-description": 0,
+    "jsdoc/require-description-complete-sentence": 2,
+    "jsdoc/require-hyphen-before-param-description": 2,
+    "jsdoc/require-param": 2,
+    "jsdoc/require-param-description": 2,
+    "jsdoc/require-param-type": 2,
+    "jsdoc/require-returns-description": 2,
+    "jsdoc/require-returns-type": 2,
+
+    //
     // Legacy
     //
     // The following rules are included for compatibility with JSHint and JSLint.
@@ -180,35 +199,37 @@
     // the functionality is the same.
     //
     "max-depth": [2, 3], // specify the maximum depth that blocks can be nested (off by default)
-    "max-len": [2, 100, 2], // specify the maximum length of a line in your program (off by default)
+    "max-len": [2, 150, 2], // specify the maximum length of a line in your program (off by default)
     "max-params": [2, 6], // limits the number of parameters that can be used in the function declaration. (off by default)
     "max-statements": [1, 36], // specify the maximum number of statement allowed in a function (off by default)
     "no-bitwise": 0, // disallow use of bitwise operators (off by default)
     "no-plusplus": 0 // disallow use of unary operators, ++ and -- (off by default)
   },
 
-  "ecmaFeatures": {
-    "arrowFunctions": true,
-    "binaryLiterals": true,
-    "blockBindings": true,
-    "classes": true,
-    "defaultParams": true,
-    "destructuring": true,
-    "forOf": true,
-    "generators": true,
-    "modules": true,
-    "objectLiteralComputedProperties": true,
-    "objectLiteralDuplicateProperties": true,
-    "objectLiteralShorthandMethods": true,
-    "objectLiteralShorthandProperties": true,
-    "octalLiterals": true,
-    "regexUFlag": true,
-    "regexYFlag": true,
-    "spread": true,
-    "superInFunctions": true,
-    "templateStrings": true,
-    "unicodeCodePointEscapes": true,
-    "globalReturn": true,
-    "jsx": true
+  "parserOptions": {
+    "ecmaFeatures": {
+      "arrowFunctions": true,
+      "binaryLiterals": true,
+      "blockBindings": true,
+      "classes": true,
+      "defaultParams": true,
+      "destructuring": true,
+      "forOf": true,
+      "generators": true,
+      "modules": true,
+      "objectLiteralComputedProperties": true,
+      "objectLiteralDuplicateProperties": true,
+      "objectLiteralShorthandMethods": true,
+      "objectLiteralShorthandProperties": true,
+      "octalLiterals": true,
+      "regexUFlag": true,
+      "regexYFlag": true,
+      "spread": true,
+      "superInFunctions": true,
+      "templateStrings": true,
+      "unicodeCodePointEscapes": true,
+      "globalReturn": true,
+      "jsx": true
+    }
   }
 }
