@@ -120,22 +120,38 @@
 </template>
 
 <script>
-  (function(document, HTMLElement) {
+  ((document, HTMLElement) => {
+    class DialogElError extends Error {
+      constructor(...args) {
+        // Create standard error
+        super(...args);
+        this.name = 'dialog-el';
+      }
+    }
+
     // Master dialog stack, we use this to compute z-indexes as well as
     // know which dialogs/modals to close on a click event in the DOM
-    var _dialogStack = [];
-    var _globalWindowListener = false;
+    let _dialogStack = [];
 
-    var _isTouch = true;
-    var _touchActive = false;
+    // A getter for the top of the dialog stack
+    Object.defineProperty(_dialogStack, '_topDialog', {
+      get: function() {
+        if (this.length === 0) return;
+        return this[this.length - 1];
+      }
+    });
 
-    document.addEventListener('touchstart', function(e) {
+    let _globalWindowListener = false;
+    let _isTouch = true;
+    let _touchActive = false;
+
+    document.addEventListener('touchstart', e => {
       if (!_dialogStack.length) return;
-      var _topDialog = _dialogStack[_dialogStack.length - 1];
+      const _topDialog = _dialogStack[_dialogStack.length - 1];
       _touchActive = true;
 
       // Wait 250ms to detect a tap
-      setTimeout(function() {
+      setTimeout(() => {
         if (_touchActive || !_isTouch) {
           // Reset _isTouch prop
           _isTouch = true;
@@ -143,15 +159,15 @@
         }
 
         // This is a tap, build the custom tap event
-        var evt = new CustomEvent('dialog-el-tap', {
+        const evt = new CustomEvent('dialog-el-tap', {
           bubbles: true,
           detail: {
             originalEvent: e
           }
         });
 
-        var root;
-        var path = e.path || (e.composedPath && e.composedPath());
+        let root;
+        const path = e.path || (e.composedPath && e.composedPath());
         if (path) {
           root = path[0];  
         } 
@@ -161,11 +177,11 @@
       }, 250);
     });
 
-    document.addEventListener('touchend', function() {
+    document.addEventListener('touchend', () => {
       _touchActive = false;
     });
 
-    document.addEventListener('touchmove', function(e) {
+    document.addEventListener('touchmove', e => {
       if (e.path[0].classList.contains('overlay')) {
         e.preventDefault();
       }
@@ -173,27 +189,53 @@
     });
 
       // Helper function to get all focusable children from a node
-    var getFocusableChildren = function(node) {
-      var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
+    const getFocusableChildren = node => {
+      if (!(node instanceof HTMLElement)) throw new DialogElError('HTMLElement not passed to `getFocusableChildren`');
 
-      return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
+      // All naturally focusable elements
+      const focusableElementsSelectors = [
+        'a[href]', 
+        'area[href]',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        'button:not([disabled])',
+        'iframe',
+        'object',
+        'embed',
+        '[contenteditable]',
+        '[tabindex]:not([tabindex^="-"])'
+      ];
+
+      // Selector for all focusable elements
+      const focusableElementsString = focusableElementsSelectors.join(',');
+
+      // NodeList of all focusable elements under a given node
+      const focusableElements = node.querySelectorAll(focusableElementsSelectors);
+      
+      return Array.from(focusableElements).filter(child => {
         return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
       });
     }
 
     // Helper function trapping the tab key inside a node
-    var trapTabKey = function(node, event) {
-      var focusableChildren = getFocusableChildren(node);
+    const trapTabKey = (node, event) => {
+      if (!(node instanceof HTMLElement)) throw new DialogElError('HTMLElement not passed to `trapTabKey`');
+      if (!(event instanceof Event)) throw new DialogElError('Event not passed to `trapTabKey`');
+      
+      const focusableChildren = getFocusableChildren(node);
 
       // This line is required due to how the Shadow DOM polyfill wraps elements
       // (See: https://github.com/webcomponents/webcomponentsjs#element-wrapping--unwrapping-limitations-)
-      var activeElement = window.ShadowDOMPolyfill && window.ShadowDOMPolyfill.wrap ? window.ShadowDOMPolyfill.wrap(document.activeElement) : document.activeElement;
+      const activeElement = window.ShadowDOMPolyfill && 
+                            (window.ShadowDOMPolyfill.wrap ? window.ShadowDOMPolyfill.wrap(document.activeElement) : 
+                                                             document.activeElement);
 
       // If there are no focusable children in the dialog, prevent tabbing through the rest
       // of the document before clearing focus on the dialog
       if (!focusableChildren.length) return event.preventDefault();
 
-      var focusedItemIndex = focusableChildren.indexOf(activeElement);
+      const focusedItemIndex = focusableChildren.indexOf(activeElement);
 
       if (event.shiftKey && focusedItemIndex === 0) {
         focusableChildren[focusableChildren.length - 1].focus();
@@ -205,28 +247,31 @@
     };
 
     // Helper function to focus the first focusable item
-    var setFocusToFirstItem = function(node) {
-      var focusableChildren = getFocusableChildren(node);
-      if (focusableChildren[0]) focusableChildren[0].focus();
+    const setFocusToFirstItem = node => {
+      if (!(node instanceof HTMLElement)) throw new DialogElError('HTMLElement not passed to `setFocusToFirstItem`');
+      const [firstChild] = getFocusableChildren(node);
+      if (firstChild) firstChild.focus();
     };
 
     /**
      * Gets top and left coordinates relative to document and the position of the dialog's offsetParent.
      * Source: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
      */
-    var getCoords = function(elem) {
-      var boundingRect = elem.getBoundingClientRect();
+    const getCoords = function(elem) {
+      if (!(elem instanceof HTMLElement)) throw new DialogElError('HTMLElement not passed to `getCoords`');
+      
+      const boundingRect = elem.getBoundingClientRect();
 
-      var docEl = document.documentElement;
+      const docEl = document.documentElement;
 
-      var scrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || document.body.scrollLeft;
+      const scrollTop = window.pageYOffset || docEl.scrollTop || document.body.scrollTop;
+      const scrollLeft = window.pageXOffset || docEl.scrollLeft || document.body.scrollLeft;
 
-      var clientTop = docEl.clientTop || document.body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || document.body.clientLeft || 0;
+      const clientTop = docEl.clientTop || document.body.clientTop || 0;
+      const clientLeft = docEl.clientLeft || document.body.clientLeft || 0;
 
-      var top  = boundingRect.top + scrollTop - clientTop;
-      var left = boundingRect.left + scrollLeft - clientLeft;
+      const top  = boundingRect.top + scrollTop - clientTop;
+      const left = boundingRect.left + scrollLeft - clientLeft;
 
       return { 
         top: Math.round(top), 
@@ -234,9 +279,21 @@
       };
     };
 
-    var querySelector = function(selector) {
-      var script = document._currentScript || document.currentScript;
+    /**
+     * Query selector in the context of the current HTML file
+     */
+    const querySelector = selector => {
+      const script = document._currentScript || document.currentScript;
       return script.ownerDocument.querySelector(selector);
+    };
+
+    /**
+     * Closes all of the dialogs currently in the _dialogStack
+     */
+    const closeAll = () => {
+      _dialogStack.forEach(function(dialog) {
+        if (dialog && dialog.close) dialog.close();
+      });
     };
 
     /**
@@ -244,492 +301,489 @@
      * (Contains a fix for the `document.currentScript`/`document._currentScript`
      * https://github.com/webcomponents/webcomponentsjs#html-imports-documentcurrentscript-doesnt-work-as-expected-)
      */
-    var styleTemplate = querySelector('#style');
-    var dialogTemplate = querySelector('#dialog');
-    var modalTemplate = querySelector('#modal');
+    const styleTemplate = querySelector('#style');
+    const dialogTemplate = querySelector('#dialog');
+    const modalTemplate = querySelector('#modal');
 
-    var proto = Object.create(HTMLElement.prototype);
+    class DialogEl extends HTMLElement {
+      constructor() {
+        super();
+      }
 
-    /**
-     * Getter/Setter for the `visible` status
-     */
-    Object.defineProperty(proto, 'visible', {
-      get: function() {
-        return this._visible !== undefined ? this._visible : (this._visible = this.hasAttribute('visible'));
-      },
-      set: function(val) {
-        if (val) {
-          this._visible = true;
+      /**
+       * Visible status for the modal
+       * @public
+       * @property {boolean} visible
+       */ 
+      get visible() {
+        const definedIsVisible = this.__visible !== undefined;
+        return definedIsVisible ? this.__visible : (this.__visible = this.hasAttribute('visible'));
+      }
+      set visible(val) {
+        if (Boolean(val)) {
+          this.__visible = true;
           this.setAttribute('visible', '');
         } else {
-          this._visible = false;
+          this.__visible = false;
           this.removeAttribute('visible');
         }
       }
-    });
 
-    /**
-     * Getter/Setter for the `modal` attribute
-     */
-    Object.defineProperty(proto, 'modal', {
-      get: function() {
-        return this.hasAttribute('modal');
-      },
-      set: function(val) {
+      /**
+       * If the dialog should be rendered
+       * as a modal
+       * @public
+       * @property {boolean} modal
+       */ 
+      get modal() {
+        const definedIsModal = this.__modal !== undefined;
+        return definedIsModal ? this.__modal : (this.__modal = this.hasAttribute('modal'));
+      }
+      set modal(val) {
         if (Boolean(val)) {
+          this.__modal = true;
           this.setAttribute('modal', '');
         } else {
+          this.__modal = false;
           this.removeAttribute('modal');
         }
       }
-    });
 
-    /**
-     * Getter/Setter for the `arrow-direction` attribute
-     */
-    Object.defineProperty(proto, 'arrowDirection', {
-      get: function() {
-        return this.getAttribute('arrow-direction');
-      },
-      set: function(val) {
-        if (!val) return this.removeAttribute('arrow-direction');
-        var validVals = ['left', 'top', 'right', 'bottom'];
+      /**
+       * The direction of an arrow displayed
+       * on the dialog
+       * @public
+       * @property {string} arrowDirection
+       */ 
+      get arrowDirection() {
+        const definedArrowDirection = this.__arrowDirection !== undefined;
+        return definedArrowDirection ? this.__arrowDirection : 
+                                       (this.__arrowDirection = this.getAttribute('arrow-direction'));
+      }
+      set arrowDirection(val) {
+        if (!val) {
+          this.__arrowDirection = null;
+          return this.removeAttribute('arrow-direction');
+        }
+        const validVals = ['left', 'top', 'right', 'bottom'];
         if (~validVals.indexOf(val)) {
+          this.__arrowDirection = val;
           this.setAttribute('arrow-direction', val);
         }
       }
-    });
 
-    /**
-     * Getter for the content of the dialog/modal
-     */
-    Object.defineProperty(proto, '_content', {
-      get: function() {
-        return this.__contentNode__ || (this.__contentNode__ = this.shadowRoot.querySelector('.content'));
-      }
-    });
-
-
-    /**
-     * Getter for the modal overlay
-     */
-    Object.defineProperty(proto, '_overlay', {
-      get: function () {
-        return this.__overlayNode__ || (this.__overlayNode__ = this.shadowRoot.querySelector('.overlay'));
-      }
-    });
-
-    /**
-     * Getter for the top of the _dialogStack
-     */
-    Object.defineProperty(proto, '_topDialog', {
-      get: function () {
-        return _dialogStack[_dialogStack.length - 1];
-      }
-    });
-
-    proto._templateInit = function() {
-      // Template Setup
-      this._isModal = this.hasAttribute('modal');
-      var style = document.importNode(styleTemplate.content, true);
-      var template = document.importNode((this._isModal ? modalTemplate : dialogTemplate).content, true);
-
-      // If there is already a shadowRoot, clear it to stamp a clean template
-      if (this.shadowRoot) {
-        while (this.shadowRoot.lastChild) { this.shadowRoot.removeChild(this.shadowRoot.lastChild) }
+      /**
+       * The direction of an arrow displayed
+       * on the dialog
+       * @private
+       * @property {HTMLElement} _content
+       */ 
+      get _content() {
+        return this.__contentNode || (this.__contentNode = this.shadowRoot.querySelector('.content'));
       }
 
-      // Create or reference an empty shadowRoot and append the style and dialogTemplate
-      var root = this.shadowRoot || this.createShadowRoot();
-      root.appendChild(style);
-      root.appendChild(template);
-
-      // If we have the full Shadow DOM polyfill and haven't instantiated
-      // an instance of this component once
-      if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling) {
-        window.WebComponents.ShadowCSS.shimStyling( this.shadowRoot, 'dialog-el' )
+      /**
+       * The direction of an arrow displayed
+       * on the dialog
+       * @private
+       * @property {HTMLElement} _overlay
+       */ 
+      get _overlay() {
+        return this.__overlayNode || (this.__overlayNode = this.shadowRoot.querySelector('.overlay'));
       }
-    }
+      _templateInit() {
+        // Template Setup
+        const style = document.importNode(styleTemplate.content, true);
+        const template = document.importNode((this.modal ? modalTemplate : dialogTemplate).content, true);
 
-    proto.createdCallback = function() {
-      // Initial Style/A11y Setup
-      this.hidden = true;
-      this.visible = false;
-      this.setAttribute('aria-hidden', 'true');
-      this.setAttribute('role', 'dialog');
-
-      this._templateInit();
-    }
-
-    var dynamicAttributes = ['modal', 'arrow-direction'];
-    proto.attributeChangedCallback = function(attr) {
-      if (!~dynamicAttributes.indexOf(attr)) return;
-      switch(attr) {
-        case 'modal':
-          this._templateInit();
-          break;
-        case 'arrow-direction':
-          if (this.visible) this.positionDialog(this._activeAnchor);
-          break;
-      }
-    };
-
-    proto.detachedCallback = function() {
-      if (this.visible) this.close();
-    };
-
-    proto._resetPosition = function() {
-      this.style.top = 'initial';
-      this.style.right = 'initial';
-      this.style.bottom = 'initial';
-      this.style.left = 'initial';
-    };
-
-    proto._computeCoords = function(elem) {
-      var anchorPosition = getCoords(elem);
-      // If the offsetParent is the document we know left and top are 0, skip expensive computation
-      if (this.offsetParent === document.body) return { top: anchorPosition.top, left: anchorPosition.left };
-
-      var dialogParentPosition = getCoords(this.offsetParent);
-      return { top: anchorPosition.top - dialogParentPosition.top, left: anchorPosition.left - dialogParentPosition.left };
-    };
-
-    proto.positionDialog = function(anchor) {
-      // If `anchor` is falsy, early return
-      if (!anchor) return;
-
-      var quadrant = 0;
-      if (this.hasAttribute('arrow-direction')) {
-        var directionQuadrantMap = {
-          bottom: 0,
-          left: 1,
-          right: 2,
-          top: 3
-        };
-
-        quadrant = directionQuadrantMap[this.getAttribute('arrow-direction')];
-        
-        var arrowSize = 22;
-        this._resetPosition();
-        var anchorCoords = this._computeCoords(anchor);
-
-        switch (quadrant) {
-          case 0: 
-            this.style.top = (anchorCoords.top - this.offsetHeight - arrowSize / 2) + 'px';
-            this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
-            break;
-          case 1: 
-            this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
-            this.style.left = (anchorCoords.left + anchor.offsetWidth + arrowSize) + 'px';
-            break;
-          case 2: 
-            this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
-            this.style.left = (anchorCoords.left - this.offsetWidth - arrowSize) + 'px';
-            break;
-          case 3: 
-            this.style.top = (anchorCoords.top + anchor.offsetHeight + arrowSize) + 'px';
-            this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
-            break;
-          default:
-            break;
-        }
-      } else {
-
-        // Get the center point of the `anchor` element relative to the page
-        // we need to compute which quadrant of the page to fly the dialog out
-        // to
-        var rect = anchor.getBoundingClientRect();
-        var anchorX = rect.left + anchor.offsetWidth / 2;
-        var anchorY = rect.top + anchor.offsetHeight / 2;
-        var screenXCenter = window.innerWidth / 2;
-        var screenYCenter = window.innerHeight / 2;
-        if (anchorX >= screenXCenter) quadrant += 1;
-        if (anchorY >= screenYCenter) quadrant += 2;
-
-        var anchorCoords = this._computeCoords(anchor);
-        // Position the dialog, relative to the `anchor` in the appropriate 
-        // quadrant
-        switch (quadrant) {
-          case 0: 
-            this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
-            this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
-            break;
-          case 1: 
-            this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
-            this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
-            break;
-          case 2: 
-            this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
-            this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
-            break;
-          case 3: 
-            this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
-            this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
-            break;
-          default:
-            this._resetPosition();
-            break;
-        }
-      }
-    };
-
-    proto.show = function(anchor) {
-      return Promise.resolve()
-      .then(function() {
-        if (this.visible) throw new Error('Tried to open a dialog that is already open', {
-          element: this
-        });
-      }.bind(this))
-      .then(function() {
-        this._attachEventHandlers();
-        _dialogStack.push(this);
-      }.bind(this))
-      .then(function() {
-        this.hidden = false;
-        this.removeAttribute('aria-hidden');
-
-        // Compute z-index for this dialog (based on stack index)
-        this.style.zIndex = 1000 + _dialogStack.length - 1;
-      }.bind(this))
-      .then(function() {
-        // Capture last active element and reassign focus
-        this._lastActive = document.activeElement;
-        setFocusToFirstItem(this);
-      }.bind(this))
-      .then(function() {
-        // Try and position the dialog if needed
-        this._activeAnchor = anchor;
-        this.positionDialog(anchor);
-      }.bind(this))
-      .then(function() {
-        // Transition the elements out and resolve when the 
-        // animation has completed
-        var event = 'transitionend';
-        return new Promise(function(resolve, reject) {
-          var handler = function() {
-            resolve();
-            this._content.removeEventListener(event, handler);
-          }.bind(this);
-          this._content.addEventListener(event, handler);
-
-          // Delay the setting of visible property to allow nested
-          // elements time to display without being closed by the
-          // click handler. Also this allows element animations
-          // to occur.
-          setTimeout(function() { this.visible = true }.bind(this), 0);
-
-          // Set a backup handler call to ensure the modal opens
-          // even if for some reason the transition craps out
-          setTimeout(function() {
-            reject(handler)
-          }, 350);
-        }.bind(this)).catch(function(handler) {
-          console.warn('dialog "show" transition did not fire', this);
-          this._content.removeEventListener(event, handler);
-        }.bind(this));
-      }.bind(this))
-      .then(function() {
-        // Fire `dialog-opened` event
-        this.dispatchEvent(new CustomEvent('dialog-opened', {
-          bubbles: true,
-        }));
-      }.bind(this));
-    };
-
-    proto.close = function() {
-      return Promise.resolve()
-      .then(function() {
-        if (!this.visible) throw new Error('Tried to close a dialog that is already closed', {
-          element: this
-        });
-      }.bind(this))
-      .then(function() {
-        // Detach event listeners and clean up dialog stack
-        this._detachEventHandlers();
-        _dialogStack = _dialogStack.filter(function(dialog) {
-          return dialog !== this
-        }.bind(this));
-
-        // Remove the global listener if the _dialogStack is empty
-        if (!_dialogStack.length) {
-          window.removeEventListener('click', proto._closeAll);
-          window.removeEventListener('dialog-el-tap', proto._closeAll);
-          _globalWindowListener = false;
+        // If there is already a shadowRoot, clear it to stamp a clean template
+        if (this.shadowRoot) {
+          while (this.shadowRoot.lastChild) { 
+            this.shadowRoot.removeChild(this.shadowRoot.lastChild) 
+          }
         }
 
-      }.bind(this))
-      .then(function() {
-        // Focus last active element and remove old reference
-        if (this._lastActive) {
-          this._lastActive.focus();
-          this._lastActive = null;
-        }
-      }.bind(this))
-      .then(function() {
-        // Transition the elements out and resolve when the
-        // animation has completed
-        var event = 'transitionend';
-        return new Promise(function(resolve, reject) {
-          var handler = function() {
-            resolve();
-            this._content.removeEventListener(event, handler);
-          }.bind(this);
-          this._content.addEventListener(event, handler);
-          this.visible = false;
+        // Create or reference an empty shadowRoot and append the style and dialogTemplate
+        const root = this.shadowRoot || this.createShadowRoot();
+        root.appendChild(style);
+        root.appendChild(template);
 
-          // Set a backup handler call to ensure the modal closes
-          // even if for some reason the transition craps out
-          setTimeout(function() {
-            reject(handler);
-          }, 350);
-        }.bind(this)).catch(function(handler) {
-          console.warn('dialog "close" transition did not fire', this);
-          this._content.removeEventListener(event, handler);
-        }.bind(this));
-      }.bind(this))
-      .then(function() {
-        // Reset element props
+        // If we have the full Shadow DOM polyfill and haven't instantiated
+        // an instance of this component once
+        if (window.WebComponents && window.WebComponents.ShadowCSS && window.WebComponents.ShadowCSS.shimStyling) {
+          window.WebComponents.ShadowCSS.shimStyling(this.shadowRoot, 'dialog-el');
+        }
+      }
+
+      createdCallback() {
+        // Initial Style/A11y Setup
         this.hidden = true;
+        this.visible = false;
         this.setAttribute('aria-hidden', 'true');
-        this.style.zIndex = null;
-        this._activeAnchor = null;
-      }.bind(this))
-      .then(function() {
-        // Fire `dialog-closed` event
-        this.dispatchEvent(new CustomEvent('dialog-closed', {
-          bubbles: true,
-          detail: {
-            action: this._closeAction
-          }
-        }));
-      }.bind(this));
-    };
+        this.setAttribute('role', 'dialog');
 
-    proto._closeAll = function() {
-      _dialogStack.forEach(function(dialog) {
-        if (dialog && dialog.close) dialog.close();
-      });
-    };
-
-    proto._clickHandler = function(e) {
-      // Find the index of the clicked dialog
-      var index = _dialogStack.indexOf(this);
-
-      // If there are dialogs on top of the clicked
-      // dialog loop through and close them (we assume
-      // that you intended to close all the other
-      // dialogs in this case)
-      if (_dialogStack.length > index + 1) {
-        _dialogStack.forEach(function(dialog, _index) {
-          if (_index <= index) return;
-          if (dialog.visible) dialog.close();
-        });
+        this._templateInit();
       }
 
-      /**
-       * By adding `dialog-submit` or `dialog-cancel` to a
-       * child of one of your components you can easily
-       * close out the current dialog/modal. This will also
-       * customize the reason statement in the close event.
-       */
-      var dismissNodes = e.path.filter(function(el) {
-        return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
-      });
-
-      /**
-       * Set the `_closeAction` property if `dialog-submit` or `dialog-cancel` is used to close the modal
-       */
-      if (dismissNodes.length) {
-        this._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
-        this.close();
-      }
-
-      /**
-       * Don't propagate the event if we haven't already closed the modal
-       */
-      if (e && e.stopPropagation) e.stopPropagation();
-    };
-
-    proto._getEventHandlers = function() {
-      var array = []
-
-      // Stacking Context Event Handlers
-      array.push({
-        element: this._content,
-        event: 'click',
-        handler: this._clickHandler.bind(this)
-      });
-
-      array.push({
-        element: this._content,
-        event: 'dialog-el-tap',
-        handler: this._clickHandler.bind(this)
-      });
-
-      // A11y Event Handlers
-      array.push({
-        element: document,
-        event: 'keydown',
-        handler: function(event) {
-          if (this._topDialog !== this) return;
-          if (this.visible && event.which === 27) {
-            event.preventDefault();
-            this.close();
-          }
-          if (this.visible && event.which === 9) {
-            trapTabKey(this, event);
-          }
-        }.bind(this)
-      });
-
-      array.push({
-        element: document.body,
-        event: 'focus',
-        handler: function(event) {
-          if (this._topDialog !== this) return;
-          if (this.visible && !node.contains(event.target)) {
-            setFocusToFirstItem(this);
-          }
-        }.bind(this)
-      });
-
-      return array;
-    };
-
-    // Properly attach all the needed event handlers
-    proto._attachEventHandlers = function() {
-      if (!Array.isArray(this.__handlers)) {
-        this.__handlers = this._getEventHandlers();
-      }
-
-      this.__handlers.forEach(function(obj) {
-        if (obj.delay) {
-          setTimeout(function() { obj.element.addEventListener(obj.event, obj.handler) }, 0);
-        } else {
-          obj.element.addEventListener(obj.event, obj.handler);
+      attributeChangedCallback(attr) {
+        const dynamicAttributes = ['modal', 'arrow-direction'];
+        if (!~dynamicAttributes.indexOf(attr)) return;
+        switch(attr) {
+          case 'modal':
+            this._templateInit();
+            break;
+          case 'arrow-direction':
+            if (this.visible) this.positionDialog(this._activeAnchor);
+            break;
         }
-      }.bind(this));
+      };
 
-      // Window clicks should close all modals
-      // There is only one listener here
-      if (!_globalWindowListener) {
-        setTimeout(function() {
-          window.addEventListener('dialog-el-tap', proto._closeAll);
-          window.addEventListener('click', proto._closeAll);
-        }.bind(this), 0);
-        _globalWindowListener = true;
-      }
-    };
+      detachedCallback() {
+        if (this.visible) this.close();
+      };
 
-    // Detach all the needed event handlers
-    proto._detachEventHandlers = function() {
-      if (!Array.isArray(this.__handlers)) return;
-      this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
-    };
+      _resetPosition() {
+        this.style.top = 'initial';
+        this.style.right = 'initial';
+        this.style.bottom = 'initial';
+        this.style.left = 'initial';
+      };
 
-    document.registerElement('dialog-el', {
-      prototype: proto
-    });
+      _computeCoords(elem) {
+        const anchorPosition = getCoords(elem);
+        // If the offsetParent is the document we know left and top are 0, skip expensive computation
+        if (this.offsetParent === document.body) return { top: anchorPosition.top, left: anchorPosition.left };
+
+        const dialogParentPosition = getCoords(this.offsetParent);
+        return { top: anchorPosition.top - dialogParentPosition.top, left: anchorPosition.left - dialogParentPosition.left };
+      };
+
+      positionDialog(anchor) {
+        // If `anchor` is falsy, early return
+        if (!anchor) return;
+
+        let quadrant = 0;
+        if (this.hasAttribute('arrow-direction')) {
+          const directionQuadrantMap = {
+            bottom: 0,
+            left: 1,
+            right: 2,
+            top: 3
+          };
+
+          quadrant = directionQuadrantMap[this.getAttribute('arrow-direction')];
+          
+          const arrowSize = 22;
+          this._resetPosition();
+          const anchorCoords = this._computeCoords(anchor);
+
+          switch (quadrant) {
+            case 0: 
+              this.style.top = (anchorCoords.top - this.offsetHeight - arrowSize / 2) + 'px';
+              this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
+              break;
+            case 1: 
+              this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
+              this.style.left = (anchorCoords.left + anchor.offsetWidth + arrowSize) + 'px';
+              break;
+            case 2: 
+              this.style.top = (anchorCoords.top + anchor.offsetHeight / 2 - this.offsetHeight / 2) + 'px';
+              this.style.left = (anchorCoords.left - this.offsetWidth - arrowSize) + 'px';
+              break;
+            case 3: 
+              this.style.top = (anchorCoords.top + anchor.offsetHeight + arrowSize) + 'px';
+              this.style.left = (anchorCoords.left + anchor.offsetWidth / 2 - this.offsetWidth / 2) + 'px';
+              break;
+            default:
+              break;
+          }
+        } else {
+
+          // Get the center point of the `anchor` element relative to the page
+          // we need to compute which quadrant of the page to fly the dialog out
+          // to
+          const rect = anchor.getBoundingClientRect();
+          const anchorX = rect.left + anchor.offsetWidth / 2;
+          const anchorY = rect.top + anchor.offsetHeight / 2;
+          const screenXCenter = window.innerWidth / 2;
+          const screenYCenter = window.innerHeight / 2;
+          if (anchorX >= screenXCenter) quadrant += 1;
+          if (anchorY >= screenYCenter) quadrant += 2;
+
+          const anchorCoords = this._computeCoords(anchor);
+          // Position the dialog, relative to the `anchor` in the appropriate 
+          // quadrant
+          switch (quadrant) {
+            case 0: 
+              this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
+              this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
+              break;
+            case 1: 
+              this.style.top = (anchorCoords.top + anchor.offsetHeight) + 'px';
+              this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
+              break;
+            case 2: 
+              this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
+              this.style.left = (anchorCoords.left + anchor.offsetWidth) + 'px';
+              break;
+            case 3: 
+              this.style.top = (anchorCoords.top - this.offsetHeight) + 'px';
+              this.style.left = (anchorCoords.left - this.offsetWidth) + 'px';
+              break;
+            default:
+              this._resetPosition();
+              break;
+          }
+        }
+      };
+
+      show(anchor) {
+        return Promise.resolve()
+        .then(() => {
+          if (this.visible) {
+            throw new DialogElError('Tried to open a dialog that is already open', {
+              element: this
+            });
+          }
+        })
+        .then(() => {
+          this._attachEventHandlers();
+          _dialogStack.push(this);
+        })
+        .then(() => {
+          this.hidden = false;
+          this.removeAttribute('aria-hidden');
+
+          // Compute z-index for this dialog (based on stack index)
+          this.style.zIndex = 1000 + _dialogStack.length - 1;
+        })
+        .then(() => {
+          // Capture last active element and reassign focus
+          this._lastActive = document.activeElement;
+          setFocusToFirstItem(this);
+        })
+        .then(() => {
+          // Try and position the dialog if needed
+          this._activeAnchor = anchor;
+          this.positionDialog(anchor);
+        })
+        .then(() => {
+          // Transition the elements out and resolve when the 
+          // animation has completed
+          const event = 'transitionend';
+          return new Promise((resolve, reject) => {
+            const handler = () => {
+              resolve(handler);
+            };
+            this._content.addEventListener(event, handler);
+
+            // Delay the setting of visible property to allow nested
+            // elements time to display without being closed by the
+            // click handler. Also this allows element animations
+            // to occur.
+            setTimeout(() => (this.visible = true), 0);
+
+            // Set a backup handler call to ensure the modal opens
+            // even if for some reason the transition craps out
+            setTimeout(() => reject(handler), 350);
+          })
+          .catch(handler => {
+            console.warn('dialog "show" transition did not fire', this);
+            return handler;
+          })
+          .then(handler => this._content.removeEventListener(event, handler));
+        })
+        .then(() => {
+          // Fire `dialog-opened` event
+          this.dispatchEvent(new CustomEvent('dialog-opened', {
+            bubbles: true,
+          }));
+        });
+      };
+
+      close() {
+        return Promise.resolve()
+        .then(() => {
+          if (!this.visible) throw new DialogElError('Tried to close a dialog that is already closed', {
+            element: this
+          });
+        })
+        .then(() => {
+          // Detach event listeners and clean up dialog stack
+          this._detachEventHandlers();
+          _dialogStack = _dialogStack.filter(dialog => dialog !== this);
+
+          // Remove the global listener if the _dialogStack is empty
+          if (!_dialogStack.length) {
+            window.removeEventListener('click', closeAll);
+            window.removeEventListener('dialog-el-tap', closeAll);
+            _globalWindowListener = false;
+          }
+        })
+        .then(() => {
+          // Focus last active element and remove old reference
+          if (this._lastActive) {
+            this._lastActive.focus();
+            this._lastActive = null;
+          }
+        })
+        .then(() => {
+          // Transition the elements out and resolve when the
+          // animation has completed
+          const event = 'transitionend';
+          return new Promise((resolve, reject) => {
+            const handler = () => {
+              resolve(handler);
+            };
+            this._content.addEventListener(event, handler);
+            this.visible = false;
+
+            // Set a backup handler call to ensure the modal closes
+            // even if for some reason the transition craps out
+            setTimeout(() => reject(handler), 350);
+          })
+          .catch(handler => {
+            console.warn('dialog "close" transition did not fire', this);
+            return handler;
+          })
+          .then(handler => this._content.removeEventListener(event, handler));
+        })
+        .then(() => {
+          // Reset element props
+          this.hidden = true;
+          this.setAttribute('aria-hidden', 'true');
+          this.style.zIndex = null;
+          this._activeAnchor = null;
+        })
+        .then(() => {
+          // Fire `dialog-closed` event
+          this.dispatchEvent(new CustomEvent('dialog-closed', {
+            bubbles: true,
+            detail: {
+              action: this._closeAction
+            }
+          }));
+        });
+      };
+
+      _clickHandler(e) {
+        // Find the index of the clicked dialog
+        const index = _dialogStack.indexOf(this);
+
+        // If there are dialogs on top of the clicked
+        // dialog loop through and close them (we assume
+        // that you intended to close all the other
+        // dialogs in this case)
+        if (_dialogStack.length > index + 1) {
+          _dialogStack.forEach((dialog, _index) => {
+            if (_index <= index) return;
+            if (dialog.visible) dialog.close();
+          });
+        }
+
+        /**
+        * By adding `dialog-submit` or `dialog-cancel` to a
+        * child of one of your components you can easily
+        * close out the current dialog/modal. This will also
+        * customize the reason statement in the close event.
+        */
+        const dismissNodes = e.path.filter(function(el) {
+          return el.hasAttribute && (el.hasAttribute('dialog-cancel') || el.hasAttribute('dialog-submit'))
+        });
+
+        /**
+        * Set the `_closeAction` property if `dialog-submit` or `dialog-cancel` is used to close the modal
+        */
+        if (dismissNodes.length) {
+          this._closeAction = dismissNodes[0].hasAttribute('dialog-submit') ? 'submit' : 'cancel';
+          this.close();
+        }
+
+        /**
+        * Don't propagate the event if we haven't already closed the modal
+        */
+        if (e && e.stopPropagation) e.stopPropagation();
+      };
+
+      _getEventHandlers() {
+        const array = []
+
+        // Stacking Context Event Handlers
+        array.push({
+          element: this._content,
+          event: 'click',
+          handler: this._clickHandler.bind(this)
+        });
+
+        array.push({
+          element: this._content,
+          event: 'dialog-el-tap',
+          handler: this._clickHandler.bind(this)
+        });
+
+        // A11y Event Handlers
+        array.push({
+          element: document,
+          event: 'keydown',
+          handler: event => {
+            if (_dialogStack._topDialog !== this) return;
+            if (this.visible && event.which === 27) {
+              event.preventDefault();
+              this.close();
+            }
+            if (this.visible && event.which === 9) {
+              trapTabKey(this, event);
+            }
+          }
+        });
+
+        array.push({
+          element: document.body,
+          event: 'focus',
+          handler: event => {
+            if (_dialogStack._topDialog !== this) return;
+            if (this.visible && !node.contains(event.target)) {
+              setFocusToFirstItem(this);
+            }
+          }
+        });
+
+        return array;
+      };
+
+      // Properly attach all the needed event handlers
+      _attachEventHandlers() {
+        if (!Array.isArray(this.__handlers)) {
+          this.__handlers = this._getEventHandlers();
+        }
+
+        this.__handlers.forEach(obj => {
+          if (obj.delay) {
+            setTimeout(() => obj.element.addEventListener(obj.event, obj.handler), 0);
+          } else {
+            obj.element.addEventListener(obj.event, obj.handler);
+          }
+        });
+
+        // Window clicks should close all modals
+        // There is only one listener here
+        if (!_globalWindowListener) {
+          setTimeout(() => {
+            window.addEventListener('dialog-el-tap', closeAll);
+            window.addEventListener('click', closeAll);
+          }, 0);
+          _globalWindowListener = true;
+        }
+      };
+
+      // Detach all the needed event handlers
+      _detachEventHandlers() {
+        if (!Array.isArray(this.__handlers)) return;
+        this.__handlers.forEach(obj => obj.element.removeEventListener(obj.event, obj.handler));
+      };
+    }
+
+    document.registerElement('dialog-el', DialogEl);
 
   })(document, HTMLElement)
 </script>

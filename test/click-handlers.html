@@ -114,16 +114,23 @@
         });
 
         it('should close all dialogs when window (not dialog content) is clicked', function(done) {
-          var _closeAll = sinon.stub(dialog.__proto__, '_closeAll');
-          dialog.show()
-            .then(function() {
-              document.body.click();
-            })
-            .then(function() {
-              expect(_closeAll.calledOnce).to.be.true;
-              _closeAll.restore();              
-              done();
-            });
+          var _closeAll = sinon.spy(dialog.__proto__, 'close');
+          Promise.all([
+            dialog.show(),
+            modal.show(),
+            nestedModal.show(),
+            nestedDialog.show()
+          ])
+          .then(function() {
+            document.body.click();
+          })
+          .then(function() {
+            expect(_closeAll.callCount).to.equal(4);
+          })
+          .then(function() {
+            _closeAll.restore();
+            done();
+          });
         });
 
         it('`close all` should call `close` on dialogs when window is clicked', function(done) {
