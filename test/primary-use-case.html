@@ -128,7 +128,7 @@
         });
 
         it('Should react to changes to the `modal` attribute', function(done) {
-          expect(dynamicDialog._isModal).to.be.false;
+          expect(dynamicDialog.modal).to.be.false;
           expect(dynamicDialog.hasAttribute('modal')).to.be.false;
           dynamicDialog.show()
             .then(function() {
@@ -136,7 +136,7 @@
             })
             .then(function() {
               dynamicDialog.modal = true;
-              expect(dynamicDialog._isModal).to.be.true;
+              expect(dynamicDialog.modal).to.be.true;
               expect(dynamicDialog.hasAttribute('modal')).to.be.true;
             })
             .then(function() {
