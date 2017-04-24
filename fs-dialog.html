@@ -92,6 +92,7 @@
         left: 0;
         transform: rotate(45deg) translate3d(-14px,2px,0);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), -1px 1px 1px 0px rgba(0,0,0,0.18);
+        @apply --fs-dialog-pointer;
       }
 
       :host([arrow-direction=bottom]) .pointer {
@@ -99,6 +100,7 @@
         left: 50%;
         transform: rotate(45deg) translate3d(-50%,-5px,0);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px 2px 1px 0px rgba(0,0,0,0.18);
+        @apply --fs-dialog-pointer;
       }
 
       :host([arrow-direction=right]) .pointer {
@@ -106,6 +108,7 @@
         left: 100%;
         transform: rotate(45deg) translate3d(-14px,2px,0);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px -1px 1px 0px rgba(0,0,0,0.18);
+        @apply --fs-dialog-pointer;
       }
     </style>
 
@@ -244,8 +247,10 @@
             }));
           }.bind(this));
         },
-        detachedCallback: function() {
-          if (this.visible) this.close();
+        detached: function() {
+          // Only close if the dialog if it's no longer on the dom but still visible.
+          // This fixes an issue where document.body.appendChild triggers this function.
+          if (this.visible && !this.isConnected) this.close();
         },
         _attachEventHandlers: function() {
           if (!Array.isArray(this.__handlers)) {
