@@ -1,6 +1,6 @@
 {
   "name": "dialog-el",
-  "version": "1.3.4",
+  "version": "1.3.5",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "authors": [
     "Josh Crowther <jshcrowthe@gmail.com>"
@@ -18,21 +18,22 @@
     "web-components"
   ],
   "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
   "dependencies": {
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.22",
-    "promise-polyfill": "taylorhakes/promise-polyfill#^6.0.1",
-    "polymer": "polymer/polymer#^1.8.0"
+    "es6-promise": "git+https://github.com/stefanpenner/es6-promise.git#~4.1.0",
+    "polymer": "git+https://github.com/Polymer/polymer#~1.9.1",
+    "webcomponentsjs": "git+https://github.com/webcomponents/webcomponentsjs#~0.7.24"
   },
   "devDependencies": {
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.2.5",
-    "web-component-tester": "Polymer/web-component-tester#^4.3.1",
-    "paper-button": "PolymerElements/paper-button#^1.0.14"
-  }
+    "iron-demo-helpers": "git+https://github.com/PolymerElements/iron-demo-helpers#~1.2.6",
+    "paper-button": "git+https://github.com/PolymerElements/paper-button#~1.0.15",
+    "web-component-tester": "git+https://github.com/Polymer/web-component-tester#~5.0.1"
+  },
+  "ignore": [
+    ".*",
+    "bin/",
+    "bin/*",
+    "test/",
+    "test/*",
+    "wct.conf.json"
+  ]
 }
