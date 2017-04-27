@@ -1,0 +1,358 @@
+<link rel="import" href="../wc-i18n/wc-i18n.html">
+<link rel="import" href="../styles-wc/fs-icon/fs-icon.html">
+<link rel="import" href="../styles-wc/fs-button/fs-button.html">
+<link rel="import" href="./fs-dialog.html">
+
+<!--
+# fs-common-dialog
+A Polymer component that uses fs-dialog to display a modal with a title and subtitle, and submit, cancel, and close button, along with a prompt (if desired).
+
+Example 1:
+  Confirm dialog with a title, subtitle, submit button (with overriding text), cancel button (with overriding text). Opened by calling 'commonDialogConfirm.show(submitFunction, cancelFunction)'.
+
+  Opened by using
+
+    <fs-common-dialog id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog>
+
+Example 2:
+  Prompt dialog with a title, subtitle, submit button (with overriding text), cancel button (with default text), prompt label, and prompt textarea. Opened by calling 'commonDialogPrompt.show(submitFunction, cancelFunction)'.
+
+    <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog>
+
+
+@demo demo/fs-common-index.html
+-->
+
+<dom-module id="fs-common-dialog">
+  <template>
+    <style>
+        fs-dialog {
+          --fs-dialog-padding: 0;
+          --fs-dialog-webkit-transition: transform 0.2s, opacity 0.2s;
+          --fs-dialog-transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .modal-content {
+          background: #FFFFFF;
+          border-radius: 4px;
+          width: 545px;
+          font-family: Verdana,sans-serif;
+          font-size: 1rem;
+          color: #333331;
+        }
+
+        .modal-content:focus {
+          outline: none;
+        }
+
+        .dialog-heading {
+          padding: 15px 15px 10px 15px;
+          min-height: 50px;
+          background-color: #EEEEEE;
+          position: relative;
+          border-radius: 4px 4px 0 0;
+        }
+
+        .dialog-heading h4 {
+          margin: 0;
+          color: #4d4d4a;
+          font-family: "museo",serif;
+          font-weight: normal;
+          font-size: 1.286rem;
+          line-height: 1.625rem;
+        }
+
+        .close-modal {
+          background: rgba(255,255,255,0.6);
+          border: none;
+          border-radius: 50%;
+          padding: 8px;
+          display: flex;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+        }
+
+        .close-modal fs-icon {
+          height: 12px;
+          width: 12px;
+        }
+
+        .dialog-content {
+          padding: 15px;
+        }
+
+        .prompt-content {
+          overflow: auto;
+        }
+
+        .prompt-content label {
+          font-size: .875rem;
+        }
+
+        .prompt-content textarea {
+          margin: 5px 0 0;
+          resize: vertical;
+          min-height: 75px;
+          background-color: #fff;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          box-shadow: inset 0 3px 0 rgba(0,0,0,0.05);
+          box-sizing: border-box;
+          color: #333331;
+          font-family: inherit;
+          font-size: 14px;
+          font-size: 1rem;
+          height: inherit;
+          line-height: normal;
+          padding: 0.429rem 0.714rem;
+          transition: border linear 0.2s;
+          width: 100%;
+        }
+
+        .dialog-buttons {
+          border-radius: 0 0 4px 4px;
+          overflow: hidden;
+          padding: 10px 0 0;
+        }
+
+        .dialog-buttons .submit-button {
+          margin-right: 15px;
+        }
+
+    </style>
+
+    <fs-dialog id="dialog" modal data-test-fs-common-dialog>
+      <div class="modal-content" tabindex="0">
+        <div class="dialog-heading">
+          <h4 class="fs-h4" data-test="title" tabindex="0">[[titleText]]</h4>
+          <span data-test="subtitle" tabindex="0">[[subtitleText]]</span>
+          <button type="button" title$="[[closeButtonText]]" tabindex="0" class="close-modal" on-tap="close" data-test="close-button">
+            <fs-icon icon="close"></fs-icon>
+          </button>
+        </div>
+        <div class="dialog-content">
+          <div class="prompt-content" hidden$="[[!isPromptDialog]]">
+            <label tabindex="0">[[promptLabelText]]</label><br/>
+            <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}"></textarea>
+          </div>
+          <div class="dialog-buttons">
+            <button is="fs-button" class="submit-button" option="recommended" on-click="submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button" class="cancel-button" on-click="cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
+          </div>
+        </div>
+      </div>
+    </fs-dialog>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'fs-common-dialog',
+      behaviors: [
+        WCI18n()
+      ],
+      properties: {
+        /** The text to display on the cancel button.
+         * Uses default "Cancel" if none is provided.
+         * @type {String}
+         */
+        cancelButtonText: {
+          type: String,
+          value: ""
+        },
+        /** The text to display on the close button.
+         * Uses default "Close" if none is provided.
+         * @type {String}
+         */
+        closeButtonText: {
+          type: String,
+          value: ""
+        },
+        /** Whether or not the dialog is a "confirm" type.
+         * @type {Boolean}
+         */
+        isConfirmDialog: {
+          type: Boolean,
+          value: false
+        },
+        /** Whether or not the dialog is a "prompt" type.
+         * Show textarea and label if true.
+         * @type {Boolean}
+         */
+        isPromptDialog: {
+          type: Boolean,
+          value: false
+        },
+        /** The text to display above the prompt's textarea.
+         * No default provided.
+         * @type {String}
+         */
+        promptLabelText: {
+          type: String,
+          value: ""
+        },
+        /** User inputted text for the prompt's textarea.
+         * @type {String}
+         */
+        promptTextareaValue: {
+          type: String,
+          value: ""
+        },
+        /** The text to display on the submit button.
+         * Uses default "OK" if none is provided.
+         * @type {String}
+         */
+        submitButtonText: {
+          type: String,
+          value: ""
+        },
+        /** The text to display for the subtitle.
+         * No default provided.
+         * @type {String}
+         */
+        subtitleText: {
+          type: String,
+          value: ""
+        },
+        /** The text to display for the title.
+         * No default provided.
+         * @type {String}
+         */
+        titleText: {
+          type: String,
+          value: ""
+        },
+        /** The type of dialog.
+         * If "prompt", a textarea is added to the dialog's content.
+         * @type {String} - prompt|confirm|dismiss
+         */
+        type: {
+          type: String,
+          value: ""
+        }
+      },
+      observers: [
+        '__cancelButtonTextObserver(cancelButtonText, i18n)',
+        '__closeButtonTextObserver(closeButtonText, i18n)',
+        '__submitButtonTextObserver(submitButtonText, i18n)',
+        '__typeObserver(type)'
+      ],
+
+      /**
+       * Set the text for the cancel button to the user-provided value or else use the default locale.
+       * @param {string} cancelButtonText - The user-provided text for the cancel button.
+       * @param {Function} i18n - Locale functionality.
+       */
+      __cancelButtonTextObserver: function(cancelButtonText, i18n) {
+        if (cancelButtonText === "" && i18n('DEFAULT_CANCEL_TEXT')) {
+          this.set("cancelButtonText", i18n('DEFAULT_CANCEL_TEXT'));
+        } else {
+          this.set("cancelButtonText", cancelButtonText);
+        }
+      },
+
+      /**
+       * Set the text for the close button to the user-provided value or else use the default locale.
+       * @param {string} closeButtonText - The user-provided text for the close button.
+       * @param {Function} i18n - Locale functionality.
+       * @returns {undefined} - Modifies component properties directly.
+       */
+      __closeButtonTextObserver: function(closeButtonText, i18n) {
+        if (closeButtonText === "" && i18n('DEFAULT_CLOSE_TEXT')) {
+          this.set("closeButtonText", i18n('DEFAULT_CLOSE_TEXT'));
+        } else {
+          this.set("closeButtonText", closeButtonText);
+        }
+      },
+
+      /**
+       * Set the text for the submit button to the user-provided value or else use the default locale.
+       * @param {string} submitButtonText - The user-provided text for the submit button.
+       * @param {Function} i18n - Locale functionality.
+       * @returns {undefined} - Modifies component properties directly.
+       */
+      __submitButtonTextObserver: function(submitButtonText, i18n) {
+        if (submitButtonText === "" && i18n('DEFAULT_OK_TEXT')) {
+          this.set("submitButtonText", i18n('DEFAULT_OK_TEXT'));
+        } else {
+          this.set("submitButtonText", submitButtonText);
+        }
+      },
+
+      /**
+       * Set isConfirmDialog or isPromptDialog depending on the type of dialog.
+       * @param {string} type - The user-provided type for the dialog.
+       * @returns {undefined} - Modifies component properties directly.
+       */
+      __typeObserver: function(type) {
+        if (type.toLowerCase() === "confirm") {
+          this.set("isConfirmDialog", true);
+        } else if (type.toLowerCase() === "prompt") {
+          this.set("isPromptDialog", true);
+        }
+      },
+
+      /**
+       * Handle the submit functionality of the dialog by calling the user-provided submit function.
+       * @returns {undefined} - Calls userSubmitFunction.
+       */
+      submitFunction: function(){
+        this.userSubmitFunction(this.promptTextareaValue);
+      },
+
+      /**
+       * Placeholder for the user-provided submit function.
+       * Overwritten in the show() function, if a function is provided.
+       * @returns {undefined} - Placeholder.
+       */
+      userSubmitFunction: function(){
+        return;
+      },
+
+      /**
+       * Handle the cancel functionality of the dialog by calling the user-provided cancel function.
+       * Ensure that the promptTextareaValue is reset and the dialog is closed after running the user-provided function (if there is one).
+       * @returns {undefined} - Calls userCancelFunction.
+       */
+      cancelFunction: function(){
+        this.promptTextareaValue = "";
+        this.userCancelFunction();
+        this.close();
+      },
+
+      /**
+       * Placeholder for the user-provided cancel function.
+       * Overwritten in the show() function, if a function is provided.
+       * @returns {undefined} - Placeholder.
+       */
+      userCancelFunction: function(){
+        return;
+      },
+
+      /**
+       * Call the fs-dialog's close function.
+       * This allows the user to close the dialog from outside of the component by calling fsCommonDialog.close().
+       */
+      close: function(){
+        this.$.dialog.close();
+      },
+
+      /**
+       * Call the fs-dialog's show function.
+       * This allows the user to open the dialog from outside of the component by calling fsCommonDialog.show().
+       * Also override the userSubmitFunction and userCancelFunction, if they are provided.
+       * @param {Function} userSubmitFunction - The function that the user wants to have called when the "submit" button is pressed.
+       * @param {Function} userCancelFunction - The function that the user wants to have called when the "cancel" button is pressed.
+       */
+      show: function(userSubmitFunction, userCancelFunction) {
+        if (userSubmitFunction) {
+          this.set("userSubmitFunction", userSubmitFunction);
+        }
+        if (userCancelFunction) {
+          this.set("userCancelFunction", userCancelFunction);
+        }
+        this.$.dialog.show();
+      }
+    });
+
+  </script>
+</dom-module>

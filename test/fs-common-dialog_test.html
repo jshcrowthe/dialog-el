@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../webcomponentsjs/webcomponents.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../es6-promise/dist/es6-promise.auto.js"></script>
+
+    <!-- Step 1: import the element to test -->
+    <link rel="import" href="../fs-common-dialog.html">
+  </head>
+  <body>
+
+    <!-- You can use the document as a place to set up your fixtures. -->
+    <test-fixture id="confirm-dialog">
+      <template>
+        <fs-common-dialog type="confirm" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit">
+        </fs-common-dialog>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="prompt-dialog">
+      <template>
+        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit">
+        </fs-common-dialog>
+      </template>
+    </test-fixture>
+
+    <script>
+      describe('<fs-common-dialog>', function() {
+        var confirmDialog, promptDialog;
+
+        beforeEach(function() {
+          confirmDialog = fixture('confirm-dialog');
+          promptDialog = fixture('prompt-dialog');
+        });
+
+        describe('setup', function(){
+          it('defines the properties correctly before rendering confirmDialog', function() {
+            expect(confirmDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
+            expect(confirmDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
+            expect(confirmDialog.isConfirmDialog, "isConfirmDialog was not true").to.be.true;
+            expect(confirmDialog.isPromptDialog, "isPromptDialog was not false").to.be.false;
+            expect(confirmDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
+            expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
+            expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
+            expect(confirmDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
+            expect(confirmDialog.titleText, "titleText was not an empty string").to.equal("");
+            expect(confirmDialog.type, "type was not 'confirm'").to.equal("confirm");
+          });
+
+          it('defines the properties correctly before rendering promptDialog', function() {
+            expect(confirmDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
+            expect(confirmDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
+            expect(promptDialog.isConfirmDialog, "isConfirmDialog was not false").to.be.false;
+            expect(promptDialog.isPromptDialog, "isPromptDialog was not true").to.be.true;
+            expect(promptDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
+            expect(promptDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
+            expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
+            expect(promptDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
+            expect(promptDialog.titleText, "titleText was not an empty string").to.equal("");
+            expect(promptDialog.type, "type was not 'prompt'").to.equal("prompt");
+          });
+        });
+
+
+        describe('function tests', function(){
+          var mockI18n;
+
+          beforeEach(function(){
+            mockI18n = { "i18n": function(key){ return key; }};
+          });
+
+          describe('__cancelButtonTextObserver',function(){
+            var cancelButtonText,
+                i18nSpy;
+
+            beforeEach(function(){
+              i18nSpy = sinon.spy(mockI18n, "i18n");
+              cancelButtonText = "";
+            });
+
+            afterEach(function(){
+              i18nSpy.reset();
+            });
+
+            it('should set cancelButtonText to the default value if none is provided',function(){
+              confirmDialog.__cancelButtonTextObserver(cancelButtonText, i18nSpy);
+              expect(confirmDialog.cancelButtonText, "cancelButtonText was not set to default value").to.equal("DEFAULT_CANCEL_TEXT");
+              expect(i18nSpy.calledTwice, "i18n was not called twice").to.be.true;
+            });
+
+            it('should set cancelButtonText to the provided text',function(){
+              cancelButtonText = "Cancel";
+              confirmDialog.__cancelButtonTextObserver(cancelButtonText, i18nSpy);
+              expect(confirmDialog.cancelButtonText, "cancelButtonText was not set correctly").to.equal(cancelButtonText);
+              expect(i18nSpy.called, "i18n was called when it shouldn't have been").to.be.false;
+            });
+          });
+
+
+          describe('__closeButtonTextObserver',function(){
+            var closeButtonText,
+                i18nSpy;
+
+            beforeEach(function(){
+              i18nSpy = sinon.spy(mockI18n, "i18n");
+              closeButtonText = "";
+            });
+
+            afterEach(function(){
+              i18nSpy.reset();
+            });
+
+            it('should set closeButtonText to the default value if none is provided',function(){
+              confirmDialog.__closeButtonTextObserver(closeButtonText, i18nSpy);
+              expect(confirmDialog.closeButtonText, "closeButtonText was not set to default value").to.equal("DEFAULT_CLOSE_TEXT");
+              expect(i18nSpy.calledTwice, "i18n was not called twice").to.be.true;
+            });
+
+            it('should set closeButtonText to the provided text',function(){
+              closeButtonText = "Close";
+              confirmDialog.__closeButtonTextObserver(closeButtonText, i18nSpy);
+              expect(confirmDialog.closeButtonText, "closeButtonText was not set to correctly").to.equal(closeButtonText);
+              expect(i18nSpy.called, "i18n was called when it shouldn't have been").to.be.false;
+            });
+          });
+
+
+          describe('__submitButtonTextObserver',function(){
+            var submitButtonText,
+                i18nSpy;
+
+            beforeEach(function(){
+              i18nSpy = sinon.spy(mockI18n, "i18n");
+              submitButtonText = "";
+            });
+
+            afterEach(function(){
+              i18nSpy.reset();
+            });
+
+            it('should set submitButtonText to the default value if none is provided',function(){
+              confirmDialog.__submitButtonTextObserver(submitButtonText, i18nSpy);
+              expect(confirmDialog.submitButtonText, "submitButtonText was not set to default value").to.equal("DEFAULT_OK_TEXT");
+              expect(i18nSpy.calledTwice, "i18n was not called twice").to.be.true;
+            });
+
+            it('should set submitButtonText to the provided text',function(){
+              submitButtonText = "Submit";
+              confirmDialog.__submitButtonTextObserver(submitButtonText, i18nSpy);
+              expect(confirmDialog.submitButtonText, "submitButtonText was not set correctly").to.equal(submitButtonText);
+              expect(i18nSpy.called, "i18n was called when it shouldn't have been").to.be.false;
+            });
+          });
+
+
+          describe('__typeObserver',function(){
+            var type,
+                setSpyConfirm,
+                setSpyPrompt;
+
+            beforeEach(function(){
+              setSpyConfirm = sinon.spy(confirmDialog, "set");
+              setSpyPrompt = sinon.spy(promptDialog, "set");
+              type = "";
+            });
+
+            afterEach(function(){
+              setSpyConfirm.reset();
+              setSpyPrompt.reset();
+            });
+
+            it('should set isConfirmDialog to true is the type is "confirm"',function(){
+              confirmDialog.isConfirmDialog = false;
+              type = "confirm";
+              confirmDialog.__typeObserver(type);
+              expect(confirmDialog.isConfirmDialog, "isConfirmDialog was not set to true").to.be.true;
+              expect(confirmDialog.isPromptDialog, "isPromptDialog was not kept as false").to.be.false;
+            });
+
+            it('should set isPromptDialog to true is the type is "prompt"',function(){
+              promptDialog.isPromptDialog = false;
+              type = "prompt";
+              promptDialog.__typeObserver(type);
+              expect(promptDialog.isPromptDialog, "isPromptDialog was not set to true").to.be.true;
+              expect(promptDialog.isConfirmDialog, "isConfirmDialog was not kept as false").to.be.false;
+            });
+          });
+
+
+          describe('submitFunction',function(){
+            var userSubmitFunctionSpy;
+
+            beforeEach(function(){
+              userSubmitFunctionSpy = sinon.spy(confirmDialog, "userSubmitFunction");
+              confirmDialog.promptTextareaValue = "Inputted Text";
+            });
+
+            afterEach(function(){
+              userSubmitFunctionSpy.reset();
+            });
+
+            it('should call userSubmitFunction with the textarea value',function(){
+              confirmDialog.submitFunction();
+              expect(userSubmitFunctionSpy.calledOnce, "userSubmitFunction was not called once").to.be.true;
+              expect(userSubmitFunctionSpy.calledWith(confirmDialog.promptTextareaValue), "userSubmitFunction was not called with the right params").to.be.true;
+            });
+          });
+
+
+          describe('userSubmitFunction',function(){
+            it('should return undefined',function(){
+              expect(confirmDialog.userSubmitFunction(), "userSubmitFunction did not return undefined").to.be.undefined;
+            });
+          });
+
+
+          describe('cancelFunction',function(){
+            var userCancelFunctionSpy,
+                closeSpy;
+
+            beforeEach(function(){
+              userCancelFunctionSpy = sinon.spy(confirmDialog, "userCancelFunction");
+              closeSpy = sinon.spy(confirmDialog, "close");
+              confirmDialog.promptTextareaValue = "Inputted Text";
+            });
+
+            afterEach(function(){
+              userCancelFunctionSpy.reset();
+              closeSpy.reset();
+            });
+
+            it('should call userCancelFunction(), and close() and reset the textarea value',function(){
+              confirmDialog.cancelFunction();
+              expect(userCancelFunctionSpy.calledOnce, "userCancelFunction was not called once").to.be.true;
+              expect(closeSpy.calledOnce, "close was not called once").to.be.true;
+              expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not reset to an empty string").to.equal("");
+            });
+          });
+
+
+          describe('userCancelFunction',function(){
+            it('should return undefined',function(){
+              expect(confirmDialog.userCancelFunction(), "userCancelFunction did not return undefined").to.be.undefined;
+            });
+          });
+
+
+          describe('close',function(){
+            var dialogCloseSpy;
+
+            beforeEach(function(){
+              dialogCloseSpy = sinon.spy(confirmDialog.$.dialog, "close");
+            });
+
+            afterEach(function(){
+              dialogCloseSpy.reset();
+            });
+
+            it('should call dialog.close()',function(){
+              confirmDialog.close();
+              expect(dialogCloseSpy.calledOnce, "dialog.close was not called once").to.be.true;
+            });
+          });
+
+
+          describe('show',function(){
+            var dialogShowSpy,
+                newUserCancelFunction,
+                newUserSubmitFunction;
+
+            beforeEach(function(){
+              dialogShowSpy = sinon.spy(confirmDialog.$.dialog, "show");
+              newUserCancelFunction = function(){return "cancel";};
+              newUserSubmitFunction = function(){return "submit";};
+            });
+
+            afterEach(function(){
+              dialogShowSpy.reset();
+            });
+
+            it('should call dialog.show()',function(){
+              confirmDialog.show();
+              expect(dialogShowSpy.calledOnce, "dialog.show was not called once").to.be.true;
+            });
+
+            it('should override the userSubmitFunction if one is passed in',function(){
+              confirmDialog.show(newUserSubmitFunction);
+              expect(confirmDialog.userSubmitFunction(), "userSubmitFunction should return 'submit' instead of undefined").to.equal("submit");
+              expect(confirmDialog.userCancelFunction(), "userCancelFunction should still return undefined").to.be.undefined;
+            });
+
+            it('should override the userCancelFunction if one is passed in',function(){
+              confirmDialog.show(newUserSubmitFunction, newUserCancelFunction);
+              expect(confirmDialog.userSubmitFunction(), "userSubmitFunction should return 'submit' instead of undefined").to.equal("submit");
+              expect(confirmDialog.userCancelFunction(), "userCancelFunction should return 'cancel' instead of undefined").to.equal("cancel");
+            });
+          });
+        });
+      });
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>fs-common-dialog</title>
+
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script>
+    window.Polymer = {
+      dom: 'shady',
+      lazyRegister: true,
+      useNativeCSSProperties: true
+    };
+  </script>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../fs-common-dialog.html">
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+
+  <style is="custom-style" include="demo-pages-shared-styles"></style>
+  <style>
+    .relative {
+      position: relative;
+    }
+  </style>
+</head>
+
+<body class="centered">
+  <h3>fs-common-dialog can be a prompt dialog with a reason statement.</h3>
+  <demo-snippet class="centered-demo global">
+    <template>
+      <div style='position: relative;'>
+        <paper-button raised id="globalDialogButton" onclick="commonDialogPrompt.show(helloWorld)">Open Prompt Dialog</paper-button>
+      </div>
+
+      <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Hello World" subtitle-text="It's me, modal." submit-button-text="Open Alert" prompt-label-text="Try this out for size."></fs-common-dialog>
+
+    </template>
+    <script>
+      function helloWorld(reason) {
+        alert(reason);
+      }
+    </script>
+  </demo-snippet>
+
+
+  <h3>fs-common-dialog can also be a confirm dialog without a reason statement.</h3>
+  <demo-snippet class="centered-demo global">
+    <template>
+
+      <div style='position: relative;'>
+        <paper-button raised id="globalDialogButton" onclick="commonDialogConfirm.show(recorded, notRecorded)">Open Confirm Dialog</paper-button>
+      </div>
+
+      <fs-common-dialog id="commonDialogConfirm" type="confirm" title-text="Do You Like This Modal?" subtitle-text="We would love your feedback." submit-button-text="Yes!" cancel-button-text="It could use some work"></fs-common-dialog>
+
+    </template>
+    <script>
+      function recorded() {
+        alert("Thanks! This input has been recorded.");
+        commonDialogConfirm.close();
+      }
+
+      function notRecorded() {
+        alert("We're sorry to hear you say that. This input has not been recorded.");
+      }
+    </script>
+  </demo-snippet>
+
+
+</body>
+
+</html>
