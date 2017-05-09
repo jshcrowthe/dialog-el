@@ -37,7 +37,7 @@
         <paper-button raised id="globalDialogButton" onclick="commonDialogPrompt.show(helloWorld)">Open Prompt Dialog</paper-button>
       </div>
 
-      <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Hello World" subtitle-text="It's me, modal." submit-button-text="Open Alert" prompt-label-text="Try this out for size."></fs-common-dialog>
+      <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Hello World" subtitle-text="It's me, modal." submit-button-text="Open Alert" prompt-label-text="Try this out for size." prompt-textarea-placeholder="Type whatever you want in here."></fs-common-dialog>
 
     </template>
     <script>
@@ -67,6 +67,28 @@
 
       function notRecorded() {
         alert("We're sorry to hear you say that. This input has not been recorded.");
+      }
+    </script>
+  </demo-snippet>
+
+  <h3>fs-common-dialog can display an error message.</h3>
+  <demo-snippet class="centered-demo global">
+    <template>
+
+      <div style='position: relative;'>
+        <paper-button raised id="globalDialogButton" onclick="commonDialogError.show(showError, closeIt)">Open Error Dialog</paper-button>
+      </div>
+
+      <fs-common-dialog id="commonDialogError" type="prompt" title-text="Do You Like This Modal?" subtitle-text="We would love your feedback." submit-button-text="Show error!" cancel-button-text="Close"></fs-common-dialog>
+
+    </template>
+    <script>
+      function showError() {
+        commonDialogError.errorMessage = "I'm an error message.";
+      }
+
+      function closeIt() {
+        commonDialogConfirm.close();
       }
     </script>
   </demo-snippet>

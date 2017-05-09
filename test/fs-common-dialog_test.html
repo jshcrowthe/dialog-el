@@ -41,10 +41,12 @@
           it('defines the properties correctly before rendering confirmDialog', function() {
             expect(confirmDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
             expect(confirmDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
+            expect(confirmDialog.errorMessage, "errorMessage was not ''").to.equal("");
             expect(confirmDialog.isConfirmDialog, "isConfirmDialog was not true").to.be.true;
             expect(confirmDialog.isPromptDialog, "isPromptDialog was not false").to.be.false;
             expect(confirmDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
             expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
+            expect(confirmDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
             expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
             expect(confirmDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(confirmDialog.titleText, "titleText was not an empty string").to.equal("");
@@ -54,11 +56,13 @@
           it('defines the properties correctly before rendering promptDialog', function() {
             expect(confirmDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
             expect(confirmDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
+            expect(confirmDialog.errorMessage, "errorMessage was not ''").to.equal("");
+            expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
             expect(promptDialog.isConfirmDialog, "isConfirmDialog was not false").to.be.false;
             expect(promptDialog.isPromptDialog, "isPromptDialog was not true").to.be.true;
             expect(promptDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
             expect(promptDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
-            expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
+            expect(confirmDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
             expect(promptDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(promptDialog.titleText, "titleText was not an empty string").to.equal("");
             expect(promptDialog.type, "type was not 'prompt'").to.equal("prompt");
@@ -191,7 +195,20 @@
           });
 
 
-          describe('submitFunction',function(){
+          describe('_hideErrorMessage',function(){
+
+            it('should return false if passed a string',function(){
+              expect(confirmDialog._hideErrorMessage('asdf'), "_hideErrorMessage returned true").to.be.false;
+            });
+
+            it('should return true if passed a string',function(){
+              expect(confirmDialog._hideErrorMessage(''), "_hideErrorMessage returned false").to.be.true;
+            });
+
+          });
+
+
+          describe('_submitFunction',function(){
             var userSubmitFunctionSpy;
 
             beforeEach(function(){
@@ -204,7 +221,7 @@
             });
 
             it('should call userSubmitFunction with the textarea value',function(){
-              confirmDialog.submitFunction();
+              confirmDialog._submitFunction();
               expect(userSubmitFunctionSpy.calledOnce, "userSubmitFunction was not called once").to.be.true;
               expect(userSubmitFunctionSpy.calledWith(confirmDialog.promptTextareaValue), "userSubmitFunction was not called with the right params").to.be.true;
             });
@@ -218,7 +235,7 @@
           });
 
 
-          describe('cancelFunction',function(){
+          describe('_cancelFunction',function(){
             var userCancelFunctionSpy,
                 closeSpy;
 
@@ -234,10 +251,16 @@
             });
 
             it('should call userCancelFunction(), and close() and reset the textarea value',function(){
-              confirmDialog.cancelFunction();
+              confirmDialog._cancelFunction();
               expect(userCancelFunctionSpy.calledOnce, "userCancelFunction was not called once").to.be.true;
               expect(closeSpy.calledOnce, "close was not called once").to.be.true;
               expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not reset to an empty string").to.equal("");
+            });
+
+            it('should clear any errorMessage',function(){
+              confirmDialog.errorMessage = "This is an error";
+              confirmDialog._cancelFunction();
+              expect(confirmDialog.errorMessage, "Error message wasn't cleared").to.equal("");
             });
           });
 

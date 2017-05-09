@@ -1,6 +1,7 @@
 <link rel="import" href="../wc-i18n/wc-i18n.html">
 <link rel="import" href="../styles-wc/fs-icon/fs-icon.html">
 <link rel="import" href="../styles-wc/fs-button/fs-button.html">
+<link rel="import" href="../styles-wc/fs-alert/fs-alert.html">
 <link rel="import" href="./fs-dialog.html">
 
 <!--
@@ -81,7 +82,9 @@ Example 2:
         .dialog-content {
           padding: 15px;
         }
-
+        fs-alert {
+          margin-top: 10px;
+        }
         .prompt-content {
           overflow: auto;
         }
@@ -119,7 +122,11 @@ Example 2:
         .dialog-buttons .submit-button {
           margin-right: 15px;
         }
-
+        @media (max-width: 600px) {
+          .modal-content {
+            width: 100%;
+          }
+        }
     </style>
 
     <fs-dialog id="dialog" modal data-test-fs-common-dialog>
@@ -127,17 +134,18 @@ Example 2:
         <div class="dialog-heading">
           <h4 class="fs-h4" data-test="title" tabindex="0">[[titleText]]</h4>
           <span data-test="subtitle" tabindex="0">[[subtitleText]]</span>
-          <button type="button" title$="[[closeButtonText]]" tabindex="0" class="close-modal" on-tap="close" data-test="close-button">
+          <button type="button" title$="[[closeButtonText]]" tabindex="0" class="close-modal" on-tap="_cancelFunction" data-test="close-button">
             <fs-icon icon="close"></fs-icon>
           </button>
         </div>
         <div class="dialog-content">
           <div class="prompt-content" hidden$="[[!isPromptDialog]]">
-            <label tabindex="0">[[promptLabelText]]</label><br/>
-            <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}"></textarea>
+            <label tabindex="0">[[promptLabelText]]</label>
+            <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]"></textarea>
           </div>
+          <fs-alert alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert>
           <div class="dialog-buttons">
-            <button is="fs-button" class="submit-button" option="recommended" on-click="submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button" class="cancel-button" on-click="cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
+            <button is="fs-button" class="submit-button" option="recommended" on-click="_submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button" class="cancel-button" on-click="_cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
           </div>
         </div>
       </div>
@@ -167,6 +175,13 @@ Example 2:
           type: String,
           value: ""
         },
+        /** Error message to be displayed if it exists
+         * @type {String}
+         */
+        errorMessage: {
+          type: String,
+          value: ""
+        },
         /** Whether or not the dialog is a "confirm" type.
          * @type {Boolean}
          */
@@ -187,6 +202,13 @@ Example 2:
          * @type {String}
          */
         promptLabelText: {
+          type: String,
+          value: ""
+        },
+        /** Text to display as textarea placeholder
+         * @type {String}
+         */
+        promptTextareaPlaceholder: {
           type: String,
           value: ""
         },
@@ -292,10 +314,19 @@ Example 2:
       },
 
       /**
+       * Helper function to know whether or not to show error message.
+       * @param {string} errorMessage - Error message to be shown.
+       * @returns {boolean} - Returns true or false.
+       */
+      _hideErrorMessage: function(errorMessage) {
+        return !errorMessage || errorMessage === '';
+      },
+
+      /**
        * Handle the submit functionality of the dialog by calling the user-provided submit function.
        * @returns {undefined} - Calls userSubmitFunction.
        */
-      submitFunction: function(){
+      _submitFunction: function(){
         this.userSubmitFunction(this.promptTextareaValue);
       },
 
@@ -310,11 +341,12 @@ Example 2:
 
       /**
        * Handle the cancel functionality of the dialog by calling the user-provided cancel function.
-       * Ensure that the promptTextareaValue is reset and the dialog is closed after running the user-provided function (if there is one).
+       * Ensure that promptTextareaValue and errorMessage are reset and the dialog is closed after running the user-provided function (if there is one).
        * @returns {undefined} - Calls userCancelFunction.
        */
-      cancelFunction: function(){
+      _cancelFunction: function(){
         this.promptTextareaValue = "";
+        this.errorMessage = "";
         this.userCancelFunction();
         this.close();
       },
