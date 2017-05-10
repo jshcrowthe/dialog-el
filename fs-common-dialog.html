@@ -1,7 +1,7 @@
 <link rel="import" href="../wc-i18n/wc-i18n.html">
 <link rel="import" href="../styles-wc/fs-icon/fs-icon.html">
 <link rel="import" href="../styles-wc/fs-button/fs-button.html">
-<link rel="import" href="../styles-wc/fs-alert/fs-alert.html">
+<link rel="import" href="../styles-wc/fs-alert-message/fs-alert-message.html">
 <link rel="import" href="./fs-dialog.html">
 
 <!--
@@ -143,7 +143,7 @@ Example 2:
             <label tabindex="0">[[promptLabelText]]</label>
             <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]"></textarea>
           </div>
-          <fs-alert alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert>
+          <fs-alert-message alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message>
           <div class="dialog-buttons">
             <button is="fs-button" class="submit-button" option="recommended" on-click="_submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button" class="cancel-button" on-click="_cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
           </div>

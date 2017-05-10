@@ -1,6 +1,6 @@
 {
   "name": "dialog-el",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "authors": [
     "Josh Crowther <jshcrowthe@gmail.com>"
@@ -21,7 +21,7 @@
   "dependencies": {
     "es6-promise": "git+https://github.com/stefanpenner/es6-promise.git#~4.1.0",
     "polymer": "git+https://github.com/Polymer/polymer#~1.9.1",
-    "styles-wc": "git+https://github.com/fs-webdev/styles-wc#~2.1.15",
+    "styles-wc": "git+https://github.com/fs-webdev/styles-wc#~2.2.0",
     "wc-i18n": "git+https://github.com/jshcrowthe/wc-i18n#^2.1.0",
     "webcomponentsjs": "git+https://github.com/webcomponents/webcomponentsjs#~0.7.24"
   },
