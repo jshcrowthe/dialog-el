@@ -31,7 +31,7 @@ notifications:
 addons:
   sauce_connect: true
 before_script:
-- npm install -g bower web-component-tester
+- npm install -g bower web-component-tester@^5.0.1
 # pipe bower install output through tee to create a log to parse for errors and preserve exit code
 - bower install --force-latest 2>&1 | tee bower-debug.log; ( exit ${PIPESTATUS[0]} )
 script:
