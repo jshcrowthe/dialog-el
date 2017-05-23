@@ -342,9 +342,11 @@ Example 2:
       /**
        * Handle the cancel functionality of the dialog by calling the user-provided cancel function.
        * Ensure that promptTextareaValue and errorMessage are reset and the dialog is closed after running the user-provided function (if there is one).
+       * @param {Object} evt - The 'dialog-closed' event.
        * @returns {undefined} - Calls userCancelFunction.
        */
-      _cancelFunction: function(){
+      _cancelFunction: function(evt){
+        evt.stopPropagation();
         this.promptTextareaValue = "";
         this.errorMessage = "";
         this.userCancelFunction();

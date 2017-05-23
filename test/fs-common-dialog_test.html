@@ -236,10 +236,14 @@
 
 
           describe('_cancelFunction',function(){
-            var userCancelFunctionSpy,
+            var mockEvent,
+                userCancelFunctionSpy,
                 closeSpy;
 
             beforeEach(function(){
+              mockEvent = {
+                stopPropagation: function() {}
+              };
               userCancelFunctionSpy = sinon.spy(confirmDialog, "userCancelFunction");
               closeSpy = sinon.spy(confirmDialog, "close");
               confirmDialog.promptTextareaValue = "Inputted Text";
@@ -250,8 +254,16 @@
               closeSpy.reset();
             });
 
+            it('should call event.stopPropagation()',function(){
+              var stopPropagationSpy = sinon.spy(mockEvent, 'stopPropagation');
+              confirmDialog._cancelFunction(mockEvent);
+              expect(stopPropagationSpy.callCount, "stopPropagation was not called just once").to.be.equal(1);
+
+              stopPropagationSpy.restore();
+            });
+
             it('should call userCancelFunction(), and close() and reset the textarea value',function(){
-              confirmDialog._cancelFunction();
+              confirmDialog._cancelFunction(mockEvent);
               expect(userCancelFunctionSpy.calledOnce, "userCancelFunction was not called once").to.be.true;
               expect(closeSpy.calledOnce, "close was not called once").to.be.true;
               expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not reset to an empty string").to.equal("");
@@ -259,7 +271,7 @@
 
             it('should clear any errorMessage',function(){
               confirmDialog.errorMessage = "This is an error";
-              confirmDialog._cancelFunction();
+              confirmDialog._cancelFunction(mockEvent);
               expect(confirmDialog.errorMessage, "Error message wasn't cleared").to.equal("");
             });
           });
