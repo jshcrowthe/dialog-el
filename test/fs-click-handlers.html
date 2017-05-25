@@ -164,7 +164,7 @@
               return inner.show();
             })
             .then(function() {
-              nestedModal._content.click();
+              nestedModal.querySelector('#_content').click();
             })
             .then(function() {
               expect(close.calledOnce).to.be.true;
@@ -182,7 +182,7 @@
               return inner.show();
             })
             .then(function() {
-              nestedModal._content.dispatchEvent(new CustomEvent('dialog-el-tap'));
+              nestedModal.querySelector('#_content').dispatchEvent(new CustomEvent('dialog-el-tap'));
             })
             .then(function() {
               expect(close.calledOnce).to.be.true;

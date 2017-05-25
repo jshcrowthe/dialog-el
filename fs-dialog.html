@@ -116,7 +116,7 @@
     <div class$="[[_computeClass(modal)]]" id="_overlay">
       <div class="content" id="_content">
         <div class="pointer" id="_pointer" hidden$="[[modal]]"></div>
-        <content></content>
+        <slot></slot>
       </div>
     </div>
   </template>
@@ -158,13 +158,13 @@
           _overlay: {
             type: Object,
             value: function(){
-              return this.$._overlay;
+              return this.querySelector('#_overlay');
             }
           },
           _content: {
             type: Object,
             value: function(){
-              return this.$._content;
+              return this.querySelector('#_content');
             }
           }
         },

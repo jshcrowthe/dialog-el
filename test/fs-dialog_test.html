@@ -79,8 +79,8 @@
             expect(dynamicDialog.arrowDirection, "arrowDirection was not undefined").to.be.undefined;
             expect(dynamicDialog.originalArrowDirection, "originalArrowDirection was not undefined").to.be.undefined;
             expect(dynamicDialog.allowArrowChange, "allowArrowChange was not false").to.be.false;
-            expect(dynamicDialog._overlay.id, "_overlay div is missing").to.equal("_overlay");
-            expect(dynamicDialog._content.id, "_content div is missing").to.equal("_content");
+            expect(dynamicDialog.querySelector('#_overlay').id, "_overlay div is missing").to.equal("_overlay");
+            expect(dynamicDialog.querySelector('#_content').id, "_content div is missing").to.equal("_content");
           });
         });
 
