@@ -59,16 +59,27 @@
         </fs-dialog>
       </template>
     </test-fixture>
+    
+    <test-fixture id="simple-dialog-with-target">
+      <template>
+        <button id="dialog-target">Open With Me!</button>
+        <fs-dialog target="#dialog-target">
+          <h1>Simple Dialog</h1>
+          <button dialog-cancel>Cancel</button>
+        </fs-dialog>
+      </template>
+    </test-fixture>
 
     <script>
       describe('<fs-dialog>', function() {
-        var dialog, submitDialog, cancelDialog;
+        var dialog, submitDialog, cancelDialog, targetDialog;
 
         beforeEach(function() {
           dialog = fixture('simple-dialog');
           dynamicDialog = fixture('simple-dynamic-dialog');
           submitDialog = fixture('simple-dialog-with-submit-button');
           cancelDialog = fixture('simple-dialog-with-cancel-button');
+          targetDialog = fixture('simple-dialog-with-target')[1]; // The second element in the fixture;
         });
 
         describe('setup', function(){
@@ -487,6 +498,16 @@
                 });
               }
             });
+            // Target-based position
+            it('should base position on the position of the `target` property', function() {
+              targetDialog.arrowDirection = "down";
+              targetDialog.allowArrowChange = true;
+              return targetDialog.show()
+              .then(function() {
+                expect(targetDialog.attributes["arrow-direction"].value, "arrow-direction was incorrectly changed").to.equal("down");
+                return targetDialog.close();
+              })
+            })
           });
         });
       });

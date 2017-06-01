@@ -147,6 +147,13 @@
             type: String,
             reflectToAttribute: true
           },
+
+          // The target attribute is the selector of an 
+          // *adjacent* element for the popover to point to
+          target: {
+            type: String,
+            reflectToAttribute: true
+          },
           allowArrowChange: {
             type: Boolean,
             value: false,
@@ -568,6 +575,14 @@
           // Reset pointer to default CSS
           pointer.style.left = "";
           pointer.style.top = "";
+
+          // Set the position based on the target
+          // Not allowed on modal
+          if (dialog.attributes['target'] && !dialog.attributes['modal']) {
+             var target = dialog.parentNode.querySelector(dialog.attributes['target'].value);
+             tempLeftPosition = target.offsetLeft + target.offsetWidth / 2;
+             tempTopPosition = target.offsetTop + target.offsetHeight / 2;
+          }
 
           switch (arrowDirectionValue) {
             case "left":

@@ -184,7 +184,40 @@
       </div>
     </template>
   </demo-snippet>
+  
+  <h3>Popover dialogs with arrows can be directed with the target attribute</h3>
+  <demo-snippet class="target-demo">
+    <template>
+      <style>
+        .content {
+          width: 100vw;
+          max-width: 350px;
+        }
+        .content .content {
+          width: 100vw;
+          max-width: 320px;
+        }
+      </style>
 
+        <paper-button raised id="opener">Target Dialog</paper-button>
+
+      <fs-dialog id="targetDialog" target="#opener" arrow-direction='left' allow-arrow-change>
+        <div class="content">
+          <h4>Dialog</h4>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
+        </div>
+      </fs-dialog>
+      <script>
+        window.onload = function() {
+          document.querySelector("#opener").addEventListener("click", function(e){
+          e.stopPropagation();
+          var dialog = document.querySelector("#targetDialog");
+          dialog.show(true);
+        });
+        };
+      </script>
+    </template>
+  </demo-snippet>
 </body>
 
 </html>
