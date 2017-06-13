@@ -1,5 +1,60 @@
 <link rel="import" href="../polymer/polymer.html">
 
+<!--
+# fs-dialog
+
+This is a Polymer-based dialog that can be a modal, a simple popup, or have an arrow (popover).
+
+**Note: This runs in hybrid mode for Polymer 1 and 2.0.*
+
+Example:
+
+  A simple dialog:
+
+  ```html
+  <fs-dialog id='dialog'>
+    <h1>A header</h1>
+    <p>Dialog Content</p>
+  </fs-dialog>
+  ```
+
+  A modal dialog:
+
+  ```html
+  <fs-dialog id='modal' modal>
+    <h1>A modal</h1>
+    <p>Modal Content</p>
+  </fs-dialog>
+  ```
+
+  A popover dialog (with smart positioning). Target element to point at is decided based on top and left positioning (x,y coordinates).
+
+  ```html
+  <fs-dialog id='popover' arrow-direction='left' allow-arrow-change>
+    <h1>Header</h1>
+    <p>Popover Content</p>
+  </fs-dialog>
+  ```
+
+  A popover dialog with a fixed target to point at:
+
+  ```html
+  <fs-dialog id='popover' arrow-direction='left' allow-arrow-change target='#buttonToPointAt'>
+    <h1>Header</h1>
+    <p>Popover Content</p>
+  </fs-dialog>
+  ```
+
+**JavaScript*
+
+```javascript
+var fsDialog = document.createElement('fs-dialog');
+document.body.appendChild(fsDialog);
+```
+
+@demo demo/fs-index.html
+-->
+
 <dom-module id="fs-dialog">
   <template>
     <style>
@@ -128,46 +183,79 @@
         is: 'fs-dialog',
 
         properties: {
+          /** Indicates if the dialog is showing on the screen.
+           * No user input is required.
+           * @type {boolean}
+           */
           visible: {
             type: Boolean,
             value: false,
             reflectToAttribute: true
           },
+          /** Indicates if the dialog is hidden from view.
+           * No user input is required.
+           * @type {boolean}
+           */
           hidden: {
             type: Boolean,
             value: true,
             reflectToAttribute: true
           },
+          /** Determines if the dialog is to be a modal type.
+           * @type {boolean}
+           */
           modal: {
             type: Boolean,
             value: false,
             reflectToAttribute: true
           },
+          /** If set, the dialog will have an arrow on whichever side is indicated.
+           * Note that this is not compatible with modal type dialogs.
+           * **Valid values are `left`, `right`, `top` or `bottom`**
+           * @type {string}
+           */
           arrowDirection: {
             type: String,
             reflectToAttribute: true
           },
-
-          // The target attribute is the selector of an 
-          // *adjacent* element for the popover to point to
+          /** The selector of an *adjacent* element for the popover arrow-dialog to point to.
+           * @type {string}
+           */
           target: {
             type: String,
             reflectToAttribute: true
           },
+          /** If set to true, the dialog will use smart positioning to determine
+           * the arrow-direction depending on screen size and position.
+           * By default, the arrow-direction will not change.
+           * @type {boolean}
+           */
           allowArrowChange: {
             type: Boolean,
             value: false,
             reflectToAttribute: true
           },
+          /** This is a property that is set when allowArrowChange is used since arrowDirection can change value.
+           * No user input is required.
+           * @type {string}
+           */
           originalArrowDirection: {
             type: String
           },
+          /** A property for selecting the overlay div of the dialog.
+           * No user input is required.
+           * @type {Object}
+           */
           _overlay: {
             type: Object,
             value: function(){
               return this.querySelector('#_overlay');
             }
           },
+          /** A property for selecting the content div of the dialog.
+           * No user input is required.
+           * @type {Object}
+           */
           _content: {
             type: Object,
             value: function(){
@@ -175,12 +263,34 @@
             }
           }
         },
+        /**
+         * Grab the topDialog from the global stack.
+         * @returns {Object} - The top dialog in the stack.
+         */
         get _topDialog() {
           return _dialogStack[_dialogStack.length - 1];
         },
+        /**
+         * If the dialog is a modal type, give it an "overlay" class.
+         * @param {boolean} modal - The modal property.
+         * @returns {string} - Will return the class if modal is true.
+         */
         _computeClass: function(modal){
           if(modal) return 'overlay';
         },
+        /**
+         * Opens the dialog by doing the following:
+         * Throws an error if already open and `keepOpen` is not true.
+         * Attaches necessary event handlers.
+         * Adds the dialog to the global stack of dialogs open on the page.
+         * Removes `hidden` attribute and adds `visible`.
+         * Sets the focus for the first item in the dialog content.
+         * Auto positions dialog if `arrow-direction` is set (and sets `originalArrowDirection` property).
+         * If not already visible, sets a listener for the transition effects to make sure they work.
+         * Fires a `dialog-opened` custom event.
+         * @param {boolean} keepOpen - An optional parameter which allows the dialog to call show() multiple times.
+         * @returns {Object} - A promise object.
+         */
         show: function(keepOpen) {
           return Promise.resolve()
           .then(function() {
@@ -202,7 +312,7 @@
           .then(function() {
             // Capture last active element and reassign focus
             this._lastActive = document.activeElement;
-            setFocusToFirstItem(this);
+            this._setFocusToFirstItem(this);
           }.bind(this))
           .then(function() {
             if (this.hasAttribute("arrow-direction")) {
@@ -214,7 +324,7 @@
                 this.originalArrowDirection = this.attributes["arrow-direction"].value;
               }
               // Compute arrow direction if needed
-              autoPositionArrowDialog(this);
+              this._autoPositionArrowDialog(this);
             }
           }.bind(this))
           .then(function() {
@@ -255,11 +365,18 @@
             }));
           }.bind(this));
         },
+        /**
+         * Listens for a detached event and closes the dialog if its visible and not connected to the dom.
+         */
         detached: function() {
           // Only close if the dialog if it's no longer on the dom but still visible.
           // This fixes an issue where document.body.appendChild triggers this function.
           if (this.visible && !this.isConnected) this.close();
         },
+        /**
+         * Gets the list of event handlers and adds each one to the dialog.
+         * Also sets the window event listeners for clicking away from the dialog.
+         */
         _attachEventHandlers: function() {
           if (!Array.isArray(this.__handlers)) {
             this.__handlers = this._getEventHandlers();
@@ -283,10 +400,26 @@
             _globalWindowListener = true;
           }
         },
+        /**
+         * Checks for event handlers and removes each one.
+         * @returns {undefined} - Exits the function if there's no Array of event handlers.
+         */
         _detachEventHandlers: function() {
           if (!Array.isArray(this.__handlers)) return;
           this.__handlers.forEach(function(obj) { obj.element.removeEventListener(obj.event, obj.handler) });
         },
+        /**
+         * Closes the dialog by doing the following:
+         * Throws an error if already closed.
+         * Detaches any event handlers.
+         * Removes the dialog from the global stack of dialogs open on the page.
+         * Removes window event listeners if there are no open dialogs.
+         * Sets the focus back on the last active item outside of the dialog.
+         * Sets a listener for the transition effects to make sure they work on close.
+         * Sets the `hidden` attribute and removes `visible`.
+         * Fires a `dialog-closed` custom event.
+         * @returns {Object} - A promise object.
+         */
         close: function() {
           return Promise.resolve()
           .then(function() {
@@ -361,6 +494,10 @@
             }
           });
         },
+        /**
+         * Creates the Array of event handlers like 'click', 'keydown', and 'focus'.
+         * @returns {Array} - The Array of event handlers to add to the dialog.
+         */
         _getEventHandlers: function() {
           var array = []
 
@@ -388,7 +525,7 @@
                 this.close();
               }
               if (this.visible && event.which === 9) {
-                trapTabKey(this, event);
+                this._trapTabKey(this, event);
               }
             }.bind(this)
           });
@@ -399,20 +536,25 @@
             handler: function(event) {
               if (this._topDialog !== this) return;
               if (this.visible && !node.contains(event.target)) {
-                setFocusToFirstItem(this);
+                this._setFocusToFirstItem(this);
               }
             }.bind(this)
           });
 
           return array;
         },
+        /**
+         * Loops through the stack of open dialogs and calls the close function of each one.
+         * Note: This is triggered by the 'click' and 'dialog-el-tap' window events.
+         */
         _closeAll: function() {
           _dialogStack.forEach(function(dialog) {
             if (dialog && dialog.close) dialog.close();
           });
         },
-        /** Close any other dialogs that might be open except
-         * the one used to call this function.
+        /**
+         * Closes any other dialogs that might be open except
+         * the one calling this function.
          * To be used similar to dialog.show() or dialog.close()
          * simply call dialog.closeAllOtherDialogs().
          */
@@ -422,6 +564,13 @@
             if (dialog && dialog !== that && dialog.close) dialog.close();
           });
         },
+        /**
+         * Determines what happens when a 'click' event is triggered on a dialog (as opposed to on the window):
+         * Closes each dialog on top of the one clicked on.
+         * Handles the 'dialog-cancel' and 'dialog-submit'.
+         * Prevents the event from propagating unless it has an href.
+         * @param {Object} e - The click event.
+         */
         _clickHandler: function(e) {
           // Find the index of the clicked dialog
           var index = _dialogStack.indexOf(this);
@@ -462,6 +611,204 @@
            * has an href so it can be caught by either the browser or a pushstate handler
            */
           if (e && e.stopPropagation && !(e.target.hasAttribute('href') || findParentHref(e.target))) e.stopPropagation();
+        },
+
+
+        /**
+         * Helper function to take an array of focusable elements in the dialog and set focus to the first one.
+         * @param {Object} node - The HTML node for the dialog.
+         */
+        _setFocusToFirstItem: function(node) {
+          var focusableChildren = this._getFocusableChildren(node);
+          if (focusableChildren[0]) focusableChildren[0].focus();
+        },
+
+        /**
+         * Helper function to create an array of focusable children elements in the dialog.
+         * @param {Object} node - The HTML node for the dialog.
+         * @returns {Array} - The computed Array of focusable elements.
+         */
+        _getFocusableChildren: function(node) {
+          var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
+
+          return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
+            return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
+          });
+        },
+
+        /**
+         * Helper function to position a dialog with the arrow-direction attribute.
+         * Logic for smart positioning gated on window and dialog size and if allowArrowChange is true.
+         * If allowArrowChange is false then the dialog will position as best as it can without changing sides (or re-running this function).
+         * Starting top and left positions are set to the middle of target elements if a target selector is provided.
+         * @param {Object} dialog - The dialog element.
+         * @returns {undefined} - Returns just to break out of the function after calling itself again.
+         */
+        _autoPositionArrowDialog: function(dialog) {
+          if (dialog.hasAttribute("arrow-direction")) {
+            var arrowDirectionValue,
+                minWidth,
+                tempLeftPosition,
+                tempTopPosition,
+                dialogRect,
+                pointer;
+
+            arrowDirectionValue = dialog.attributes["arrow-direction"].value;
+
+            // Grab the min or fixed width of the dialog if there is one, or default to 100px.
+            minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || dialog.offsetWidth || "100");
+            tempLeftPosition = parseFloat(dialog.style.left.replace("px", ""));
+            tempTopPosition = parseFloat(dialog.style.top.replace("px", ""));
+            dialogRect = dialog.getBoundingClientRect();
+            pointer = dialog.$._pointer;
+            // Reset pointer to default CSS
+            pointer.style.left = "";
+            pointer.style.top = "";
+
+            // Set the position based on the target
+            // Not allowed on modal
+            if (dialog.attributes['target'] && !dialog.attributes['modal']) {
+               var target = dialog.parentNode.querySelector(dialog.attributes['target'].value);
+               tempLeftPosition = target.offsetLeft + target.offsetWidth / 2;
+               tempTopPosition = target.offsetTop + target.offsetHeight / 2;
+            }
+
+            switch (arrowDirectionValue) {
+              case "left":
+                if (window.innerWidth - dialog.offsetLeft - 30 < minWidth && dialog.allowArrowChange) {
+                  dialog.attributes["arrow-direction"].value = "right";
+                  // if dialog doesn't fit with the "right" arrow, default to "top"
+                  if (dialog.offsetLeft - minWidth <= 0) {
+                    dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
+                  }
+                  // Re-run function to get the right positioning
+                  this._autoPositionArrowDialog(dialog);
+                  return;
+                } else {
+                  // "left" is correct
+                  // Create a buffer from the top and left
+                  // coordinates so that the arrow lines up.
+                  if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
+                    //Reposition Arrow
+                    pointer.style.top = tempTopPosition - 2 + "px";
+                    pointer.style.left = "0px";
+                    // Ensure that the dialog won't run off-screen
+                    tempTopPosition = 0;
+                  } else {
+                    tempTopPosition -= (dialog.offsetHeight / 2);
+                  }
+                  tempLeftPosition += 30;
+                }
+                break;
+              case "right":
+                if (dialog.offsetLeft - 30 - minWidth <= 0 && dialog.allowArrowChange) {
+                  dialog.attributes["arrow-direction"].value = "left";
+                  // if dialog doesn't fit with the "left" arrow, default to "top"
+                  if (window.innerWidth - dialog.offsetLeft < minWidth) {
+                    dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
+                  }
+                  // Re-run function to get the right positioning
+                  this._autoPositionArrowDialog(dialog);
+                  return;
+                } else {
+                  // "right" is correct
+                  // Create a buffer from the top and left
+                  // coordinates so that the arrow lines up.
+                  if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
+                    //Reposition Arrow
+                    pointer.style.top = tempTopPosition - 2 + "px";
+                    pointer.style.left = "100%";
+                    // Ensure that the dialog won't run off-screen
+                    tempTopPosition = 0;
+                  } else {
+                    tempTopPosition -= (dialog.offsetHeight / 2);
+                  }
+                  tempLeftPosition -= (dialog.offsetWidth + 30);
+                }
+                break;
+              case "bottom":
+                if ((dialog.offsetTop - dialog.offsetHeight - 30 <= 0 ||  tempTopPosition - window.scrollY - 30 - dialog.offsetHeight <= 0) && dialog.allowArrowChange) {
+                  var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
+                  var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
+                  if (negativeOffsetTop < negativeOffsetBottom) {
+                    dialog.attributes["arrow-direction"].value = "top";
+                    // Re-run function to get the right positioning
+                    this._autoPositionArrowDialog(dialog);
+                    return;
+                  }
+                }
+                // "bottom" is correct
+                // Create a buffer from the top and left
+                // coordinates so that the arrow lines up.
+                if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
+                  //Reposition Arrow
+                  pointer.style.top = "100%";
+                  pointer.style.left = tempLeftPosition - 7 + "px";
+                  // Ensure that the dialog won't run off-screen
+                  tempLeftPosition = 0;
+                } else {
+                  tempLeftPosition -= (dialog.offsetWidth / 2);
+                }
+                tempTopPosition -= (dialog.offsetHeight + 30);
+                break;
+              case "top":
+                if ((window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30) <= 0) && dialog.allowArrowChange) {
+                  var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
+                  var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
+                  if (negativeOffsetTop > negativeOffsetBottom) {
+                    dialog.attributes["arrow-direction"].value = "bottom";
+
+                    // Re-run function to get the right positioning
+                    this._autoPositionArrowDialog(dialog);
+                    return;
+                  }
+                }
+                // "top" is default (because it's scrollable)
+                // Create a buffer from the top and left
+                // coordinates so that the arrow lines up.
+                if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
+                  //Reposition Arrow
+                  pointer.style.top = "0px";
+                  pointer.style.left = tempLeftPosition - 7 + "px";
+                  // Ensure that the dialog won't run off-screen
+                  tempLeftPosition = 0;
+                } else {
+                  tempLeftPosition -= (dialog.offsetWidth / 2);
+                }
+                tempTopPosition += 30;
+                break;
+            }
+            dialog.style.left = tempLeftPosition + "px";
+            dialog.style.top = tempTopPosition + "px";
+          }
+        },
+
+        /**
+         * Helper function trap the tab key inside a node.
+         * @param {Object} node - The HTML node for the dialog.
+         * @param {Object} event - The keydown event.
+         * @returns {boolean} - Returns false if there are no focusable children.
+         */
+        _trapTabKey: function(node, event) {
+          var focusableChildren = this._getFocusableChildren(node);
+
+          // This line is required due to how the Shadow DOM polyfill wraps elements
+          // (See: https://github.com/webcomponents/webcomponentsjs#element-wrapping--unwrapping-limitations-)
+          var activeElement = window.ShadowDOMPolyfill && window.ShadowDOMPolyfill.wrap ? window.ShadowDOMPolyfill.wrap(document.activeElement) : document.activeElement;
+
+          // If there are no focusable children in the dialog, prevent tabbing through the rest
+          // of the document before clearing focus on the dialog
+          if (!focusableChildren.length) return event.preventDefault();
+
+          var focusedItemIndex = focusableChildren.indexOf(activeElement);
+
+          if (event.shiftKey && focusedItemIndex === 0) {
+            focusableChildren[focusableChildren.length - 1].focus();
+            event.preventDefault();
+          } else if (!event.shiftKey && focusedItemIndex === focusableChildren.length - 1) {
+            if (focusableChildren[0]) focusableChildren[0].focus();
+            event.preventDefault();
+          }
         }
       });
 
@@ -516,183 +863,6 @@
         _isTouch = false;
       });
 
-        // Helper function to get all focusable children from a node
-      function getFocusableChildren(node) {
-        var focusableElements = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'object', 'embed', '[contenteditable]', '[tabindex]:not([tabindex^="-"])'];
-
-        return Array.prototype.filter.call(node.querySelectorAll(focusableElements.join(',')), function(child) {
-          return !!(child.offsetWidth || child.offsetHeight || child.getClientRects().length);
-        });
-      }
-
-      // Helper function trapping the tab key inside a node
-      function trapTabKey (node, event) {
-        var focusableChildren = getFocusableChildren(node);
-
-        // This line is required due to how the Shadow DOM polyfill wraps elements
-        // (See: https://github.com/webcomponents/webcomponentsjs#element-wrapping--unwrapping-limitations-)
-        var activeElement = window.ShadowDOMPolyfill && window.ShadowDOMPolyfill.wrap ? window.ShadowDOMPolyfill.wrap(document.activeElement) : document.activeElement;
-
-        // If there are no focusable children in the dialog, prevent tabbing through the rest
-        // of the document before clearing focus on the dialog
-        if (!focusableChildren.length) return event.preventDefault();
-
-        var focusedItemIndex = focusableChildren.indexOf(activeElement);
-
-        if (event.shiftKey && focusedItemIndex === 0) {
-          focusableChildren[focusableChildren.length - 1].focus();
-          event.preventDefault();
-        } else if (!event.shiftKey && focusedItemIndex === focusableChildren.length - 1) {
-          if (focusableChildren[0]) focusableChildren[0].focus();
-          event.preventDefault();
-        }
-      }
-
-      // Helper function to focus the first focusable item
-      function setFocusToFirstItem (node) {
-        var focusableChildren = getFocusableChildren(node);
-        if (focusableChildren[0]) focusableChildren[0].focus();
-      }
-
-      // Helper function for determining if the dialog needs to change direction.
-      function autoPositionArrowDialog (dialog) {
-        if (dialog.hasAttribute("arrow-direction")) {
-          var arrowDirectionValue,
-              minWidth,
-              tempLeftPosition,
-              tempTopPosition,
-              dialogRect,
-              pointer;
-
-          arrowDirectionValue = dialog.attributes["arrow-direction"].value;
-
-          // Grab the min or fixed width of the dialog if there is one, or default to 100px.
-          minWidth = parseFloat(dialog.style.width.replace("px", "") || dialog.style.minWidth.replace("px", "") || dialog.offsetWidth || "100");
-          tempLeftPosition = parseFloat(dialog.style.left.replace("px", ""));
-          tempTopPosition = parseFloat(dialog.style.top.replace("px", ""));
-          dialogRect = dialog.getBoundingClientRect();
-          pointer = dialog.$._pointer;
-          // Reset pointer to default CSS
-          pointer.style.left = "";
-          pointer.style.top = "";
-
-          // Set the position based on the target
-          // Not allowed on modal
-          if (dialog.attributes['target'] && !dialog.attributes['modal']) {
-             var target = dialog.parentNode.querySelector(dialog.attributes['target'].value);
-             tempLeftPosition = target.offsetLeft + target.offsetWidth / 2;
-             tempTopPosition = target.offsetTop + target.offsetHeight / 2;
-          }
-
-          switch (arrowDirectionValue) {
-            case "left":
-              if (window.innerWidth - dialog.offsetLeft - 30 < minWidth && dialog.allowArrowChange) {
-                dialog.attributes["arrow-direction"].value = "right";
-                // if dialog doesn't fit with the "right" arrow, default to "top"
-                if (dialog.offsetLeft - minWidth <= 0) {
-                  dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
-                }
-                // Re-run function to get the right positioning
-                autoPositionArrowDialog(dialog);
-                return;
-              } else {
-                // "left" is correct
-                // Create a buffer from the top and left
-                // coordinates so that the arrow lines up.
-                if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
-                  //Reposition Arrow
-                  pointer.style.top = tempTopPosition - 2 + "px";
-                  pointer.style.left = "0px";
-                  // Ensure that the dialog won't run off-screen
-                  tempTopPosition = 0;
-                } else {
-                  tempTopPosition -= (dialog.offsetHeight / 2);
-                }
-                tempLeftPosition += 30;
-              }
-              break;
-            case "right":
-              if (dialog.offsetLeft - 30 - minWidth <= 0 && dialog.allowArrowChange) {
-                dialog.attributes["arrow-direction"].value = "left";
-                // if dialog doesn't fit with the "left" arrow, default to "top"
-                if (window.innerWidth - dialog.offsetLeft < minWidth) {
-                  dialog.attributes["arrow-direction"].value = (window.innerHeight - dialogRect.bottom <= 0) ? "bottom" : "top";
-                }
-                // Re-run function to get the right positioning
-                autoPositionArrowDialog(dialog);
-                return;
-              } else {
-                // "right" is correct
-                // Create a buffer from the top and left
-                // coordinates so that the arrow lines up.
-                if (tempTopPosition - (dialog.offsetHeight / 2) < 0) {
-                  //Reposition Arrow
-                  pointer.style.top = tempTopPosition - 2 + "px";
-                  pointer.style.left = "100%";
-                  // Ensure that the dialog won't run off-screen
-                  tempTopPosition = 0;
-                } else {
-                  tempTopPosition -= (dialog.offsetHeight / 2);
-                }
-                tempLeftPosition -= (dialog.offsetWidth + 30);
-              }
-              break;
-            case "bottom":
-              if ((dialog.offsetTop - dialog.offsetHeight - 30 <= 0 ||  tempTopPosition - window.scrollY - 30 - dialog.offsetHeight <= 0) && dialog.allowArrowChange) {
-                var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
-                var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
-                if (negativeOffsetTop < negativeOffsetBottom) {
-                  dialog.attributes["arrow-direction"].value = "top";
-                  // Re-run function to get the right positioning
-                  autoPositionArrowDialog(dialog);
-                  return;
-                }
-              }
-              // "bottom" is correct
-              // Create a buffer from the top and left
-              // coordinates so that the arrow lines up.
-              if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
-                //Reposition Arrow
-                pointer.style.top = "100%";
-                pointer.style.left = tempLeftPosition - 7 + "px";
-                // Ensure that the dialog won't run off-screen
-                tempLeftPosition = 0;
-              } else {
-                tempLeftPosition -= (dialog.offsetWidth / 2);
-              }
-              tempTopPosition -= (dialog.offsetHeight + 30);
-              break;
-            case "top":
-              if ((window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30) <= 0) && dialog.allowArrowChange) {
-                var negativeOffsetTop = tempTopPosition - window.scrollY - 30 - dialog.offsetHeight;
-                var negativeOffsetBottom = window.innerHeight - (tempTopPosition - window.scrollY + dialog.offsetHeight + 30);
-                if (negativeOffsetTop > negativeOffsetBottom) {
-                  dialog.attributes["arrow-direction"].value = "bottom";
-
-                  // Re-run function to get the right positioning
-                  autoPositionArrowDialog(dialog);
-                  return;
-                }
-              }
-              // "top" is default (because it's scrollable)
-              // Create a buffer from the top and left
-              // coordinates so that the arrow lines up.
-              if (tempLeftPosition - (dialog.offsetWidth / 2) < 0) {
-                //Reposition Arrow
-                pointer.style.top = "0px";
-                pointer.style.left = tempLeftPosition - 7 + "px";
-                // Ensure that the dialog won't run off-screen
-                tempLeftPosition = 0;
-              } else {
-                tempLeftPosition -= (dialog.offsetWidth / 2);
-              }
-              tempTopPosition += 30;
-              break;
-          }
-          dialog.style.left = tempLeftPosition + "px";
-          dialog.style.top = tempTopPosition + "px";
-        }
-      }
 
       /**
        * Executes querySelector on the current document

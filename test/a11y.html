@@ -30,12 +30,7 @@
 
     <script>
       describe('<dialog-el> A11y', function() {
-        /**
-         * Do a11y audit if native shadow DOM is supported
-         */
-        if (!window.ShadowDOMPolyfill) {
-          a11ySuite('a11y');
-        }
+        a11ySuite('a11y');
       });
     </script>
 

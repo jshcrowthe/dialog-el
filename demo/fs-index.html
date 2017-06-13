@@ -30,6 +30,14 @@
 </head>
 
 <body class="centered">
+  <h1>fs-dialog</h1>
+
+  <p>Click to see demos of <a href="index.html" title="dialog-el's demo page">&lt;dialog-el&gt;</a> and <a href="fs-common-index.html" title="fs-common-dialog's demo page">&lt;fs-common-dialog&gt;.</a></p>
+
+  <h2>Description</h2>
+
+  <p>This is a Polymer-based dialog that can be a modal, a simple popup, or have an arrow (popover). Note that this runs in hybrid mode for Polymer 1 and 2.0.</p>
+
   <h3>By Default the <code>fs-dialog</code> renders an absolutely positioned dialog</h3>
   <demo-snippet class="centered-demo">
     <template>
@@ -138,16 +146,17 @@
         </div>
       </fs-dialog>
       <script>
-      window.onload = function() {
-        document.querySelector("#globalDialogButton").addEventListener("click", function(e){
-          // Cancel the person card's default click event.
-          e.stopPropagation();
-          var dialog = document.querySelector("#globalDialog");
-          dialog.style.left = e.pageX + "px";
-          dialog.style.top = e.pageY + "px";
-          dialog.show(true);
-        });
-      };
+        // Commented out so it doesn't conflict with the target dialog's onload.
+        // window.onload = function() {
+        //   document.querySelector("#globalDialogButton").addEventListener("click", function(e){
+        //     // Cancel the person card's default click event.
+        //     e.stopPropagation();
+        //     var dialog = document.querySelector("#globalDialog");
+        //     dialog.style.left = e.pageX + "px";
+        //     dialog.style.top = e.pageY + "px";
+        //     dialog.show(true);
+        //   });
+        // };
       </script>
     </template>
   </demo-snippet>
@@ -184,7 +193,7 @@
       </div>
     </template>
   </demo-snippet>
-  
+
   <h3>Popover dialogs with arrows can be directed with the target attribute</h3>
   <demo-snippet class="target-demo">
     <template>
@@ -208,16 +217,38 @@
         </div>
       </fs-dialog>
       <script>
-        window.onload = function() {
-          document.querySelector("#opener").addEventListener("click", function(e){
-          e.stopPropagation();
-          var dialog = document.querySelector("#targetDialog");
-          dialog.show(true);
-        });
-        };
+        // Commented out due to conflict with window.onload for global arrow dialog.
+        // window.onload = function() {
+        //   document.querySelector("#opener").addEventListener("click", function(e){
+        //     e.stopPropagation();
+        //     var dialog = document.querySelector("#targetDialog");
+        //     dialog.show(true);
+        //   });
+        // };
       </script>
     </template>
   </demo-snippet>
 </body>
-
+<script>
+  /**
+   * Moved window.onload here because there can only be one per page.
+   * Listen for when the window has loaded before using querySelector on any elements.
+   * Add click event listeners for buttons for global dialogs.
+   */
+  window.onload = function() {
+    document.querySelector("#opener").addEventListener("click", function(e){
+      e.stopPropagation();
+      var dialog = document.querySelector("#targetDialog");
+      dialog.show(true);
+    });
+    document.querySelector("#globalDialogButton").addEventListener("click", function(e){
+      // Cancel the person card's default click event.
+      e.stopPropagation();
+      var dialog = document.querySelector("#globalDialog");
+      dialog.style.left = e.pageX + "px";
+      dialog.style.top = e.pageY + "px";
+      dialog.show(true);
+    });
+  };
+</script>
 </html>
