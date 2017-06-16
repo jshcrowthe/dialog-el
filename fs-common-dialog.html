@@ -113,6 +113,13 @@ Example 2:
           width: 100%;
         }
 
+        .char-counter {
+          float: right;
+          clear: both;
+          margin: 0;
+          font-size: .875rem;
+        }
+
         .dialog-buttons {
           border-radius: 0 0 4px 4px;
           overflow: hidden;
@@ -142,6 +149,7 @@ Example 2:
           <div class="prompt-content" hidden$="[[!isPromptDialog]]">
             <label tabindex="0">[[promptLabelText]]</label>
             <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]" maxlength$="[[promptTextLimit]]"></textarea>
+            <p class="char-counter" hidden$="[[!showCounter]]">[[_getTextCountRemaining(promptTextLimit, promptTextareaValue)]]</p>
           </div>
           <fs-alert-message alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message>
           <div class="dialog-buttons">
@@ -225,6 +233,13 @@ Example 2:
          */
         promptTextLimit: {
           type: Number
+        },
+        /** Determine if the text limit counter for the characters remaining should show.
+         * @type {Boolean}
+         */
+        showCounter: {
+          type: Boolean,
+          value: false
         },
         /** The text to display on the submit button.
          * Uses default "OK" if none is provided.
@@ -318,6 +333,16 @@ Example 2:
         } else if (type.toLowerCase() === "prompt") {
           this.set("isPromptDialog", true);
         }
+      },
+
+      /**
+       * Calculate the remaining characters allowed in the prompt textarea.
+       * @param {number} promptTextLimit - The user-provided text limit.
+       * @param {string} promptTextareaValue - The inputted text in the textarea.
+       * @returns {number|string} - The calculated number or nothing (empty string).
+       */
+      _getTextCountRemaining: function(promptTextLimit, promptTextareaValue) {
+        return promptTextLimit ? promptTextLimit - promptTextareaValue.length : "";
       },
 
       /**

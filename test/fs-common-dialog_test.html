@@ -23,7 +23,7 @@
 
     <test-fixture id="prompt-dialog">
       <template>
-        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit" prompt-text-limit="2000">
+        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit" prompt-text-limit="2000" show-counter>
         </fs-common-dialog>
       </template>
     </test-fixture>
@@ -48,6 +48,7 @@
             expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
             expect(confirmDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
             expect(confirmDialog.promptTextLimit, "promptTextLimit was not undefined").to.be.undefined;
+            expect(confirmDialog.showCounter, "showCounter was not false").to.be.false;
             expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
             expect(confirmDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(confirmDialog.titleText, "titleText was not an empty string").to.equal("");
@@ -65,6 +66,7 @@
             expect(promptDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
             expect(promptDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
             expect(promptDialog.promptTextLimit, "promptTextLimit was not 2000").to.equal(2000);
+            expect(promptDialog.showCounter, "showCounter was not true").to.be.true;
             expect(promptDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(promptDialog.titleText, "titleText was not an empty string").to.equal("");
             expect(promptDialog.type, "type was not 'prompt'").to.equal("prompt");
@@ -194,6 +196,19 @@
               expect(promptDialog.isPromptDialog, "isPromptDialog was not set to true").to.be.true;
               expect(promptDialog.isConfirmDialog, "isConfirmDialog was not kept as false").to.be.false;
             });
+          });
+
+
+          describe('_getTextCountRemaining',function(){
+
+            it('should return a number if promptTextLimit is set',function(){
+              expect(confirmDialog._getTextCountRemaining(100, 'asdf'), "_getTextCountRemaining did not return a number").to.equal(96);
+            });
+
+            it('should return an empty string if promptTextLimit is not set',function(){
+              expect(confirmDialog._getTextCountRemaining(undefined, 'asdf'), "_getTextCountRemaining did not return an empty string").to.equal('');
+            });
+
           });
 
 
