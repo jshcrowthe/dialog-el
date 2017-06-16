@@ -141,7 +141,7 @@ Example 2:
         <div class="dialog-content">
           <div class="prompt-content" hidden$="[[!isPromptDialog]]">
             <label tabindex="0">[[promptLabelText]]</label>
-            <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]"></textarea>
+            <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]" maxlength$="[[promptTextLimit]]"></textarea>
           </div>
           <fs-alert-message alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message>
           <div class="dialog-buttons">
@@ -218,6 +218,13 @@ Example 2:
         promptTextareaValue: {
           type: String,
           value: ""
+        },
+        /** An optional proerty for setting a text limit on the textarea.
+         * No default value.
+         * @type {Number}
+         */
+        promptTextLimit: {
+          type: Number
         },
         /** The text to display on the submit button.
          * Uses default "OK" if none is provided.

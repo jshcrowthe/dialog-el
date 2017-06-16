@@ -23,7 +23,7 @@
 
     <test-fixture id="prompt-dialog">
       <template>
-        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit">
+        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit" prompt-text-limit="2000">
         </fs-common-dialog>
       </template>
     </test-fixture>
@@ -47,6 +47,7 @@
             expect(confirmDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
             expect(confirmDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
             expect(confirmDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
+            expect(confirmDialog.promptTextLimit, "promptTextLimit was not undefined").to.be.undefined;
             expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
             expect(confirmDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(confirmDialog.titleText, "titleText was not an empty string").to.equal("");
@@ -54,15 +55,16 @@
           });
 
           it('defines the properties correctly before rendering promptDialog', function() {
-            expect(confirmDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
-            expect(confirmDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
-            expect(confirmDialog.errorMessage, "errorMessage was not ''").to.equal("");
-            expect(confirmDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
+            expect(promptDialog.cancelButtonText, "cancelButtonText was not correctly set").to.equal("cancel");
+            expect(promptDialog.closeButtonText, "closeButtonText was not correctly set").to.equal("close");
+            expect(promptDialog.errorMessage, "errorMessage was not ''").to.equal("");
+            expect(promptDialog.submitButtonText, "submitButtonText was not correctly set").to.equal("submit");
             expect(promptDialog.isConfirmDialog, "isConfirmDialog was not false").to.be.false;
             expect(promptDialog.isPromptDialog, "isPromptDialog was not true").to.be.true;
             expect(promptDialog.promptLabelText, "promptLabelText was not an empty string").to.equal("");
             expect(promptDialog.promptTextareaValue, "promptTextareaValue was not an empty string").to.equal("");
-            expect(confirmDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
+            expect(promptDialog.promptTextareaPlaceholder, "promptTextareaPlaceholder was not an empty string").to.equal("");
+            expect(promptDialog.promptTextLimit, "promptTextLimit was not 2000").to.equal(2000);
             expect(promptDialog.subtitleText, "subtitleText was not an empty string").to.equal("");
             expect(promptDialog.titleText, "titleText was not an empty string").to.equal("");
             expect(promptDialog.type, "type was not 'prompt'").to.equal("prompt");
