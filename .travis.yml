@@ -31,7 +31,10 @@ notifications:
 addons:
   sauce_connect: true
 before_script:
-- npm install -g bower web-component-tester@^5.0.1
+- npm install -g bower
+- npm install -g t2ym/web-component-tester#6.0.0-wct6-plugin.1
+- npm install -g t2ym/web-component-tester-istanbul#0.10.1-wct6.11
+- npm install -g codeclimate/javascript-test-reporter#v0.4.1
 # pipe bower install output through tee to create a log to parse for errors and preserve exit code
 - bower install --force-latest 2>&1 | tee bower-debug.log; ( exit ${PIPESTATUS[0]} )
 script:
@@ -39,5 +42,6 @@ script:
 - xvfb-run wct --skip-plugin local 2>&1 | tee wct.log; ( exit ${PIPESTATUS[0]} )
 after_success:
 - bin/tag_build.sh
+- codeclimate-test-reporter < reports/coverage/lcov.info
 after_failure:
 - bin/report_failure_details.sh

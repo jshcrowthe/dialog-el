@@ -235,7 +235,7 @@
    * Listen for when the window has loaded before using querySelector on any elements.
    * Add click event listeners for buttons for global dialogs.
    */
-  window.onload = function() {
+  document.addEventListener('WebComponentsReady', function(){
     document.querySelector("#opener").addEventListener("click", function(e){
       e.stopPropagation();
       var dialog = document.querySelector("#targetDialog");
@@ -249,6 +249,6 @@
       dialog.style.top = e.pageY + "px";
       dialog.show(true);
     });
-  };
+  });
 </script>
 </html>

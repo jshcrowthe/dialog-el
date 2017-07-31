@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../es6-promise/dist/es6-promise.auto.js"></script>
 
@@ -61,109 +61,112 @@
     </test-fixture>
 
     <script>
-      describe('<fs-dialog>', function() {
-        var dialog, submitDialog, cancelDialog;
+      document.addEventListener('WebComponentsReady', function(){
 
-        beforeEach(function() {
-          dialog = fixture('simple-dialog');
-          dynamicDialog = fixture('simple-dynamic-dialog');
-          submitDialog = fixture('simple-dialog-with-submit-button');
-          cancelDialog = fixture('simple-dialog-with-cancel-button');
-        });
+        describe('<fs-dialog>', function() {
+          var dialog, submitDialog, cancelDialog;
 
-        it('Should have expected API methods', function() {
-          expect(dialog.show).to.be.ok;
-          expect(dialog.close).to.be.ok;
-        });
+          beforeEach(function() {
+            dialog = fixture('simple-dialog');
+            dynamicDialog = fixture('simple-dynamic-dialog');
+            submitDialog = fixture('simple-dialog-with-submit-button');
+            cancelDialog = fixture('simple-dialog-with-cancel-button');
+          });
 
-        it('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
-          var handler = function() {
-            dialog.removeEventListener('dialog-opened', handler);
-            done();
-          };
-          dialog.addEventListener('dialog-opened', handler);
-          dialog.show();
-        });
+          it('Should have expected API methods', function() {
+            expect(dialog.show).to.be.ok;
+            expect(dialog.close).to.be.ok;
+          });
 
-        it('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
-          var handler = function() {
-            dialog.removeEventListener('dialog-closed', handler);
-            done();
-          };
-          dialog.addEventListener('dialog-closed', handler);
-          dialog.show()
-            .then(function() {
-              dialog.close()
-            });
-        });
-
-        it('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
-          var button = submitDialog.querySelector('[dialog-submit]');
-
-          var handler = function(e) {
-            expect(e.detail.action).to.equal('submit');
-            submitDialog.removeEventListener('dialog-closed', handler);
-            done();
-          };
-          submitDialog.addEventListener('dialog-closed', handler);
-          submitDialog.show()
-            .then(function() {
-              button.click();
-            });
-        });
-
-        it('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
-          var button = cancelDialog.querySelector('[dialog-cancel]');
-
-          var handler = function(e) {
-            expect(e.detail.action).to.equal('cancel');
-            cancelDialog.removeEventListener('dialog-closed', handler);
-            done();
-          };
-          cancelDialog.addEventListener('dialog-closed', handler);
-          cancelDialog.show()
-            .then(function() {
-              button.click();
-            });
-        });
-
-        it('Should react to changes to the `modal` attribute', function(done) {
-          expect(dynamicDialog.hasAttribute('modal')).to.be.false;
-          dynamicDialog.show()
-            .then(function() {
-              return dynamicDialog.close();
-            })
-            .then(function() {
-              dynamicDialog.modal = true;
-              expect(dynamicDialog.hasAttribute('modal')).to.be.true;
-            })
-            .then(function() {
-              return dynamicDialog.show()
-            })
-            .then(function() {
+          it('Should fire bubbling `dialog-opened` event on `dialog.show()`', function(done) {
+            var handler = function() {
+              dialog.removeEventListener('dialog-opened', handler);
               done();
-            });
-        });
+            };
+            dialog.addEventListener('dialog-opened', handler);
+            dialog.show();
+          });
 
-        it('Should react to valid changes to the `arrowDirection` property', function() {
-          expect(dynamicDialog.arrowDirection).to.be.falsy;
-          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
-          dynamicDialog.arrowDirection = 'left';
-          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('left');
-          dynamicDialog.arrowDirection = 'right';
-          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('right');
-          dynamicDialog.arrowDirection = 'top';
-          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('top');
-          dynamicDialog.arrowDirection = 'bottom';
-          expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('bottom');
-        });
+          it('Should fire bubbling `dialog-closed` event on `dialog.close()`', function(done) {
+            var handler = function() {
+              dialog.removeEventListener('dialog-closed', handler);
+              done();
+            };
+            dialog.addEventListener('dialog-closed', handler);
+            dialog.show()
+              .then(function() {
+                dialog.close()
+              });
+          });
 
-        it('Should noop on invalid changes to the `arrowDirection` property', function() {
-          expect(dynamicDialog.arrowDirection).to.be.falsy;
-          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
-          dynamicDialog.arrowDirection = 'qwerty';
-          expect(dynamicDialog.arrowDirection).to.be.falsy;
-          expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          it('Should close the dialog when a child with `dialog-submit` is clicked', function(done) {
+            var button = submitDialog.querySelector('[dialog-submit]');
+
+            var handler = function(e) {
+              expect(e.detail.action).to.equal('submit');
+              submitDialog.removeEventListener('dialog-closed', handler);
+              done();
+            };
+            submitDialog.addEventListener('dialog-closed', handler);
+            submitDialog.show()
+              .then(function() {
+                button.click();
+              });
+          });
+
+          it('Should close the dialog when a child with `dialog-cancel` is clicked', function(done) {
+            var button = cancelDialog.querySelector('[dialog-cancel]');
+
+            var handler = function(e) {
+              expect(e.detail.action).to.equal('cancel');
+              cancelDialog.removeEventListener('dialog-closed', handler);
+              done();
+            };
+            cancelDialog.addEventListener('dialog-closed', handler);
+            cancelDialog.show()
+              .then(function() {
+                button.click();
+              });
+          });
+
+          it('Should react to changes to the `modal` attribute', function(done) {
+            expect(dynamicDialog.hasAttribute('modal')).to.be.false;
+            dynamicDialog.show()
+              .then(function() {
+                return dynamicDialog.close();
+              })
+              .then(function() {
+                dynamicDialog.modal = true;
+                expect(dynamicDialog.hasAttribute('modal')).to.be.true;
+              })
+              .then(function() {
+                return dynamicDialog.show()
+              })
+              .then(function() {
+                done();
+              });
+          });
+
+          it('Should react to valid changes to the `arrowDirection` property', function() {
+            expect(dynamicDialog.arrowDirection).to.be.falsy;
+            expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+            dynamicDialog.arrowDirection = 'left';
+            expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('left');
+            dynamicDialog.arrowDirection = 'right';
+            expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('right');
+            dynamicDialog.arrowDirection = 'top';
+            expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('top');
+            dynamicDialog.arrowDirection = 'bottom';
+            expect(dynamicDialog.getAttribute('arrow-direction')).to.equal('bottom');
+          });
+
+          it('Should noop on invalid changes to the `arrowDirection` property', function() {
+            expect(dynamicDialog.arrowDirection).to.be.falsy;
+            expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+            dynamicDialog.arrowDirection = 'qwerty';
+            expect(dynamicDialog.arrowDirection).to.be.falsy;
+            expect(dynamicDialog.hasAttribute('arrow-direction')).to.be.falsy;
+          });
         });
       });
     </script>

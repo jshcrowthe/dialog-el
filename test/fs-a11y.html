@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
     <script src="../../es6-promise/dist/es6-promise.auto.js"></script>
 
@@ -29,8 +29,10 @@
     </test-fixture>
 
     <script>
-      describe('<fs-dialog> A11y', function() {
-        a11ySuite('a11y');
+      document.addEventListener('WebComponentsReady', function(){
+        describe('<fs-dialog> A11y', function() {
+          a11ySuite('a11y');
+        });
       });
     </script>
 

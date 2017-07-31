@@ -166,11 +166,17 @@ document.body.appendChild(fsDialog);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px -1px 1px 0px rgba(0,0,0,0.18);
         @apply --fs-dialog-pointer;
       }
+      .visible {
+        visibility: visible;
+      }
+      .inherit-visible {
+        visibility: inherit;
+      }
     </style>
 
-    <div class$="[[_computeClass(modal)]]" id="_overlay">
-      <div class="content" id="_content">
-        <div class="pointer" id="_pointer" hidden$="[[modal]]"></div>
+    <div class$="[[_computeClass(modal)]] [[_visibilityClass(visible)]]" id="_overlay">
+      <div class$="content [[_visibilityClass(visible)]]" id="_content">
+        <div class$="pointer [[_visibilityClass(visible)]]" id="_pointer" hidden$="[[modal]]"></div>
         <slot></slot>
       </div>
     </div>
@@ -249,7 +255,7 @@ document.body.appendChild(fsDialog);
           _overlay: {
             type: Object,
             value: function(){
-              return this.querySelector('#_overlay');
+              return this._querySelector('#_overlay');
             }
           },
           /** A property for selecting the content div of the dialog.
@@ -259,7 +265,7 @@ document.body.appendChild(fsDialog);
           _content: {
             type: Object,
             value: function(){
-              return this.querySelector('#_content');
+              return this._querySelector('#_content');
             }
           }
         },
@@ -277,6 +283,14 @@ document.body.appendChild(fsDialog);
          */
         _computeClass: function(modal){
           if(modal) return 'overlay';
+        },
+        /**
+         * Huge workaround for non-chrome
+         * @param {boolean} visible - The visibility of the modal.
+         * @returns {string} - Will return the class if visible is true.
+         */
+        _visibilityClass: function(visible){
+          return visible ? 'visible' : 'inherit-visible';
         },
         /**
          * Opens the dialog by doing the following:
@@ -345,7 +359,8 @@ document.body.appendChild(fsDialog);
                 // click handler. Also this allows element animations
                 // to occur.
                 setTimeout(function() {
-                  this.set('visible', true) }.bind(this), 0);
+                  this.set('visible', true);
+                }.bind(this), 0);
 
                 // Set a backup handler call to ensure the modal opens
                 // even if for some reason the transition craps out
@@ -809,6 +824,12 @@ document.body.appendChild(fsDialog);
             if (focusableChildren[0]) focusableChildren[0].focus();
             event.preventDefault();
           }
+        },
+        _querySelector: function(selector){
+          if(this.shadowRoot){
+            return this.shadowRoot.querySelector(selector);
+          }
+          return this.querySelector(selector);
         }
       });
 
