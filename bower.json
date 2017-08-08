@@ -1,6 +1,6 @@
 {
   "name": "dialog-el",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "description": "A WebComponent for accesible dialogs and modals",
   "main": "fs-dialog.html",
@@ -18,7 +18,7 @@
   "dependencies": {
     "es6-promise": "stefanpenner/es6-promise#^4.1.0",
     "polymer": "Polymer/polymer#1 - 2",
-    "styles-wc": "fs-webdev/styles-wc#~3.0.1",
+    "styles-wc": "fs-webdev/styles-wc#^3.0.1",
     "wc-i18n": "jshcrowthe/wc-i18n#^1.2.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#0.7 - 1"
   },
