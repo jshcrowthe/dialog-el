@@ -622,10 +622,13 @@ document.body.appendChild(fsDialog);
           }
 
           /**
-           * Don't propagate the event if we haven't already closed the modal unless the target
-           * has an href so it can be caught by either the browser or a pushstate handler
+           * Don't propagate the event if we haven't already closed the modal unless the target has an
+           * href and no target="_blank" so it can be caught by either the browser or a pushstate handler
            */
-          if (e && e.stopPropagation && !(e.target.hasAttribute('href') || findParentHref(e.target))) e.stopPropagation();
+          if (e && e.target && e.stopPropagation) {
+            var hrefElement = e.target.hasAttribute('href') ? e.target : findParentHref(e.target);
+            if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) e.stopPropagation();
+          }
         },
 
 
@@ -900,7 +903,7 @@ document.body.appendChild(fsDialog);
         while (el.parentNode) {
           el = el.parentNode;
           if (el.hasAttribute && el.hasAttribute('href')){
-            return true;
+            return el;
           }
         }
         return false;
