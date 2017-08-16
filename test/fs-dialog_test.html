@@ -151,7 +151,7 @@
                 return dynamicDialog.show()
                 .then(function() {
                   expect(dynamicDialog.visible, "dynamicDialog was not opened").to.be.true;
-                  return dynamicDialog._closeAll();
+                  return dynamicDialog._closeAll({});
                 })
                 .then(function(){
                   expect(dynamicCloseStub.called, "dialog.close was not called for dynamicDialog").to.be.true;

@@ -562,10 +562,16 @@ document.body.appendChild(fsDialog);
          * Loops through the stack of open dialogs and calls the close function of each one.
          * Note: This is triggered by the 'click' and 'dialog-el-tap' window events.
          */
-        _closeAll: function() {
-          _dialogStack.forEach(function(dialog) {
-            if (dialog && dialog.close) dialog.close();
-          });
+        _closeAll: function(e) {
+          if (e.isOpeningPersonCard && !e.targetIsDialog) {
+            _dialogStack.forEach(function(dialog) {
+              if (dialog && dialog.close && !dialog.classList.contains('fs-person-card')) dialog.close();
+            });
+          } else if (!e.targetIsDialog) {
+            _dialogStack.forEach(function(dialog) {
+              if (dialog && dialog.close) dialog.close();
+            });
+          }
         },
         /**
          * Closes any other dialogs that might be open except
@@ -595,9 +601,11 @@ document.body.appendChild(fsDialog);
           // that you intended to close all the other
           // dialogs in this case)
           if (_dialogStack.length > index + 1) {
+            var keepPersonCardOpen = e.isOpeningPersonCard;
             _dialogStack.forEach(function(dialog, _index) {
+              var dialogIsPersonCard = dialog.classList.contains('fs-person-card');
               if (_index <= index) return;
-              if (dialog.visible) dialog.close();
+              if (dialog.visible && !(keepPersonCardOpen && dialogIsPersonCard)) dialog.close();
             });
           }
 
@@ -625,9 +633,12 @@ document.body.appendChild(fsDialog);
            * Don't propagate the event if we haven't already closed the modal unless the target has an
            * href and no target="_blank" so it can be caught by either the browser or a pushstate handler
            */
-          if (e && e.target && e.stopPropagation) {
+          if (e && e.target && e.preventDefault) {
             var hrefElement = e.target.hasAttribute('href') ? e.target : findParentHref(e.target);
-            if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) e.stopPropagation();
+            if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) {
+              e.preventDefault();
+              e.targetIsDialog = true;
+            }
           }
         },
 
