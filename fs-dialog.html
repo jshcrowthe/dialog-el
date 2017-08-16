@@ -633,12 +633,9 @@ document.body.appendChild(fsDialog);
            * Don't propagate the event if we haven't already closed the modal unless the target has an
            * href and no target="_blank" so it can be caught by either the browser or a pushstate handler
            */
-          if (e && e.target && e.preventDefault) {
+          if (e && e.target) {
             var hrefElement = e.target.hasAttribute('href') ? e.target : findParentHref(e.target);
-            if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) {
-              e.preventDefault();
-              e.targetIsDialog = true;
-            }
+            if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) e.targetIsDialog = true;
           }
         },
 
