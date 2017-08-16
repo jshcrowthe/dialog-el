@@ -565,7 +565,7 @@ document.body.appendChild(fsDialog);
         _closeAll: function(e) {
           if (e.isOpeningPersonCard && !e.targetIsDialog) {
             _dialogStack.forEach(function(dialog) {
-              if (dialog && dialog.close && !dialog.classList.contains('fs-person-card')) dialog.close();
+              if (dialog && dialog.close && !dialog.hasAttribute('is-fs-person-card')) dialog.close();
             });
           } else if (!e.targetIsDialog) {
             _dialogStack.forEach(function(dialog) {
@@ -603,7 +603,7 @@ document.body.appendChild(fsDialog);
           if (_dialogStack.length > index + 1) {
             var keepPersonCardOpen = e.isOpeningPersonCard;
             _dialogStack.forEach(function(dialog, _index) {
-              var dialogIsPersonCard = dialog.classList.contains('fs-person-card');
+              var dialogIsPersonCard = dialog.hasAttribute('is-fs-person-card');
               if (_index <= index) return;
               if (dialog.visible && !(keepPersonCardOpen && dialogIsPersonCard)) dialog.close();
             });
