@@ -306,7 +306,13 @@ document.body.appendChild(fsDialog);
          * @returns {Object} - A promise object.
          */
         show: function(keepOpen) {
-          return Promise.resolve()
+          // HACK: There's some race conditions, especially on iphones that caused TW-113. This seems to fix them.
+          var stupidPromise = new Promise(function(resolve, reject) {
+            setTimeout(function() {
+              resolve();
+            }, 200)
+          });
+          return stupidPromise
           .then(function() {
             if (this.visible && !keepOpen) throw new Error('Tried to open a dialog that is already open', {
               element: this

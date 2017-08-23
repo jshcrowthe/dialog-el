@@ -1,6 +1,6 @@
 {
   "name": "dialog-el",
-  "version": "1.7.6",
+  "version": "1.7.7",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "description": "A WebComponent for accesible dialogs and modals",
   "main": "fs-dialog.html",
