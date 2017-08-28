@@ -5,7 +5,7 @@
 <link rel="import" href="fs-dialog-eol.html">
 
 <!--
-# fs-common-dialog
+# fs-common-dialog-eol
 A Polymer component that uses fs-dialog-eol to display a modal with a title and subtitle, and submit, cancel, and close button, along with a prompt (if desired).
 
 Example 1:
@@ -13,18 +13,18 @@ Example 1:
 
   Opened by using
 
-    <fs-common-dialog id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog>
+    <fs-common-dialog-eol id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog-eol>
 
 Example 2:
   Prompt dialog with a title, subtitle, submit button (with overriding text), cancel button (with default text), prompt label, and prompt textarea. Opened by calling 'commonDialogPrompt.show(submitFunction, cancelFunction)'.
 
-    <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog>
+    <fs-common-dialog-eol id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog-eol>
 
 
 @demo demo/fs-common-index.html
 -->
 
-<dom-module id="fs-common-dialog">
+<dom-module id="fs-common-dialog-eol">
   <template>
     <style>
         fs-dialog {
@@ -136,7 +136,7 @@ Example 2:
         }
     </style>
 
-    <fs-dialog-eol id="dialog" modal data-test-fs-common-dialog>
+    <fs-dialog-eol id="dialog" modal data-test-fs-common-dialog-eol>
       <div class="modal-content" tabindex="0">
         <div class="dialog-heading">
           <h4 class="fs-h4" data-test="title" tabindex="0">[[titleText]]</h4>
@@ -162,7 +162,7 @@ Example 2:
 
   <script>
     Polymer({
-      is: 'fs-common-dialog',
+      is: 'fs-common-dialog-eol',
       behaviors: [
         WCI18n()
       ],

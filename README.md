@@ -13,7 +13,7 @@ There are no non-native dependencies for the `dialog-el` Web Component. If your 
 - Web Components (including Shadow DOM)
   - https://github.com/webcomponents/webcomponentsjs
 
-For `fs-dialog-eol` (and `fs-common-dialog`), Polymer is imported as part of the component.
+For `fs-dialog-eol` (and `fs-common-dialog-eol`), Polymer is imported as part of the component.
 
 ## Utilization
 
@@ -172,7 +172,7 @@ Property Name | Description | Default Value
 
 These defaults effectively wrap your provided local DOM in a 15px white border. Override them to change the appearance.
 
-# &lt;fs-common-dialog&gt;
+# &lt;fs-common-dialog-eol&gt;
 
 This is another Polymer-based component that wraps `fs-dialog-eol` (modal) and adds a Title, Subtitle, Submit Button, Cancel Button, and Close Button. A textarea and label can be added for prompt types as well.
 
@@ -188,7 +188,7 @@ _Examples:_
     <paper-button raised id="globalDialogButton" onclick="commonDialogPrompt.show(helloWorld)">Open Prompt Dialog</paper-button>
   </div>
 
-  <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Hello World" subtitle-text="It's me, modal." submit-button-text="Open Alert" prompt-label-text="Try this out for size."></fs-common-dialog>
+  <fs-common-dialog-eol id="commonDialogPrompt" type="prompt" title-text="Hello World" subtitle-text="It's me, modal." submit-button-text="Open Alert" prompt-label-text="Try this out for size."></fs-common-dialog-eol>
 
 </template>
 <script>
@@ -199,14 +199,14 @@ _Examples:_
 ```
 
 ```html
-<fs-common-dialog></fs-common-dialog>
+<fs-common-dialog-eol></fs-common-dialog-eol>
 ```
 
 **JavaScript**
 
 ```javascript
-var dialogEl = document.createElement('fs-common-dialog');
-document.body.appendChild(fs-common-dialog);
+var dialogEl = document.createElement('fs-common-dialog-eol');
+document.body.appendChild(fs-common-dialog-eol);
 ```
 
 ## Methods
@@ -214,7 +214,7 @@ document.body.appendChild(fs-common-dialog);
 - `dialog.show`
 
   This is the means of displaying the modal. Simply select the element and call this method to display the modal.
-  For `fs-common-dialog`, this has the option of 2 parameters: a function to call after the submit button is clicked, and another for the cancel/close button.
+  For `fs-common-dialog-eol`, this has the option of 2 parameters: a function to call after the submit button is clicked, and another for the cancel/close button.
 
   _Example:_
 
@@ -225,7 +225,7 @@ document.body.appendChild(fs-common-dialog);
   function cancelFunction(){
     return false;
   }
-  var dialog = document.querySelector('fs-common-dialog');
+  var dialog = document.querySelector('fs-common-dialog-eol');
   dialog.show(submitFunction, cancelFunction);
   ```
 
@@ -240,7 +240,7 @@ document.body.appendChild(fs-common-dialog);
   _Example:_
 
   ```javascript
-  var dialog = document.querySelector('fs-common-dialog');
+  var dialog = document.querySelector('fs-common-dialog-eol');
   dialog.close();
   ```
 
@@ -279,13 +279,13 @@ document.body.appendChild(fs-common-dialog);
   _Example:_
 
   ```html
-  <fs-common-dialog id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog>
+  <fs-common-dialog-eol id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog-eol>
 
-  <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog>
+  <fs-common-dialog-eol id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog-eol>
   ```
 
   ```javascript
-  var dialog = document.createElement('fs-common-dialog');
+  var dialog = document.createElement('fs-common-dialog-eol');
   dialog.type = 'confirm';
   document.body.appendChild(dialog);
   ```
