@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>fs-dialog</title>
+  <title>fs-dialog-eol</title>
 
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -16,7 +16,7 @@
   </script>
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-  <link rel="import" href="../fs-dialog.html">
+  <link rel="import" href="../fs-dialog-eol.html">
   <link rel="import" href="../../paper-button/paper-button.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
@@ -30,7 +30,7 @@
 </head>
 
 <body class="centered">
-  <h1>fs-dialog</h1>
+  <h1>fs-dialog-eol</h1>
 
   <p>Click to see demos of <a href="index.html" title="dialog-el's demo page">&lt;dialog-el&gt;</a> and <a href="fs-common-index.html" title="fs-common-dialog's demo page">&lt;fs-common-dialog&gt;.</a></p>
 
@@ -38,7 +38,7 @@
 
   <p>This is a Polymer-based dialog that can be a modal, a simple popup, or have an arrow (popover). Note that this runs in hybrid mode for Polymer 1 and 2.0.</p>
 
-  <h3>By Default the <code>fs-dialog</code> renders an absolutely positioned dialog</h3>
+  <h3>By Default the <code>fs-dialog-eol</code> renders an absolutely positioned dialog</h3>
   <demo-snippet class="centered-demo">
     <template>
       <style>
@@ -51,12 +51,12 @@
       <div style='position: relative;'>
         <paper-button raised onclick="dialog0.show()">Default Dialog</paper-button>
 
-        <fs-dialog id="dialog0">
+        <fs-dialog-eol id="dialog0">
           <div class="content">
             <h4>Dialog</h4>
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Provident et optio quo illum fugiat, distinctio quasi accusantium vel! Odit facilis obcaecati dignissimos provident suscipit tempore corrupti, impedit est sequi a.</p>
           </div>
-        </fs-dialog>
+        </fs-dialog-eol>
       </div>
     </template>
   </demo-snippet>
@@ -66,10 +66,10 @@
     <template>
       <paper-button raised onclick="dialog1.show()">Modal Dialog</paper-button>
 
-      <fs-dialog id="dialog1" modal>
+      <fs-dialog-eol id="dialog1" modal>
         <h4>Modal</h4>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi debitis quam dicta, ex, libero porro. Iste provident soluta, et tempora maxime distinctio omnis sunt aliquam aperiam qui, libero, inventore tenetur.</p>
-      </fs-dialog>
+      </fs-dialog-eol>
     </template>
   </demo-snippet>
 
@@ -78,12 +78,12 @@
     <template>
       <paper-button raised onclick="dialog2.show()">Modal Dialog</paper-button>
 
-      <fs-dialog id="dialog2" modal>
+      <fs-dialog-eol id="dialog2" modal>
         <h4>Modal</h4>
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Commodi debitis quam dicta, ex, libero porro. Iste provident soluta, et tempora maxime distinctio omnis sunt aliquam aperiam qui, libero, inventore tenetur.</p>
         <paper-button raised dialog-submit>Submit</paper-button>
         <paper-button raised dialog-cancel>Cancel</paper-button>
-      </fs-dialog>
+      </fs-dialog-eol>
 
       <script>
         dialog2.addEventListener('dialog-closed', function(event) {
@@ -111,12 +111,12 @@
       <div style='position: relative;'>
         <paper-button raised onclick="dialog3.show()">Arrow Dialog</paper-button>
 
-        <fs-dialog id="dialog3" arrow-direction='left' class="positioned-dialog">
+        <fs-dialog-eol id="dialog3" arrow-direction='left' class="positioned-dialog">
           <div class="content">
             <h4>Dialog</h4>
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
           </div>
-        </fs-dialog>
+        </fs-dialog-eol>
       </div>
     </template>
   </demo-snippet>
@@ -139,12 +139,12 @@
         <paper-button raised id="globalDialogButton">Arrow Dialog</paper-button>
       </div>
 
-      <fs-dialog id="globalDialog" arrow-direction='left' allow-arrow-change>
+      <fs-dialog-eol id="globalDialog" arrow-direction='left' allow-arrow-change>
         <div class="content">
           <h4>Dialog</h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
         </div>
-      </fs-dialog>
+      </fs-dialog-eol>
       <script>
         // Commented out so it doesn't conflict with the target dialog's onload.
         // window.onload = function() {
@@ -175,21 +175,21 @@
       <div style='position: relative;'>
         <paper-button raised onclick="dialog4.show()">Open Dialog</paper-button>
 
-        <fs-dialog id="dialog4">
+        <fs-dialog-eol id="dialog4">
           <div class="content">
             <h4>Dialog</h4>
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
             <paper-button raised onclick="dialog5.show()">Open Nested Dialog</paper-button>
 
-            <fs-dialog id="dialog5">
+            <fs-dialog-eol id="dialog5">
               <div class="content">
                 <h4>Dialog</h4>
                 <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
               </div>
-            </fs-dialog>
+            </fs-dialog-eol>
 
           </div>
-        </fs-dialog>
+        </fs-dialog-eol>
       </div>
     </template>
   </demo-snippet>
@@ -210,12 +210,12 @@
 
         <paper-button raised id="opener">Target Dialog</paper-button>
 
-      <fs-dialog id="targetDialog" target="#opener" arrow-direction='left' allow-arrow-change>
+      <fs-dialog-eol id="targetDialog" target="#opener" arrow-direction='left' allow-arrow-change>
         <div class="content">
           <h4>Dialog</h4>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio temporibus obcaecati impedit mollitia veniam eligendi sapiente. Sunt praesentium, tempora, odio nostrum, itaque eaque labore dolore similique omnis harum possimus porro.</p>
         </div>
-      </fs-dialog>
+      </fs-dialog-eol>
       <script>
         // Commented out due to conflict with window.onload for global arrow dialog.
         // window.onload = function() {

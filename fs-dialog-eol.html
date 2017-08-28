@@ -1,7 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-# fs-dialog
+# fs-dialog-eol
 
 This is a Polymer-based dialog that can be a modal, a simple popup, or have an arrow (popover).
 
@@ -12,50 +12,50 @@ Example:
   A simple dialog:
 
   ```html
-  <fs-dialog id='dialog'>
+  <fs-dialog-eol id='dialog'>
     <h1>A header</h1>
     <p>Dialog Content</p>
-  </fs-dialog>
+  </fs-dialog-eol>
   ```
 
   A modal dialog:
 
   ```html
-  <fs-dialog id='modal' modal>
+  <fs-dialog-eol id='modal' modal>
     <h1>A modal</h1>
     <p>Modal Content</p>
-  </fs-dialog>
+  </fs-dialog-eol>
   ```
 
   A popover dialog (with smart positioning). Target element to point at is decided based on top and left positioning (x,y coordinates).
 
   ```html
-  <fs-dialog id='popover' arrow-direction='left' allow-arrow-change>
+  <fs-dialog-eol id='popover' arrow-direction='left' allow-arrow-change>
     <h1>Header</h1>
     <p>Popover Content</p>
-  </fs-dialog>
+  </fs-dialog-eol>
   ```
 
   A popover dialog with a fixed target to point at:
 
   ```html
-  <fs-dialog id='popover' arrow-direction='left' allow-arrow-change target='#buttonToPointAt'>
+  <fs-dialog-eol id='popover' arrow-direction='left' allow-arrow-change target='#buttonToPointAt'>
     <h1>Header</h1>
     <p>Popover Content</p>
-  </fs-dialog>
+  </fs-dialog-eol>
   ```
 
 **JavaScript*
 
 ```javascript
-var fsDialog = document.createElement('fs-dialog');
+var fsDialog = document.createElement('fs-dialog-eol');
 document.body.appendChild(fsDialog);
 ```
 
 @demo demo/fs-index.html
 -->
 
-<dom-module id="fs-dialog">
+<dom-module id="fs-dialog-eol">
   <template>
     <style>
       * {
@@ -186,7 +186,7 @@ document.body.appendChild(fsDialog);
     (function(){
 
       Polymer({
-        is: 'fs-dialog',
+        is: 'fs-dialog-eol',
 
         properties: {
           /** Indicates if the dialog is showing on the screen.

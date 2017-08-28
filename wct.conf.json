@@ -30,7 +30,7 @@
       "reporters": ["text", "text-summary", "lcov"],
       "include": [
         "**/fs-common-dialog.html",
-        "**/fs-dialog.html"
+        "**/fs-dialog-eol.html"
       ],
       "exclude": [
         "**/bin/*",
