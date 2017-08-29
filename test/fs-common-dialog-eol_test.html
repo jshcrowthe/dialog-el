@@ -9,28 +9,28 @@
     <script src="../../es6-promise/dist/es6-promise.auto.js"></script>
 
     <!-- Step 1: import the element to test -->
-    <link rel="import" href="../fs-common-dialog.html">
+    <link rel="import" href="../fs-common-dialog-eol.html">
   </head>
   <body>
 
     <!-- You can use the document as a place to set up your fixtures. -->
     <test-fixture id="confirm-dialog">
       <template>
-        <fs-common-dialog type="confirm" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit">
-        </fs-common-dialog>
+        <fs-common-dialog-eol type="confirm" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit">
+        </fs-common-dialog-eol>
       </template>
     </test-fixture>
 
     <test-fixture id="prompt-dialog">
       <template>
-        <fs-common-dialog type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit" prompt-text-limit="2000" show-counter>
-        </fs-common-dialog>
+        <fs-common-dialog-eol type="prompt" cancel-button-text="cancel" close-button-text="close" submit-button-text="submit" prompt-text-limit="2000" show-counter>
+        </fs-common-dialog-eol>
       </template>
     </test-fixture>
 
     <script>
       document.addEventListener('WebComponentsReady', function(){
-        describe('<fs-common-dialog>', function() {
+        describe('<fs-common-dialog-eol>', function() {
           var confirmDialog, promptDialog;
 
           beforeEach(function() {

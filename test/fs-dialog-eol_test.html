@@ -9,14 +9,14 @@
     <script src="../../es6-promise/dist/es6-promise.auto.js"></script>
 
     <!-- Step 1: import the element to test -->
-    <link rel="import" href="../fs-dialog.html">
+    <link rel="import" href="../fs-dialog-eol.html">
   </head>
   <body>
 
     <!-- You can use the document as a place to set up your fixtures. -->
     <test-fixture id="simple-dialog">
       <template>
-        <fs-dialog>
+        <fs-dialog-eol>
           <h1>Simple Dialog</h1>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
           tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -24,13 +24,13 @@
           consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
           cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
           proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        </fs-dialog>
+        </fs-dialog-eol>
       </template>
     </test-fixture>
 
     <test-fixture id="simple-dynamic-dialog">
       <template>
-        <fs-dialog>
+        <fs-dialog-eol>
           <h1>Simple Dynamic Dialog</h1>
           <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
           tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -38,41 +38,41 @@
           consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
           cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
           proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        </fs-dialog>
+        </fs-dialog-eol>
       </template>
     </test-fixture>
 
     <test-fixture id="simple-dialog-with-submit-button">
       <template>
-        <fs-dialog>
+        <fs-dialog-eol>
           <h1>Simple Dialog</h1>
           <button dialog-submit>Submit</button>
-        </fs-dialog>
+        </fs-dialog-eol>
       </template>
     </test-fixture>
 
     <test-fixture id="simple-dialog-with-cancel-button">
       <template>
-        <fs-dialog>
+        <fs-dialog-eol>
           <h1>Simple Dialog</h1>
           <button dialog-cancel>Cancel</button>
-        </fs-dialog>
+        </fs-dialog-eol>
       </template>
     </test-fixture>
 
     <test-fixture id="simple-dialog-with-target">
       <template>
         <button id="dialog-target">Open With Me!</button>
-        <fs-dialog target="#dialog-target">
+        <fs-dialog-eol target="#dialog-target">
           <h1>Simple Dialog</h1>
           <button dialog-cancel>Cancel</button>
-        </fs-dialog>
+        </fs-dialog-eol>
       </template>
     </test-fixture>
 
     <script>
       document.addEventListener('WebComponentsReady', function(){
-        describe('<fs-dialog>', function() {
+        describe('<fs-dialog-eol>', function() {
           var dialog, submitDialog, cancelDialog, targetDialog;
 
           beforeEach(function() {

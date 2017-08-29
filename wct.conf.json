@@ -29,8 +29,8 @@
       "dir": "./reports/coverage",
       "reporters": ["text", "text-summary", "lcov"],
       "include": [
-        "**/fs-common-dialog.html",
-        "**/fs-dialog.html"
+        "**/fs-common-dialog-eol.html",
+        "**/fs-dialog-eol.html"
       ],
       "exclude": [
         "**/bin/*",

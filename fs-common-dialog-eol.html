@@ -1,30 +1,30 @@
 <link rel="import" href="../wc-i18n/wc-i18n.html">
 <link rel="import" href="../styles-wc/fs-icon/fs-icon.html">
-<link rel="import" href="../styles-wc/fs-button/fs-button.html">
-<link rel="import" href="../styles-wc/fs-alert-message/fs-alert-message.html">
-<link rel="import" href="./fs-dialog.html">
+<link rel="import" href="../styles-wc/fs-button-eol/fs-button-eol.html">
+<link rel="import" href="../styles-wc/fs-alert-message-eol/fs-alert-message-eol.html">
+<link rel="import" href="fs-dialog-eol.html">
 
 <!--
-# fs-common-dialog
-A Polymer component that uses fs-dialog to display a modal with a title and subtitle, and submit, cancel, and close button, along with a prompt (if desired).
+# fs-common-dialog-eol
+A Polymer component that uses fs-dialog-eol to display a modal with a title and subtitle, and submit, cancel, and close button, along with a prompt (if desired).
 
 Example 1:
   Confirm dialog with a title, subtitle, submit button (with overriding text), cancel button (with overriding text). Opened by calling 'commonDialogConfirm.show(submitFunction, cancelFunction)'.
 
   Opened by using
 
-    <fs-common-dialog id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog>
+    <fs-common-dialog-eol id="commonDialogConfirm" type="confirm" title-text="Confirm Title" subtitle-text="Subtitle" submit-button-text="Yes" cancel-button-text="No"></fs-common-dialog-eol>
 
 Example 2:
   Prompt dialog with a title, subtitle, submit button (with overriding text), cancel button (with default text), prompt label, and prompt textarea. Opened by calling 'commonDialogPrompt.show(submitFunction, cancelFunction)'.
 
-    <fs-common-dialog id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog>
+    <fs-common-dialog-eol id="commonDialogPrompt" type="prompt" title-text="Prompt Title" subtitle-text="Subtitle" submit-button-text="Submit" prompt-label-text="Please enter a reason statement"></fs-common-dialog-eol>
 
 
 @demo demo/fs-common-index.html
 -->
 
-<dom-module id="fs-common-dialog">
+<dom-module id="fs-common-dialog-eol">
   <template>
     <style>
         fs-dialog {
@@ -136,7 +136,7 @@ Example 2:
         }
     </style>
 
-    <fs-dialog id="dialog" modal data-test-fs-common-dialog>
+    <fs-dialog-eol id="dialog" modal data-test-fs-common-dialog-eol>
       <div class="modal-content" tabindex="0">
         <div class="dialog-heading">
           <h4 class="fs-h4" data-test="title" tabindex="0">[[titleText]]</h4>
@@ -153,16 +153,16 @@ Example 2:
           </div>
           <fs-alert-message alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message>
           <div class="dialog-buttons">
-            <button is="fs-button" class="submit-button" option="recommended" on-click="_submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button" class="cancel-button" on-click="_cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
+            <button is="fs-button-eol" class="submit-button" option="recommended" on-click="_submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button-eol" class="cancel-button" on-click="_cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
           </div>
         </div>
       </div>
-    </fs-dialog>
+    </fs-dialog-eol>
   </template>
 
   <script>
     Polymer({
-      is: 'fs-common-dialog',
+      is: 'fs-common-dialog-eol',
       behaviors: [
         WCI18n()
       ],
@@ -395,7 +395,7 @@ Example 2:
       },
 
       /**
-       * Call the fs-dialog's close function.
+       * Call the fs-dialog-eol's close function.
        * This allows the user to close the dialog from outside of the component by calling fsCommonDialog.close().
        */
       close: function(){
@@ -403,7 +403,7 @@ Example 2:
       },
 
       /**
-       * Call the fs-dialog's show function.
+       * Call the fs-dialog-eol's show function.
        * This allows the user to open the dialog from outside of the component by calling fsCommonDialog.show().
        * Also override the userSubmitFunction and userCancelFunction, if they are provided.
        * @param {Function} userSubmitFunction - The function that the user wants to have called when the "submit" button is pressed.
