@@ -151,7 +151,7 @@ Example 2:
             <textarea data-test="prompt-textarea" tabindex="0" value="{{promptTextareaValue::input}}" placeholder$="[[promptTextareaPlaceholder]]" maxlength$="[[promptTextLimit]]"></textarea>
             <p class="char-counter" hidden$="[[!showCounter]]">[[_getTextCountRemaining(promptTextLimit, promptTextareaValue)]]</p>
           </div>
-          <fs-alert-message alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message>
+          <fs-alert-message-eol alert-type="error" hidden="[[_hideErrorMessage(errorMessage)]]">[[errorMessage]]</fs-alert-message-eol>
           <div class="dialog-buttons">
             <button is="fs-button-eol" class="submit-button" option="recommended" on-click="_submitFunction" aria-label$="[[submitButtonText]]" data-test="submit-button" tabindex="0">[[submitButtonText]]</button><button is="fs-button-eol" class="cancel-button" on-click="_cancelFunction" aria-label$="[[cancelButtonText]]" data-test="cancel-button" tabindex="0">[[cancelButtonText]]</button>
           </div>
