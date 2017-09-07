@@ -116,7 +116,7 @@ document.body.appendChild(fsDialog);
 
       :host([modal][visible]) > .overlay > .content {
         opacity: 1;
-        transform: translate3d(-50%, -50%, 0) scale(1.0);
+        transform: translateX(-50%) translateY(-50%) scale(1.0);
       }
 
       :host([visible]) > .overlay {
@@ -135,7 +135,7 @@ document.body.appendChild(fsDialog);
         position: absolute;
         top: 0;
         left: 50%;
-        transform: rotate(45deg) translate3d(-50%,-5px,0);
+        transform: rotate(45deg) translateX(-50%) translateY(-5px);
         z-index: -1;
         background-color: #FFFFFF;
         background-color: var(--fs-dialog-background, #FFFFFF);
@@ -146,7 +146,7 @@ document.body.appendChild(fsDialog);
       :host([arrow-direction=left]) .pointer {
         top: 50%;
         left: 0;
-        transform: rotate(45deg) translate3d(-14px,2px,0);
+        transform: rotate(45deg) translateX(-14px) translateY(2px);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), -1px 1px 1px 0px rgba(0,0,0,0.18);
         @apply --fs-dialog-pointer;
       }
@@ -154,7 +154,7 @@ document.body.appendChild(fsDialog);
       :host([arrow-direction=bottom]) .pointer {
         top: 100%;
         left: 50%;
-        transform: rotate(45deg) translate3d(-50%,-5px,0);
+        transform: rotate(45deg) translateX(-50%) translateY(-5px);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px 2px 1px 0px rgba(0,0,0,0.18);
         @apply --fs-dialog-pointer;
       }
@@ -162,7 +162,7 @@ document.body.appendChild(fsDialog);
       :host([arrow-direction=right]) .pointer {
         top: 50%;
         left: 100%;
-        transform: rotate(45deg) translate3d(-14px,2px,0);
+        transform: rotate(45deg) translateX(-14px) translateY(2px);
         box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.35), 2px -1px 1px 0px rgba(0,0,0,0.18);
         @apply --fs-dialog-pointer;
       }
