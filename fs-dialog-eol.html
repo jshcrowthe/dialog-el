@@ -320,6 +320,9 @@ document.body.appendChild(fsDialog);
           }.bind(this))
           .then(function() {
             this._attachEventHandlers();
+            _dialogStack = _dialogStack.filter(function(elem) {
+              return elem !== this;
+            }.bind(this))
             _dialogStack.push(this);
           }.bind(this))
           .then(function() {
