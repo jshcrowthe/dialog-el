@@ -71,6 +71,10 @@ document.body.appendChild(fsDialog);
         display: none !important;
       }
 
+      #_content {
+        max-height: var(--fs-dialog-content-height, initial);
+        display: var(--fs-dialog-content-display, initial);
+      }
       .content {
         background: #FFFFFF;
         background: var(--fs-dialog-background, #FFFFFF);
