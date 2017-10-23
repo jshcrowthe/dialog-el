@@ -574,7 +574,7 @@ document.body.appendChild(fsDialog);
          * Note: This is triggered by the 'click' and 'dialog-el-tap' window events.
          */
         _closeAll: function(e) {
-          if (!e.targetIsDialog) e.targetIsDialog = isPartOfDialog(e.target);
+          if (!e.hasOwnProperty("targetIsDialog")) e.targetIsDialog = isPartOfDialog(e.target);
           if (e.isOpeningPersonCard && !e.targetIsDialog) {
             _dialogStack.forEach(function(dialog) {
               if (dialog && dialog.close && !dialog.hasAttribute('is-fs-person-card')) dialog.close();
@@ -648,6 +648,7 @@ document.body.appendChild(fsDialog);
           if (e && e.target) {
             var hrefElement = e.target.hasAttribute('href') ? e.target : findParentHref(e.target);
             if (!hrefElement || (hrefElement.attributes.target && hrefElement.attributes.target.value === '_blank')) e.targetIsDialog = true;
+            if (hrefElement && (!hrefElement.attributes.target || hrefElement.attributes.target.value !== '_blank')) e.targetIsDialog = false;
           }
         },
 
