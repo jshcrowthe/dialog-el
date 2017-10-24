@@ -1,6 +1,6 @@
 {
   "name": "dialog-el",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "homepage": "https://github.com/fs-webdev/dialog-el",
   "description": "A WebComponent for accesible dialogs and modals",
   "main": "fs-dialog-eol.html",
@@ -16,17 +16,17 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "es6-promise": "stefanpenner/es6-promise#^4.1.0",
+    "es6-promise": "stefanpenner/es6-promise#^4.1.1",
     "polymer": "Polymer/polymer#1 - 2",
-    "styles-wc": "fs-webdev/styles-wc#^4.0.0",
-    "wc-i18n": "jshcrowthe/wc-i18n#^1.2.0",
+    "styles-wc": "fs-webdev/styles-wc#^4.1.5",
+    "wc-i18n": "jshcrowthe/wc-i18n#^2.2.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#0.7 - 1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#1 - 3",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#1 - 2 ",
     "paper-button": "PolymerElements/paper-button#1 - 2",
-    "web-component-tester": "git+https://github.com/t2ym/web-component-tester#6.0.1"
+    "web-component-tester": "git+https://github.com/t2ym/web-component-tester#^6.0.2"
   },
   "ignore": [
     ".*",
