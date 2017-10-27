@@ -289,3 +289,48 @@ document.body.appendChild(fs-common-dialog-eol);
   dialog.type = 'confirm';
   document.body.appendChild(dialog);
   ```
+
+## Submodules for Common Files
+
+The `tree-common-build-scripts` folder is a Git submodule, made to house build-related code common across multiple repositories. In order to update, run:
+
+```bash
+git pull --recurse-submodules; git submodule update --remote --recursive
+```
+
+## Running Tests
+
+This component is set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester).
+
+In order to run the `wct` command, you need to globally install web-component-tester:
+
+> NOTE OF WARNING: This component is using a [patcharound](https://github.com/thedeeno/web-component-tester-istanbul/issues/38#issuecomment-287544522) in order to incorporate code coverage reporting. In order to be able to run unit tests locally, (as of 2017-05-18) you must install the *patched* versions of web-component-tester and web-component-tester-istanbul. (You may need to uninstall other versions, first)
+
+```bash
+npm install -g t2ym/web-component-tester#6.0.0-wct6-plugin.1
+npm install -g t2ym/web-component-tester-istanbul#0.10.1-wct6.11
+```
+
+In order for the `size-limit` WCT plugin to run, you need to globally install it:
+
+```bash
+npm install --g fs-webdev/size-limit
+```
+
+To run tests locally, run:
+
+```bash
+wct --skip-plugin sauce
+```
+
+If you need to debug locally (keeping the browser open), run:
+
+```bash
+polymer test --skip-plugin sauce --local chrome -p
+```
+
+If you want to run the full suite of SauceLabs browser tests, run:
+
+```bash
+wct test/index.html --configFile wct.conf.json  --sauce-username {USERNAME} --sauce-access-key {ACCESS_KEY}
+```

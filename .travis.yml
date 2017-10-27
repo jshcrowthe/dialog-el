@@ -1,6 +1,11 @@
-# Create .netrc for private repo install
+git:
+  # http://docs.travis-ci.com/user/customizing-the-build/#Git-Submodules
+  submodules: false
 before_install:
-- echo -e "machine github.com\n  login $CI_USER_TOKEN" >> ~/.netrc
+  # Create .netrc for private repo install
+  - 'echo -e "machine github.com\n  login $CI_USER_TOKEN" >> ~/.netrc'
+  # https://github.com/travis-ci/travis-ci/issues/4099
+  - 'git submodule update --init --remote --recursive'
 # Branch whitelist
 branches:
   only:
@@ -8,22 +13,22 @@ branches:
 dist: trusty
 language: node_js
 node_js:
-  - "6"
-# Cache bower dependencies for faster/network error-tolerant builds (provided cache invalidation occurs as expected)
+  - '8'
 cache:
-  directories:
-  - bower_components # bower packages
+  directories: null
+  # - bower_components # disabled, due to an increase in delayed breakages
+
 notifications:
   email:
     on_success: never
     on_failure: change
   slack:
     template:
-      - "%{result}: %{repository} <%{build_url}|#%{build_number}>  (<%{compare_url}|%{commit}>)"
+      - '%{result}: %{repository} <%{build_url}|#%{build_number}>  (<%{compare_url}|%{commit}>)'
       - "\tin %{duration} for %{author}'s commit:"
       - "\t\"%{commit_subject}\""
     rooms:
-      - ldschurch:S4NvL7BI3BFGOMfoiSCfARk5#treeweb-tw1-builds
+      - 'ldschurch:S4NvL7BI3BFGOMfoiSCfARk5#treeweb-gold-builds'
     on_pull_requests: false
     on_success: always
     on_failure: change
@@ -31,17 +36,14 @@ notifications:
 addons:
   sauce_connect: true
 before_script:
-- npm install -g bower
-- npm install -g t2ym/web-component-tester#6.0.1
-- npm install -g t2ym/web-component-tester-istanbul#0.10.1-wct6.11
-- npm install -g codeclimate/javascript-test-reporter#v0.4.1
-# pipe bower install output through tee to create a log to parse for errors and preserve exit code
-- bower install --force-latest 2>&1 | tee bower-debug.log; ( exit ${PIPESTATUS[0]} )
+  - tree-common-build-scripts/bin/before_script.sh
+  # pipe bower install output through tee to create a log to parse for errors and preserve exit code
+  - 'bower install --force-latest 2>&1 | tee bower-debug.log; ( exit ${PIPESTATUS[0]} )'
 script:
-# pipe wct output through tee to create a log to parse for errors and preserve exit code
-- xvfb-run wct --skip-plugin local 2>&1 | tee wct.log; ( exit ${PIPESTATUS[0]} )
+  # pipe wct output through tee to create a log to parse for errors and preserve exit code
+  - 'xvfb-run wct --skip-plugin local 2>&1 | tee wct.log; ( exit ${PIPESTATUS[0]} )'
 after_success:
-- bin/tag_build.sh
-- codeclimate-test-reporter < reports/coverage/lcov.info
+  - tree-common-build-scripts/bin/tag_build.sh
+  - 'codeclimate-test-reporter < reports/coverage/lcov.info'
 after_failure:
-- bin/report_failure_details.sh
+  - tree-common-build-scripts/bin/report_failure_details.sh

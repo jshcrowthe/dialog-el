@@ -47,6 +47,10 @@
           "functions": 0
         }
       }
+    },
+    "size-limit": {
+      "path": "fs-common-dialog-eol.html",
+      "limit": "50 KB"
     }
   }
 }
