@@ -18,7 +18,7 @@
   "dependencies": {
     "es6-promise": "stefanpenner/es6-promise#^4.1.1",
     "polymer": "Polymer/polymer#1 - 2",
-    "styles-wc": "fs-webdev/styles-wc#^4.1.5",
+    "styles-wc-do-not-use": "fs-eng/styles-wc-do-not-use",
     "wc-i18n": "jshcrowthe/wc-i18n#^2.2.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#0.7 - 1"
   },
