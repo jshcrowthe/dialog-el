@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<script src="../fs-dialog/fs-dialog-service.js"></script>
 
 <!--
 # fs-dialog-eol
@@ -276,7 +277,8 @@ document.body.appendChild(fsDialog);
          * @returns {Object} - The top dialog in the stack.
          */
         get _topDialog() {
-          return _dialogStack[_dialogStack.length - 1];
+          var stack = FS.dialog.service.getStack();
+          return stack[stack.length - 1];
         },
         /**
          * If the dialog is a modal type, give it an "overlay" class.
@@ -322,17 +324,14 @@ document.body.appendChild(fsDialog);
           }.bind(this))
           .then(function() {
             this._attachEventHandlers();
-            _dialogStack = _dialogStack.filter(function(elem) {
-              return elem !== this;
-            }.bind(this))
-            _dialogStack.push(this);
+            FS.dialog.service.addDialogToStack(this);
           }.bind(this))
           .then(function() {
             this.hidden = false;
             this.removeAttribute('aria-hidden');
 
             // Compute z-index for this dialog (based on stack index)
-            this.style.zIndex = 1000 + _dialogStack.length - 1;
+            this.style.zIndex = 2000 + (10 * (FS.dialog.service.getStack().length - 1));
           }.bind(this))
           .then(function() {
             // Capture last active element and reassign focus
@@ -458,12 +457,10 @@ document.body.appendChild(fsDialog);
           .then(function() {
             // Detach event listeners and clean up dialog stack
             this._detachEventHandlers();
-            _dialogStack = _dialogStack.filter(function(dialog) {
-              return dialog !== this
-            }.bind(this));
+            FS.dialog.service.removeDialogFromStack(this)
 
-            // Remove the global listener if the _dialogStack is empty
-            if (!_dialogStack.length) {
+            // Remove the global listener if the stack is empty
+            if (!FS.dialog.service.getStack.length) {
               window.removeEventListener('click', this._closeAll);
               window.removeEventListener('dialog-el-tap', this._closeAll);
               _globalWindowListener = false;
@@ -574,13 +571,14 @@ document.body.appendChild(fsDialog);
          * Note: This is triggered by the 'click' and 'dialog-el-tap' window events.
          */
         _closeAll: function(e) {
+          var stack = FS.dialog.service.getStack();
           if (!e.hasOwnProperty("targetIsDialog")) e.targetIsDialog = isPartOfDialog(e.target);
           if (e.isOpeningPersonCard && !e.targetIsDialog) {
-            _dialogStack.forEach(function(dialog) {
+            stack.forEach(function(dialog) {
               if (dialog && dialog.close && !dialog.hasAttribute('is-fs-person-card')) dialog.close();
             });
           } else if (!e.targetIsDialog) {
-            _dialogStack.forEach(function(dialog) {
+            stack.forEach(function(dialog) {
               if (dialog && dialog.close) dialog.close();
             });
           }
@@ -593,7 +591,7 @@ document.body.appendChild(fsDialog);
          */
         closeAllOtherDialogs: function() {
           var that = this;
-          _dialogStack.forEach(function(dialog) {
+          FS.dialog.service.getStack().forEach(function(dialog) {
             if (dialog && dialog !== that && dialog.close) dialog.close();
           });
         },
@@ -605,16 +603,17 @@ document.body.appendChild(fsDialog);
          * @param {Object} e - The click event.
          */
         _clickHandler: function(e) {
+          var stack = FS.dialog.service.getStack()
           // Find the index of the clicked dialog
-          var index = _dialogStack.indexOf(this);
+          var index = stack.indexOf(this);
 
           // If there are dialogs on top of the clicked
           // dialog loop through and close them (we assume
           // that you intended to close all the other
           // dialogs in this case)
-          if (_dialogStack.length > index + 1) {
+          if (stack.length > index + 1) {
             var keepPersonCardOpen = e.isOpeningPersonCard;
-            _dialogStack.forEach(function(dialog, _index) {
+            stack.forEach(function(dialog, _index) {
               var dialogIsPersonCard = dialog.hasAttribute('is-fs-person-card');
               if (_index <= index) return;
               if (dialog.visible && !(keepPersonCardOpen && dialogIsPersonCard)) dialog.close();
@@ -859,15 +858,15 @@ document.body.appendChild(fsDialog);
 
       // Master dialog stack, we use this to compute z-indexes as well as
       // know which dialogs/modals to close on a click event in the DOM
-      var _dialogStack = [];
       var _globalWindowListener = false;
 
       var _isTouch = true;
       var _touchActive = false;
 
       document.addEventListener('touchstart', function(e) {
-        if (!_dialogStack.length) return;
-        var _topDialog = _dialogStack[_dialogStack.length - 1];
+        var stack = FS.dialog.service.getStack();
+        if (!stack.length) return;
+        var _topDialog = stack[stack.length - 1];
         _touchActive = true;
 
         // Wait 250ms to detect a tap
@@ -936,12 +935,14 @@ document.body.appendChild(fsDialog);
       var isPartOfDialog = function(el) {
         if (!el) {
           return false;
-        } else if (el.tagName === "FS-DAILOG-EOL") {
+        } else if (el.tagName === "FS-DAILOG-EOL" || FS.dialog.service.getStack().indexOf(el) > -1) {
           return true;
         } else {
           while (el.parentNode) {
             el = el.parentNode;
             if (el.tagName === "FS-DIALOG-EOL"){
+              return true;
+            } else if (FS.dialog.service.getStack().indexOf(el) > -1) {
               return true;
             }
           }
