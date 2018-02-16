@@ -287,7 +287,7 @@ Example 2:
        * @param {Function} i18n - Locale functionality.
        */
       __cancelButtonTextObserver: function(cancelButtonText, i18n) {
-        if (cancelButtonText === "" && i18n('DEFAULT_CANCEL_TEXT')) {
+        if (cancelButtonText === "" && i18n && i18n('DEFAULT_CANCEL_TEXT')) {
           this.set("cancelButtonText", i18n('DEFAULT_CANCEL_TEXT'));
         } else {
           this.set("cancelButtonText", cancelButtonText);
@@ -301,7 +301,7 @@ Example 2:
        * @returns {undefined} - Modifies component properties directly.
        */
       __closeButtonTextObserver: function(closeButtonText, i18n) {
-        if (closeButtonText === "" && i18n('DEFAULT_CLOSE_TEXT')) {
+        if (closeButtonText === "" && i18n && i18n('DEFAULT_CLOSE_TEXT')) {
           this.set("closeButtonText", i18n('DEFAULT_CLOSE_TEXT'));
         } else {
           this.set("closeButtonText", closeButtonText);
@@ -315,7 +315,7 @@ Example 2:
        * @returns {undefined} - Modifies component properties directly.
        */
       __submitButtonTextObserver: function(submitButtonText, i18n) {
-        if (submitButtonText === "" && i18n('DEFAULT_OK_TEXT')) {
+        if (submitButtonText === "" && i18n && i18n('DEFAULT_OK_TEXT')) {
           this.set("submitButtonText", i18n('DEFAULT_OK_TEXT'));
         } else {
           this.set("submitButtonText", submitButtonText);
