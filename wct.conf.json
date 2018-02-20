@@ -50,7 +50,7 @@
     },
     "size-limit": {
       "path": "fs-common-dialog-eol.html",
-      "limit": "155 KB"
+      "limit": "165 KB"
     }
   }
 }
